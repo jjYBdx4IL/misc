@@ -126,6 +126,12 @@ public class MainTest {
     }
 
     @Test
+    public void testBgr() throws IOException {
+        run("bgr", "--devtests");
+        assertEquals(outputBlob, 0, exitCode);
+    }
+    
+    @Test
     public void testGrep() throws IOException {
         String emptyArg = SystemUtils.IS_OS_WINDOWS ? "\"\"" : "";
         

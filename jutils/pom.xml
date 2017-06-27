@@ -44,6 +44,16 @@
             <version>3.5</version>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.mylyn.github</groupId>
+            <artifactId>org.eclipse.egit.github.core</artifactId>
+            <version>2.1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jgit</groupId>
+            <artifactId>org.eclipse.jgit</artifactId>
+            <version>4.7.0.201704051617-r</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.25</version>
@@ -170,7 +180,7 @@
                         </goals>
                         <configuration>
                             <excludeGroupIds>${project.groupId}</excludeGroupIds>
-                            <includeArtifactIds>gson,jsoup,commons-cli,commons-codec,commons-io,dom4j,xml-apis,commons-lang3,github-utils,slf4j-simple,slf4j-api</includeArtifactIds>
+                            <includeArtifactIds>gson,jsoup,commons-cli,commons-codec,commons-io,dom4j,xml-apis,commons-lang3,github-utils,slf4j-simple,slf4j-api,org.eclipse.egit.github.core,org.eclipse.jgit,jsch</includeArtifactIds>
                             <outputDirectory>${project.build.directory}/libs</outputDirectory>
                         </configuration>
                     </execution>

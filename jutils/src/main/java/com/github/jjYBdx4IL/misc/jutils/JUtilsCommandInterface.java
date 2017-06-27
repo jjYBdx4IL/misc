@@ -17,6 +17,9 @@ import org.apache.commons.cli.Options;
  */
 public interface JUtilsCommandInterface {
 
+    public static final String OPTNAME_DEVTESTS = "devtests";
+
     int run(CommandLine line) throws Exception;
+
     Options getCommandLineOptions();
 }
