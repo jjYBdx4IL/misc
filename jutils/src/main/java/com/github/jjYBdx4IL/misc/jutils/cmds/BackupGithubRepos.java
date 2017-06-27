@@ -1,10 +1,17 @@
 /*
- * #%L
- * Java Command Line Utilities
- * %%
- * Copyright (C) 2016 jjYBdx4IL (https://github.com/jjYBdx4IL)
- * %%
- * #L%
+ * Copyright © 2016 jjYBdx4IL (https://github.com/jjYBdx4IL)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.github.jjYBdx4IL.misc.jutils.cmds;
 
@@ -244,7 +251,7 @@ public class BackupGithubRepos implements JUtilsCommandInterface {
     public Options getCommandLineOptions() {
         Options options = new Options();
         options.addOption(OPTNAME_CONFIG, "config", false, "configure the github account and oauth token to use");
-        options.addOption(OPTNAME_DESTDIR, "dest", true, "absolute destination directory for the backups (default: current dir)");
+        options.addOption(OPTNAME_DESTDIR, "dest", true, "absolute destination directory for the backups (required)");
         options.addOption(OPTNAME_EMBEDDED, "embedded", false, "run embedded git (jgit), not recommended");
         options.addOption(OPTNAME_VERBOSE, "verbose", false, "be more verbose");
         options.addOption(OPTNAME_DUMPONLY, "dumponly", false, "dump only the list of repositories, do nothing else");
