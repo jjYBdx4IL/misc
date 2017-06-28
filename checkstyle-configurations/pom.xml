@@ -1,28 +1,59 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="
+    xsi:schemaLocation="
         http://maven.apache.org/POM/4.0.0
             http://maven.apache.org/maven-v4_0_0.xsd
             ">
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>com.github.jjYBdx4IL</groupId>
-		<artifactId>github-parent</artifactId>
-		<version>1.1-SNAPSHOT</version>
-		<relativePath/>
-	</parent>
+    <groupId>com.github.jjYBdx4IL.misc</groupId>
+    <artifactId>checkstyle-configurations</artifactId>
+    <name>Checkstyle Configurations</name>
+    <version>1.0-SNAPSHOT</version>
+    <url>https://github.com/jjYBdx4IL/misc</url>
+    <inceptionYear>2017</inceptionYear>
 
-	<groupId>com.github.jjYBdx4IL.misc</groupId>
-	<artifactId>checkstyle-configurations</artifactId>
-	<name>Checkstyle Configurations</name>
-	<version>1.0-SNAPSHOT</version>
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-	<properties>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+    <organization>
+        <name>Github jjYBdx4IL Projects</name>
+        <url>https://github.com/jjYBdx4IL</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>jjYBdx4IL</id>
+            <roles>
+                <role>author</role>
+                <role>maven build/maven central deployment</role>
+            </roles>
+            <url>https://github.com/jjYBdx4IL</url>
+        </developer>
+    </developers>
+
+    <issueManagement>
+        <system>Github Issues</system>
+        <url>https://github.com/jjYBdx4IL/misc/issues</url>
+    </issueManagement>
+
+    <scm>
+        <connection>scm:git:git://github.com/jjYBdx4IL/misc.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/jjYBdx4IL/misc.git</developerConnection>
+        <url>https://github.com/jjYBdx4IL/misc</url>
+        <tag>HEAD</tag>
+    </scm>
 
 </project>
 
