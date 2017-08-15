@@ -1,0 +1,144 @@
+Version 1.4.1
+(Stephan Nagy, Jon S. Stevens, People on the ECS mailing list)
+- Added missing ecs.properties file. Jeff Brekke <jeff.brekke@qg.com>
+
+Version 1.4
+(Stephan Nagy, Jon S. Stevens, People on the ECS mailing list)
+- A.setFolder() thanks to Dan Diephouse <diephouse@compassarts.org>
+- Fixed bug in GenericElement. The output(OutputStream) method did not
+  take into account the current codeset specified in the properties file.
+- RegexpFilter() added by Krzysztof Zelazowski <Krzysztof.Zelazowski@cern.ch>
+- WML Timer() class added by Krzysztof Zelazowski <Krzysztof.Zelazowski@cern.ch>
+- WML Img() class added by Krzysztof Zelazowski <Krzysztof.Zelazowski@cern.ch>
+- XHTML support added by Bojan Smojver <bojan@binarix.com>
+- Upgraded to Ant 1.2 (JSS)
+- Website now built with Anakia and Jakarta-Site2 module dependency (JSS)
+- Moved site to the Jakarta Project
+ 
+Version 1.3.3
+(Stephan Nagy, Jon S. Stevens, People on the ECS mailing list)
+- Fixed bug in Document class that was causing NPE's.
+- added some methods to make things easier to add attributes
+- Doctype: updated to allow a visibiity other than PUBLIC
+
+Version 1.3.2
+(Stephan Nagy, Jon S. Stevens, People on the ECS mailing list)
+- This version actually has the stuff mentioned in 1.3.1. Due
+  to a screwup on my part, stuff in 1.3.1 was not included properly.
+
+Version 1.3.1
+(Stephan Nagy, Jon S. Stevens, People on the ECS mailing list)
+- Moved the Doctype tag up out of the Html directory because of
+  additions by Bruce.Durling@equifax.com to make it less Html
+  specific
+- PI tag now implements Printable
+- Added the Doctype tag to the Document element (John Mcnally, Jon Stevens)
+
+Version 1.3
+(Stephan Nagy, Jon S. Stevens, People on the ECS mailing list)
+- Fixed OpenXML requirement issues. Now, we distribute xerces from 
+  the xml.apache.org project. Updated the classes to take advantage
+  of xerces now.
+- Re-worked the build system to use the latest version of Ant
+- Added elements() method to ElementContainer Suggestion by 
+  greg barnes gsbarnes@u.washington.edu
+- ElementAttributes - Add getAttribute(String) method for fetching attribute values.
+- CharacterFilter - Made the javadoc match up with reality
+- NullFilter - added support for a Clear ECS element that doesn't change characters
+  thanks to Kevin Burton
+- TH - fixed rowspan bug
+- RTF - added more elements
+- Added support for WML thanks to Orjan Petersson
+
+Version 1.2
+(Stephan Nagy, Jon S. Stevens, People on the ECS mailing list)
+- Fixed bug where we were using a JDK 1.2 method
+- Fixed bug where elements would come out out of order
+- Speed/Memory improvement by making initial size of hashtables and 
+  vectors smaller
+- Added some defensive programming in StringElement
+- Some pretty print fixes
+- Allow the addition of multiple targets to a PI (process instruction).  
+  This allows things like <?xml-stylesheet href="style.xsl" type="text/xsl" 
+- Added XMLDocument object
+
+Version 1.1
+(Stephan Nagy, Jon S. Stevens, People on the ECS mailing list)
+- Added %events% to all the Html Elements. This is essentially 
+  support for javascript in the elements.
+- Turned off filtering by default
+- Added new build system. Using Ant now. See INSTALL and 
+  build/README.
+- Added new methods here and there for the html tags
+- Fixed string casting bug in ElementAttributes thanks to 
+  Gerrit Riessen griessen@de.oracle.com
+- Added Doctype tag thanks to Michael Heuer heuermh@shore.net
+
+Version 1.0.2
+(Stephan Nagy, Jon S. Stevens, People on the ECS mailing list)
+- fixes to the autoconf system
+- added interfaces for javascript functionality. the elements do not 
+currently implement these interfaces, but will in the next version.
+
+Version 1.0.1
+(Stephan Nagy, Jon S. Stevens, People on the ECS mailing list)
+- bug fixes
+- new FrameSetDocument for the creation of frames based Documents
+- new autoconf based configuration system (thanks to Vadim)
+
+Version 1.0
+(Stephan Nagy, Jon S. Stevens)
+- lots of bug fixes
+- filtering now works
+- re-structured the package tree
+
+Version 1.0b2
+(Stephan Nagy, Jon S. Stevens)
+- bug fixes
+- speed improvements
+- output() methods have been cleaned up
+- filters are now applied during output() instead of during 
+  addElement(). filters are still kind of broken, so please 
+  be cautious when using them. help is needed in finding the 
+  best solutions.
+- there is now an org.apache.ecs.ecs.properties file that 
+  allows you to configure some parts of ECS without having 
+  to recompile
+
+Version 1.0b1
+(Stephan Nagy, Jon S. Stevens)
+- added ConcreteElement
+	- *PartElements descend from here.
+	- Fixed the output methods for ConcreteElement
+	  it no longer creates unnecssary objects (well not too many.)
+	- Changed ElementRegistry so that it uses a Hashtable instead of a Vector.
+	- Fixed removedElementFromRegistry so that it makes more sense.
+	- Added addElementToRegistry(String name,element) methods so that you can
+	  name the elements that get added to the registry. 
+	  (handy for removeElement(String) methods.)
+	- Added removeElement(String) methods.
+
+Version 1.0a3
+(Stephan Nagy, Jon S. Stevens)
+- added a few missing methods and other minor bug fixes
+- added HtmlColor.convertColor()
+- added StringElement and ElementContainer objects
+- fixed bug with CharacterFilter not correctly filtering
+  out ' characters
+- fixed a bug with XML element not having filters 
+  applied to the addElement() methods
+- added Html2Ecs which is a small java application that 
+  attempts to use the OpenXML framework to read in an
+  Html file and convert it into ECS code.
+
+Version 1.0a2
+(Stephan Nagy, Jon S. Stevens)
+- more example code in TestBed.java
+- WordFilter added
+- lots of code re-structuring
+- lots of bug fixes
+- lots of speed improvements
+
+Version 1.0a1
+(Stephan Nagy, Jon S. Stevens)
+Initial Release

@@ -47,20 +47,22 @@
 
     <issueManagement>
         <system>Github Issues</system>
-        <url>https://github.com/jjYBdx4IL/aspectj-utils/issues</url>
+        <url>https://github.com/jjYBdx4IL/misc/issues</url>
     </issueManagement>
 
     <scm>
-        <connection>scm:git:git://github.com/jjYBdx4IL/aspectj-utils.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/jjYBdx4IL/aspectj-utils.git</developerConnection>
-        <url>https://github.com/jjYBdx4IL/aspectj-utils</url>
+        <connection>scm:git:git://github.com/jjYBdx4IL/misc.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/jjYBdx4IL/misc.git</developerConnection>
+        <url>https://github.com/jjYBdx4IL/misc</url>
         <tag>HEAD</tag>
     </scm>
 
     <modules>
         <module>checkstyle-configurations</module>
+        <module>ecs</module>
         <module>jutils</module>
         <module>parser</module>
+        <module>release-parent</module>
     </modules>
 
 </project>
