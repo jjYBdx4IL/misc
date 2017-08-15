@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>com.github.jjYBdx4IL</groupId>
+        <artifactId>release-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../release-parent</relativePath>
+    </parent>
+
+    <artifactId>encryption-utils</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>encryption-utils</name>
+    <description>collection of small encryption helpers</description>
+    <url>https://github.com/jjYBdx4IL/encryption-utils</url>
+    <inceptionYear>2017</inceptionYear>
+
+    <properties>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+    </properties>
+
+    <issueManagement>
+        <system>Github Issues</system>
+        <url>https://github.com/jjYBdx4IL/encryption-utils/issues</url>
+    </issueManagement>
+
+    <scm>
+        <connection>scm:git:git://github.com/jjYBdx4IL/encryption-utils.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/jjYBdx4IL/encryption-utils.git</developerConnection>
+        <url>https://github.com/jjYBdx4IL/encryption-utils</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <dependencies>
+        <!-- sorted by artifactId -->
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.10</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.25</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

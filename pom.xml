@@ -60,6 +60,7 @@
     <modules>
         <module>checkstyle-configurations</module>
         <module>ecs</module>
+        <module>encryption-utils</module>
         <module>jutils</module>
         <module>parser</module>
         <module>release-parent</module>
