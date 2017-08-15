@@ -15,4 +15,6 @@ This version is simply a redeployment to maven central with the following change
 Also added a first, simple test unit. If you got some examples/test units, feel
 free to submit them under the Apache v1.1 license.
 
+Unfortunately, it seems there is no implicit support for proper encoding of '&' etc.
+
 Obviously, this repository is not related to Apache in any way.
