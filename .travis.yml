@@ -1,0 +1,16 @@
+language: java
+before_install:
+  - git clone https://github.com/jjYBdx4IL/misc
+  - mvn install -f misc/checkstyle-configurations    
+  - git clone https://github.com/jjYBdx4IL/github-parent
+  - mvn install -f github-parent -DskipTests
+  - git clone https://github.com/jjYBdx4IL/github-test-utils
+  - mvn install -f github-test-utils -DskipTests    
+  - git clone https://github.com/jjYBdx4IL/diskcache
+  - mvn install -f diskcache -DskipTests
+  - git clone https://github.com/jjYBdx4IL/github-utils
+  - mvn install -f github-utils -DskipTests
+env:
+  - PUBLIC_CI=true
+jdk:
+  - oraclejdk8
