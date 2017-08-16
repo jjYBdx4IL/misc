@@ -8,7 +8,6 @@ SRCJAR=~/.m2/repository/com/github/jjYBdx4IL/misc/jutils/1.0-SNAPSHOT/jutils-1.0
 SUBDIR=jutils
 EXECJARF=jutils-1.0-SNAPSHOT.jar
 
-CHGTODIR="$INSTDIR/$SUBDIR"
 EXECJAR="$INSTDIR/$SUBDIR/$EXECJARF"
 
 if test -e "$EXECJAR"; then
@@ -25,6 +24,8 @@ if ! test -e "$EXECJAR"; then
     popd >/dev/null
 fi
 
-cd $CHGTODIR
-java -jar $EXECJARF "$@"
+if which cygpath >&/dev/null; then
+    EXECJAR=`cygpath -w $EXECJAR`
+fi
+java -jar $EXECJAR "$@"
 
