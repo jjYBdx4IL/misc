@@ -57,17 +57,20 @@ public class BackupGithubRepos implements JUtilsCommandInterface {
     private static final String OPTNAME_EMBEDDED = "e";
     private static final String OPTNAME_VERBOSE = "v";
     private static final String OPTNAME_DUMPONLY = "u";
+    private static final String OPTNAME_EXCLUDE_FORKS = "k";
     private static final String CFGKEY_GITHUB_USER = "github user";
     private static final String CFGKEY_GITHUB_OAUTH_TOKEN = "github oauth token";
 
     private boolean verbose = false;
     private boolean embedded = false;
+    private boolean excludeForks = false;
 
     @Override
     public int run(CommandLine line) {
         try {
             verbose = line.hasOption(OPTNAME_VERBOSE);
             embedded = line.hasOption(OPTNAME_EMBEDDED);
+            excludeForks = line.hasOption(OPTNAME_EXCLUDE_FORKS);
 
             if (line.hasOption(OPTNAME_DEVTESTS)) {
                 runDevTests();
@@ -234,6 +237,12 @@ public class BackupGithubRepos implements JUtilsCommandInterface {
         RepositoryService service = new RepositoryService();
         Map<String, String> repos = new HashMap<>();
         for (Repository repo : service.getRepositories(cfg.get(CFGKEY_GITHUB_USER))) {
+        	if (excludeForks && repo.isFork()) {
+        		if (verbose) {
+        			System.out.println("skipping forked repository " + repo.getName());
+        		}
+        		continue;
+        	}
             Object prev = repos.put(repo.getName(), repo.getCloneUrl());
             if (prev != null) {
                 throw new IOException("duplice repo name returned");
@@ -255,6 +264,7 @@ public class BackupGithubRepos implements JUtilsCommandInterface {
         options.addOption(OPTNAME_EMBEDDED, "embedded", false, "run embedded git (jgit), not recommended");
         options.addOption(OPTNAME_VERBOSE, "verbose", false, "be more verbose");
         options.addOption(OPTNAME_DUMPONLY, "dumponly", false, "dump only the list of repositories, do nothing else");
+        options.addOption(OPTNAME_EXCLUDE_FORKS, "exclude-forks", false, "exclude forked repositories");
         options.addOption(null, OPTNAME_DEVTESTS, false, "ignore this");
         return options;
     }
