@@ -59,6 +59,10 @@
 
     <modules>
         <module>checkstyle-configurations</module>
+        <module>cms-webapp</module>
+        <module>cms-dist</module>
+        <module>cms-embedded-server</module>
+        <module>cms-parent</module>
         <module>ecs</module>
         <module>encryption-utils</module>
         <module>jutils</module>
