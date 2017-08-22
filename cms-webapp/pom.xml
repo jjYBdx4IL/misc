@@ -41,10 +41,6 @@
                     <jettyXml>${project.basedir}/src/main/webapp/WEB-INF/jetty.devel.xml</jettyXml>
                     <systemProperties>
                         <systemProperty>
-                            <name>gwt.codeserver.port</name>
-                            <value>9876</value>
-                        </systemProperty>
-                        <systemProperty>
                             <!-- h2 frontend: -->
                             <name>h2.bindAddress</name>
                             <value>localhost</value>
@@ -53,16 +49,34 @@
                 </configuration>
                 <dependencies>
                     <dependency>
-                        <groupId>org.glassfish.jersey.core</groupId>
-                        <artifactId>jersey-server</artifactId>
-                        <version>${jersey.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.glassfish.jersey.containers</groupId>
-                        <artifactId>jersey-container-servlet-core</artifactId>
-                        <version>${jersey.version}</version>
+                        <groupId>com.github.jjYBdx4IL.cms</groupId>
+                        <artifactId>cms-embedded-server</artifactId>
+                        <version>${project.version}</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+<!--                     <execution> -->
+<!--                         <id>compile1</id> -->
+<!--                         <goals> -->
+<!--                             <goal>compile</goal> -->
+<!--                         </goals> -->
+<!--                         <phase>process-sources</phase> -->
+<!--                     </execution> -->
+                    <execution>
+                        <id>default-compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <compilerArgument>-proc:none</compilerArgument>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -104,6 +118,11 @@
             <artifactId>cms-embedded-server</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
         </dependency>
 
         <dependency>

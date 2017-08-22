@@ -1,14 +1,11 @@
 package com.github.jjYBdx4IL.cms.rest;
 
-import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Path("/")
-@Singleton // needed to avoid entity manager leak with TX manager because the TX
-           // manager assumes GenericServlet's destroy method for cleanup
 public class Root {
 
     // This method is called if TEXT_PLAIN is request
@@ -33,4 +30,11 @@ public class Root {
                 + "</html> ";
     }
 
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Path("/error")
+    public String sayError() {
+        return "<html> " + "<title>" + "Ups!" + "</title>" + "<body><h1>" + "We encountered an internal error." + "</h1></body>"
+                + "</html> ";
+    }
 }
