@@ -45,12 +45,12 @@ public class EmbeddedMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmbeddedMain.class);
 
-    public static final String JETTY_PORT_OFFSET = "jetty.port.offset";
+    public static final String JETTY_HTTP_PORT = "jetty.http.port";
     private final String cwd = Paths.get(System.getProperty("appserver.base", "."))
-            .toAbsolutePath().normalize().toString();
+        .toAbsolutePath().normalize().toString();
     // sys prop jetty.port.offset has priority over env var with same name
-    private final int portOffset = Integer.parseInt(System.getProperty(JETTY_PORT_OFFSET,
-        System.getenv(JETTY_PORT_OFFSET) != null ? System.getenv(JETTY_PORT_OFFSET) : "0"));
+    private final int httpPort = Integer.parseInt(System.getProperty(JETTY_HTTP_PORT,
+        System.getenv(JETTY_HTTP_PORT) != null ? System.getenv(JETTY_HTTP_PORT) : "80"));
 
     public EmbeddedMain(String[] args) {
     }
@@ -65,7 +65,7 @@ public class EmbeddedMain {
 
     public void run() throws Exception {
         LOG.info("cwd = " + cwd);
-        LOG.info("port offset = " + portOffset);
+        LOG.info("http port = " + httpPort);
 
         System.setProperty("jetty.home", cwd);
         System.setProperty("jetty.base", cwd);
@@ -79,7 +79,7 @@ public class EmbeddedMain {
 
         HttpConfiguration http_config = new HttpConfiguration();
         http_config.setSecureScheme("https");
-        http_config.setSecurePort(portOffset + 443);
+        http_config.setSecurePort(443);
         http_config.setOutputBufferSize(32768);
         http_config.setRequestHeaderSize(8192);
         http_config.setResponseHeaderSize(8192);
@@ -88,8 +88,8 @@ public class EmbeddedMain {
 
         ContextHandlerCollection contexts = new ContextHandlerCollection();
         HandlerCollection handlers = new HandlerCollection();
-        handlers.setHandlers(new Handler[]{contexts, new DefaultHandler()});
-        
+        handlers.setHandlers(new Handler[] { contexts, new DefaultHandler() });
+
         server.setHandler(handlers);
 
         server.setDumpAfterStart(true);
@@ -99,12 +99,12 @@ public class EmbeddedMain {
 
         // JMX
         MBeanContainer mbContainer = new MBeanContainer(
-                ManagementFactory.getPlatformMBeanServer());
+            ManagementFactory.getPlatformMBeanServer());
         server.addBean(mbContainer);
 
         ServerConnector http = new ServerConnector(server,
-                new HttpConnectionFactory(http_config));
-        http.setPort(portOffset + 80);
+            new HttpConnectionFactory(http_config));
+        http.setPort(httpPort);
         http.setIdleTimeout(30000);
         server.addConnector(http);
 
@@ -115,20 +115,24 @@ public class EmbeddedMain {
         sslContextFactory.setTrustStorePath(cwd + "/data/keystore");
         sslContextFactory.setTrustStorePassword("password");
         sslContextFactory.setExcludeCipherSuites("SSL_RSA_WITH_DES_CBC_SHA",
-                "SSL_DHE_RSA_WITH_DES_CBC_SHA", "SSL_DHE_DSS_WITH_DES_CBC_SHA",
-                "SSL_RSA_EXPORT_WITH_RC4_40_MD5",
-                "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA",
-                "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA",
-                "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA");
+            "SSL_DHE_RSA_WITH_DES_CBC_SHA", "SSL_DHE_DSS_WITH_DES_CBC_SHA",
+            "SSL_RSA_EXPORT_WITH_RC4_40_MD5",
+            "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA",
+            "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA",
+            "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA");
 
         HttpConfiguration https_config = new HttpConfiguration(http_config);
         https_config.addCustomizer(new SecureRequestCustomizer());
 
         ServerConnector sslConnector = new ServerConnector(server,
-                new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
-                new HttpConnectionFactory(https_config));
-        sslConnector.setPort(portOffset + 443);
+            new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
+            new HttpConnectionFactory(https_config));
+        sslConnector.setPort(443);
         server.addConnector(sslConnector);
+
+        String jdbcUrl = "jdbc:h2:" + new File(cwd, "data/db/h2").getAbsolutePath();
+        new Resource(server, "jdbc/url", jdbcUrl);
+        server.addManaged(new ServerEmfRunner(server, jdbcUrl));
 
         DeploymentManager deployer = new DeploymentManager();
         DebugListener debug = new DebugListener(System.err, true, true, true);
@@ -136,14 +140,15 @@ public class EmbeddedMain {
         deployer.addLifeCycleBinding(new DebugListenerBinding(debug));
         deployer.setContexts(contexts);
         deployer.setContextAttribute(
-                "org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
-                ".*/[^g]+[^/]*jar$");
-//        deployer.setContextAttribute("org.apache.tomcat.InstanceManager",
-//                new SimpleInstanceManager());
+            "org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
+            ".*/[^g]+[^/]*jar$");
+        // deployer.setContextAttribute("org.apache.tomcat.InstanceManager",
+        // new SimpleInstanceManager());
 
         WebAppProvider webAppProvider = new WebAppProvider();
         webAppProvider.setMonitoredDirName(cwd + "/apps");
-        //webapp_provider.setDefaultsDescriptor(jetty_home + "/etc/webdefault.xml");
+        // webapp_provider.setDefaultsDescriptor(jetty_home +
+        // "/etc/webdefault.xml");
         webAppProvider.setScanInterval(1);
         webAppProvider.setExtractWars(false);
         webAppProvider.setConfigurationManager(new PropertiesConfigurationManager());
@@ -154,12 +159,12 @@ public class EmbeddedMain {
         // === setup jetty plus ==
         Configuration.ClassList classList = Configuration.ClassList.setServerDefault(server);
         classList.addBefore(
-                org.eclipse.jetty.webapp.JettyWebXmlConfiguration.class.getName(),
-                org.eclipse.jetty.annotations.AnnotationConfiguration.class.getName());
+            org.eclipse.jetty.webapp.JettyWebXmlConfiguration.class.getName(),
+            org.eclipse.jetty.annotations.AnnotationConfiguration.class.getName());
         classList.addAfter(
-                org.eclipse.jetty.webapp.FragmentConfiguration.class.getName(),
-                org.eclipse.jetty.plus.webapp.EnvConfiguration.class.getName(),
-                org.eclipse.jetty.plus.webapp.PlusConfiguration.class.getName());
+            org.eclipse.jetty.webapp.FragmentConfiguration.class.getName(),
+            org.eclipse.jetty.plus.webapp.EnvConfiguration.class.getName(),
+            org.eclipse.jetty.plus.webapp.PlusConfiguration.class.getName());
 
         // === jetty-stats.xml ===
         StatisticsHandler stats = new StatisticsHandler();
@@ -168,9 +173,9 @@ public class EmbeddedMain {
         ServerConnectionStatistics.addToAllConnectors(server);
 
         // === Rewrite Handler
-//        RewriteHandler rewrite = new RewriteHandler();
-//        rewrite.setHandler(server.getHandler());
-//        server.setHandler(rewrite);
+        // RewriteHandler rewrite = new RewriteHandler();
+        // rewrite.setHandler(server.getHandler());
+        // server.setHandler(rewrite);
         // === jetty-requestlog.xml ===
         NCSARequestLog requestLog = new NCSARequestLog();
         requestLog.setFilename(cwd + "/data/log/yyyy_mm_dd.request.log");
@@ -194,17 +199,15 @@ public class EmbeddedMain {
         lowResourcesMonitor.setMaxLowResourcesTime(5000);
         server.addBean(lowResourcesMonitor);
 
-        String jdbcUrl = "jdbc:h2:" + new File(cwd, "data/db/h2").getAbsolutePath();
-        new Resource(server, "jdbc/url", jdbcUrl);
         // lifecycle handlers run outside webapps, so can't make use of jndi
         server.addManaged(new H2FrontendRunner(jdbcUrl));
-        
+
         // === test-realm.xml ===
-//        HashLoginService login = new HashLoginService();
-//        login.setName("Test Realm");
-//        login.setConfig(jetty_base + "/etc/realm.properties");
-//        login.setHotReload(false);
-//        server.addBean(login);
+        // HashLoginService login = new HashLoginService();
+        // login.setName("Test Realm");
+        // login.setConfig(jetty_base + "/etc/realm.properties");
+        // login.setHotReload(false);
+        // server.addBean(login);
         // Start the server
         server.start();
         server.join();

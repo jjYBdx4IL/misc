@@ -1,0 +1,73 @@
+package com.github.jjYBdx4IL.cms.rest;
+
+import static org.junit.Assert.*;
+
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.logging.LoggingFeature;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+public class RootIT {
+
+    private static final Logger LOG = LoggerFactory.getLogger(RootIT.class);
+    private Client client = null;
+
+    @Test
+    public void testGetMainPage() {
+        WebTarget webTarget = getTarget("/");
+        Invocation.Builder invocationBuilder = webTarget.request(MediaType.TEXT_HTML);
+
+        // GET non-existing element
+        Response response = (Response) invocationBuilder.get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        assertTrue(response.readEntity(String.class).contains("<h3>Please enter key-value pair</h3>"));
+    }
+
+    protected Client getClient() {
+        if (client != null) {
+            return client;
+        }
+        java.util.logging.Logger LOGJ = java.util.logging.Logger.getLogger(RootIT.class.getName());
+        client = ClientBuilder.newClient(new ClientConfig());
+        LOGJ.setLevel(java.util.logging.Level.FINEST);
+        LOGJ.addHandler(new Handler() {
+
+            @Override
+            public void publish(LogRecord record) {
+                LOG.info(record.getSourceClassName() + System.lineSeparator() + record.getMessage());
+
+            }
+
+            @Override
+            public void flush() {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void close() throws SecurityException {
+                // TODO Auto-generated method stub
+
+            }
+        });
+        LOGJ.log(java.util.logging.Level.FINEST, "test");
+        client.register(new LoggingFeature(LOGJ, LoggingFeature.Verbosity.PAYLOAD_ANY));
+        return client;
+    }
+
+    protected WebTarget getTarget(String path) {
+        return getClient().target("http://localhost:" + System.getProperty("jetty.http.port", "9999") + path);
+    }
+}

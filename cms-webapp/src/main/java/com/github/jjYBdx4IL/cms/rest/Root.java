@@ -59,12 +59,12 @@ public class Root {
                 attrs("#table-example"),
                 tbody(
                     each(pairs, kvp -> tr(
-                        td(kvp.getKey()),
+                        td(kvp.getKey()), 
                         td(kvp.getValue()))))),
             form().withMethod("post").with(
-                    input().withName("key").withPlaceholder("key").isRequired(),
-                    input().withName("value").withPlaceholder("value").isRequired(),
-                    button("add").withType("submit")));
+                input().withName("key").withPlaceholder("key").isRequired(),
+                input().withName("value").withPlaceholder("value").isRequired(),
+                button("add").withType("submit")));
     }
 
     @POST

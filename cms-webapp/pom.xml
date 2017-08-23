@@ -27,6 +27,22 @@
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>${jetty.version}</version>
+                <executions>
+                    <execution>
+                        <id>jetty-it-start</id>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                        <phase>pre-integration-test</phase>
+                    </execution>
+                    <execution>
+                        <id>jetty-it-stop</id>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                        <phase>post-integration-test</phase>
+                    </execution>
+                </executions>
                 <configuration>
                     <!-- we cannot use provided scope for additional server 
                         classes because if the webapp needs it too, it may get declared twice, once 
@@ -41,11 +57,17 @@
                     <jettyXml>${project.basedir}/src/main/webapp/WEB-INF/jetty.devel.xml</jettyXml>
                     <systemProperties>
                         <systemProperty>
+                            <name>jetty.http.port</name>
+                            <value>${jetty.http.port}</value>
+                        </systemProperty>
+                        <systemProperty>
                             <!-- h2 frontend: -->
                             <name>h2.bindAddress</name>
                             <value>localhost</value>
                         </systemProperty>
                     </systemProperties>
+                    <stopKey>123</stopKey>
+                    <stopPort>8085</stopPort>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -56,52 +78,6 @@
                 </dependencies>
             </plugin>
 
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>compile1</id>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <phase>process-sources</phase>
-                        <configuration>
-                            <includes><include>**/jpa/dto/**</include></includes>
-                            <excludes><exclude>**/jpa/dto/QueryFactory*</exclude></excludes>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>default-compile</id>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <phase>compile</phase>
-                        <configuration>
-                            <compilerArgument>-proc:none</compilerArgument>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${project.build.directory}/generated-sources/annotations</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
@@ -132,6 +108,37 @@
                     </excludes>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                        <phase>integration-test</phase>
+                        <configuration>
+                            <failIfNoTests>true</failIfNoTests>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>verify</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <systemPropertyVariables>
+                        <jetty.http.port>${jetty.http.port}</jetty.http.port>
+                    </systemPropertyVariables>
+                    <dependenciesToScan>
+                        <dependency>${project.groupId}:cms-it</dependency>
+                    </dependenciesToScan>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -144,22 +151,15 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-jpamodelgen</artifactId>
-            <!-- only needed during compilation -->
-            <scope>provided</scope>
-            <version>5.2.10.Final</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
+            <groupId>com.github.jjYBdx4IL.cms</groupId>
+            <artifactId>cms-it</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
         </dependency>
     </dependencies>
 

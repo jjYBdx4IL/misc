@@ -25,6 +25,7 @@ public class EmFactory implements Factory<EntityManager> {
         this.emf = emf;
     }
 
+    @Override
     public EntityManager provide() {
         LOG.info("provide()");
         final EntityManager em = emf.createEntityManager();

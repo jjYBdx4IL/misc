@@ -7,8 +7,6 @@ import org.glassfish.jersey.server.monitoring.RequestEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.ext.Provider;
 
 @Provider
@@ -17,10 +15,6 @@ public class MyApplicationEventListener implements ApplicationEventListener {
     private static final Logger LOG = LoggerFactory.getLogger(MyApplicationEventListener.class);
 
     private volatile int requestCnt = 0;
-
-    // make sure the persistence context gets initialized at server start already
-    @Inject
-    private EntityManagerFactory emf;
 
     @Override
     public void onEvent(ApplicationEvent event) {

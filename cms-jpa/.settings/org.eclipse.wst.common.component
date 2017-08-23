@@ -4,6 +4,7 @@
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/target/generated-sources/annotations"/>
         <property name="java-output-path" value="/cms/target/cms-1.0-SNAPSHOT/WEB-INF/classes"/>
         <property name="component.exclusion.patterns" value="**/*.cache.ttf,**/hosted.html,WEB-INF/web.devel.xml,WEB-INF/jetty-env.xml,WEB-INF/jetty.devel.xml"/>
         <property name="context-root" value="cms-webapp"/>

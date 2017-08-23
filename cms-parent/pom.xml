@@ -20,6 +20,10 @@
 
         <jetty.version>9.4.6.v20170531</jetty.version>
         <jersey.version>2.25.1</jersey.version>
+        <hibernate.version>5.2.10.Final</hibernate.version>
+
+        <!-- jetty port used for testing -->
+        <jetty.http.port>9999</jetty.http.port>
     </properties>
 
     <organization>
@@ -42,12 +46,17 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-entitymanager</artifactId>
-                <version>5.2.10.Final</version>
+                <version>${hibernate.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.javax.persistence</groupId>
                 <artifactId>hibernate-jpa-2.1-api</artifactId>
                 <version>1.0.0.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-jpamodelgen</artifactId>
+                <version>${hibernate.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.j2html</groupId>
@@ -344,7 +353,8 @@
                     <artifactId>selenium-maven-plugin</artifactId>
                     <version>2.3</version>
                 </plugin>
-                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <!--This plugin's configuration is used to store Eclipse 
+                    m2e settings only. It has no influence on the Maven build itself. -->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
                     <artifactId>lifecycle-mapping</artifactId>

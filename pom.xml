@@ -62,6 +62,8 @@
         <module>cms-webapp</module>
         <module>cms-dist</module>
         <module>cms-embedded-server</module>
+        <module>cms-it</module>
+        <module>cms-jpa</module>
         <module>cms-parent</module>
         <module>ecs</module>
         <module>encryption-utils</module>

@@ -20,37 +20,54 @@ public class EmfFactory implements Factory<EntityManagerFactory> {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmfFactory.class);
 
-    private final EntityManagerFactory emf;
+    private EntityManagerFactory emf = null;
+    private boolean isOwner = false;
 
-    public EmfFactory() throws NamingException {
+    public EmfFactory() {
         LOG.info("init()");
-        this.emf = Persistence.createEntityManagerFactory("default", getProps());
-        LOG.info("created " + emf);
     }
 
-
+    @Override
     public EntityManagerFactory provide() {
         LOG.info("provide()");
+        if (emf == null) {
+            getEmfInstance();
+        }
         return emf;
     }
 
     @Override
     public void dispose(EntityManagerFactory instance) {
         LOG.info("dispose() " + instance);
-        emf.close();
-        LOG.info("emf closed: " + emf);
+        if (isOwner) {
+            emf.close();
+            emf = null;
+            LOG.info("emf closed: " + emf);
+        }
     }
 
-    protected Map<String, String> getProps() throws NamingException {
-        Map<String, String> props = new HashMap<>();
-        InitialContext ic = new InitialContext();
-        String jdbcUrl = (String) ic.lookup("java:comp/env/jdbc/url");
-
-        props.put(AvailableSettings.HBM2DDL_AUTO, SchemaAutoTooling.UPDATE.name().toLowerCase(Locale.ROOT));
-        props.put(AvailableSettings.SHOW_SQL, "true");
-        props.put(AvailableSettings.JPA_JDBC_DRIVER, Driver.class.getName());
-        props.put(AvailableSettings.JPA_JDBC_URL, jdbcUrl);
-        return props;
+    protected void getEmfInstance() {
+        try {
+            InitialContext ic = new InitialContext();
+            try {
+                // use an EMF instance provided by the app server if possible
+                emf = (EntityManagerFactory) ic.lookup("java:comp/env/jpa/emf");
+            } catch (NamingException ex) {
+                // fall back to an EMF instance that we manage ourselves inside the webapp if needed
+                // (bad for development because of mostly unnecessary EMF re-initializations on webapp reloads)
+                Map<String, String> props = new HashMap<>();
+                String jdbcUrl = (String) ic.lookup("java:comp/env/jdbc/url");
+                props.put(AvailableSettings.HBM2DDL_AUTO, SchemaAutoTooling.UPDATE.name().toLowerCase(Locale.ROOT));
+                props.put(AvailableSettings.SHOW_SQL, "true");
+                props.put(AvailableSettings.JPA_JDBC_DRIVER, Driver.class.getName());
+                props.put(AvailableSettings.JPA_JDBC_URL, jdbcUrl);
+                emf = Persistence.createEntityManagerFactory("default", props);
+                LOG.info("created " + emf);
+                isOwner = true;
+            }
+        } catch (NamingException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
 }

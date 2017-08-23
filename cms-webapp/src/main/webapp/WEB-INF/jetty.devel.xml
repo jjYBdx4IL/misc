@@ -28,4 +28,16 @@
         </Arg>
     </Call>
     -->
+    <Call name="addManaged">
+        <Arg>
+            <New id="emfRunner" class="com.github.jjYBdx4IL.cms.ServerEmfRunner">
+                <Arg>
+                    <Ref refid="Server" />
+                </Arg>
+                <Arg>
+                    <Ref refid="jdbcUrl" />
+                </Arg>
+            </New>
+        </Arg>
+    </Call>
 </Configure>
