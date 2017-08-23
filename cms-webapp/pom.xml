@@ -17,6 +17,10 @@
     <name>CMS WebApp</name>
     <inceptionYear>2017</inceptionYear>
 
+    <properties>
+        <webappAssetsDirectory>${project.build.directory}/${project.build.finalName}/assets</webappAssetsDirectory>
+    </properties>
+
     <build>
         <!-- put compiled classes where jetty:run's auto-reload is looking 
             for changes -->
@@ -52,6 +56,10 @@
                     <scanIntervalSeconds>1</scanIntervalSeconds>
                     <webApp>
                         <overrideDescriptor>${project.basedir}/src/main/webapp/WEB-INF/web.devel.xml</overrideDescriptor>
+                        <resourceBases>
+                            <resourceBase>${project.basedir}/src/main/webapp</resourceBase>
+                            <resourceBase>${project.build.directory}/${project.build.finalName}</resourceBase>
+                        </resourceBases>
                     </webApp>
                     <jettyEnvXml>${project.basedir}/src/main/webapp/WEB-INF/jetty-env.xml</jettyEnvXml>
                     <jettyXml>${project.basedir}/src/main/webapp/WEB-INF/jetty.devel.xml</jettyXml>
@@ -137,6 +145,29 @@
                     <dependenciesToScan>
                         <dependency>${project.groupId}:cms-it</dependency>
                     </dependenciesToScan>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <artifactId>download-maven-plugin</artifactId>
+                <version>1.3.0</version>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <url>https://developers.google.com/identity/images/signin-assets.zip</url>
+                    <outputDirectory>${project.build.directory}/google-signin-assets</outputDirectory>
+                    <targetDirectory>${project.build.directory}/google-signin-assets</targetDirectory>
+                    <skipCache>false</skipCache>
+                    <retries>2</retries>
+                    <unpack>true</unpack>
+                    <outputDirectory>${webappAssetsDirectory}</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>

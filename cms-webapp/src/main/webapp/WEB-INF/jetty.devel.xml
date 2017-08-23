@@ -3,6 +3,8 @@
 
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
 
+    <Set name="dumpAfterStart">true</Set>
+
     <!-- this file isnt deployed to production and only intended for use with mvn jetty:run command
     during development. In production, the embedded jetty server will configure this data resource -->
 
