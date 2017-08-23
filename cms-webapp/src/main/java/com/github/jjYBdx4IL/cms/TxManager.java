@@ -16,9 +16,7 @@
 package com.github.jjYBdx4IL.cms;
 
 import com.github.jjYBdx4IL.cms.jpa.tx.TxEntityManager;
-import com.github.jjYBdx4IL.cms.rest.Hello;
 
-import org.eclipse.jetty.webapp.WebAppContext;
 import org.h2.Driver;
 import org.hibernate.boot.SchemaAutoTooling;
 import org.hibernate.cfg.AvailableSettings;
@@ -31,6 +29,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.EntityManager;
@@ -228,10 +227,6 @@ public class TxManager implements ServletContextListener {
                 }
             }
         }
-//        if (object instanceof Hello) {
-//            ((Hello)object).em = em;
-//            count++;
-//        }
         return count;
     }
 

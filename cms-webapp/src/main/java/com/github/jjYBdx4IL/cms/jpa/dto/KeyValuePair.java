@@ -12,7 +12,12 @@ import javax.persistence.Version;
  * @author Github jjYBdx4IL Projects
  */
 @Entity
-public class ExampleItem implements Serializable {
+public class KeyValuePair implements Serializable {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * @return the version
@@ -31,29 +36,31 @@ public class ExampleItem implements Serializable {
     /**
      * @return the data1
      */
-    public String getData1() {
-        return data1;
+    public String getKey() {
+        return key;
     }
 
     /**
-     * @param data1 the data1 to set
+     * @param data1
+     *            the data1 to set
      */
-    public void setData1(String data1) {
-        this.data1 = data1;
+    public void setKey(String key) {
+        this.key = key;
     }
 
     /**
      * @return the data2
      */
-    public String getData2() {
-        return data2;
+    public String getValue() {
+        return value;
     }
 
     /**
-     * @param data2 the data2 to set
+     * @param data2
+     *            the data2 to set
      */
-    public void setData2(String data2) {
-        this.data2 = data2;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     @Id
@@ -61,10 +68,10 @@ public class ExampleItem implements Serializable {
     private int id;
 
     @Basic
-    private String data1;
+    private String key;
 
     @Basic
-    private String data2;
+    private String value;
 
     @Version
     private long version;
@@ -72,15 +79,8 @@ public class ExampleItem implements Serializable {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("SomeEntityWithVersionAndIndex [id=");
-        builder.append(getId());
-        builder.append(", data=");
-        builder.append(getData1());
-        builder.append(", data2=");
-        builder.append(getData2());
-        builder.append(", version=");
-        builder.append(getVersion());
-        builder.append("]");
+        builder.append("KeyValuePair [id=").append(id).append(", key=").append(key).append(", value=").append(value)
+            .append(", version=").append(version).append("]");
         return builder.toString();
     }
 

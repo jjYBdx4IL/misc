@@ -59,13 +59,17 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <executions>
-<!--                     <execution> -->
-<!--                         <id>compile1</id> -->
-<!--                         <goals> -->
-<!--                             <goal>compile</goal> -->
-<!--                         </goals> -->
-<!--                         <phase>process-sources</phase> -->
-<!--                     </execution> -->
+                    <execution>
+                        <id>compile1</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                        <configuration>
+                            <includes><include>**/jpa/dto/**</include></includes>
+                            <excludes><exclude>**/jpa/dto/QueryFactory*</exclude></excludes>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>default-compile</id>
                         <goals>
@@ -79,6 +83,25 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/annotations</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
@@ -118,6 +141,14 @@
             <artifactId>cms-embedded-server</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+            <!-- only needed during compilation -->
+            <scope>provided</scope>
+            <version>5.2.10.Final</version>
         </dependency>
         
         <dependency>
