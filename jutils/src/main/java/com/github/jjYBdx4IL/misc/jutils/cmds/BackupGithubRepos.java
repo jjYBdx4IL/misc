@@ -59,7 +59,7 @@ public class BackupGithubRepos implements JUtilsCommandInterface {
     private static final String OPTNAME_DUMPONLY = "u";
     private static final String OPTNAME_EXCLUDE_FORKS = "k";
     private static final String OPTNAME_NOMIRROR = "n";
-    private static final String OPTNAME_GITURL = "g";
+    private static final String OPTNAME_SSHURL = "s";
     private static final String CFGKEY_GITHUB_USER = "github user";
     private static final String CFGKEY_GITHUB_OAUTH_TOKEN = "github oauth token";
 
@@ -67,7 +67,7 @@ public class BackupGithubRepos implements JUtilsCommandInterface {
     private boolean embedded = false;
     private boolean excludeForks = false;
     private boolean noMirror = false;
-    private boolean useGitUrl = false;
+    private boolean useSshUrl = false;
 
     @Override
     public int run(CommandLine line) {
@@ -76,7 +76,7 @@ public class BackupGithubRepos implements JUtilsCommandInterface {
             embedded = line.hasOption(OPTNAME_EMBEDDED);
             excludeForks = line.hasOption(OPTNAME_EXCLUDE_FORKS);
             noMirror = line.hasOption(OPTNAME_NOMIRROR);
-            useGitUrl = line.hasOption(OPTNAME_GITURL);
+            useSshUrl = line.hasOption(OPTNAME_SSHURL);
 
             if (embedded && noMirror) {
             	throw new RuntimeException("--no-mirror not supported with --embedded enabled");
@@ -178,7 +178,7 @@ public class BackupGithubRepos implements JUtilsCommandInterface {
 
     private boolean fetchUsingCmdlineGit(File mirrorDir, String repoUrl) {
     	if (noMirror) {
-    		return runCmdlineGit(mirrorDir, "pull");
+    		return runCmdlineGit(mirrorDir, "pull", "--all");
     	}
         return runCmdlineGit(mirrorDir, "fetch", "--all", "--tags");
     }
@@ -259,7 +259,7 @@ public class BackupGithubRepos implements JUtilsCommandInterface {
         		}
         		continue;
         	}
-            Object prev = repos.put(repo.getName(), useGitUrl ? repo.getGitUrl() : repo.getCloneUrl());
+            Object prev = repos.put(repo.getName(), useSshUrl ? repo.getSshUrl() : repo.getCloneUrl());
             if (prev != null) {
                 throw new IOException("duplice repo name returned");
             }
@@ -282,7 +282,7 @@ public class BackupGithubRepos implements JUtilsCommandInterface {
         options.addOption(OPTNAME_DUMPONLY, "dumponly", false, "dump only the list of repositories, do nothing else");
         options.addOption(OPTNAME_EXCLUDE_FORKS, "exclude-forks", false, "exclude forked repositories");
         options.addOption(OPTNAME_NOMIRROR, "no-mirror", false, "use regular clone/pull instead of --mirror/fetch");
-        options.addOption(OPTNAME_GITURL, "use-git-url", false, "use git url instead of http url");
+        options.addOption(OPTNAME_SSHURL, "use-ssh-url", false, "use ssh url instead of http url");
         options.addOption(null, OPTNAME_DEVTESTS, false, "ignore this");
         return options;
     }
