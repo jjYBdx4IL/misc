@@ -1,0 +1,3 @@
+add connection pool, see:
+
+https://stackoverflow.com/questions/12545129/setting-up-jndi-datasource-in-junit

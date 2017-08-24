@@ -24,6 +24,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.github.jjYBdx4IL</groupId>
+            <artifactId>website-verifier</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>

@@ -2,6 +2,8 @@ package com.github.jjYBdx4IL.cms.rest;
 
 import static org.junit.Assert.*;
 
+import com.github.jjYBdx4IL.wsverifier.WebsiteVerifier;
+
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.junit.Test;
@@ -24,15 +26,25 @@ public class RootIT {
     private static final Logger LOG = LoggerFactory.getLogger(RootIT.class);
     private Client client = null;
 
+    private static final String rootUrl = "http://localhost:" + System.getProperty("jetty.http.port", "9999") + "/";
+
     @Test
     public void testGetMainPage() {
-        WebTarget webTarget = getTarget("/");
+        WebTarget webTarget = getClient().target(rootUrl);
         Invocation.Builder invocationBuilder = webTarget.request(MediaType.TEXT_HTML);
 
         // GET non-existing element
         Response response = (Response) invocationBuilder.get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
         assertTrue(response.readEntity(String.class).contains("<h3>Please enter key-value pair</h3>"));
+    }
+
+    @Test
+    public void verifyLinks() {
+        WebsiteVerifier verifier = new WebsiteVerifier();
+        if (!verifier.verify(rootUrl)) {
+            fail(verifier.resultToString());
+        }
     }
 
     protected Client getClient() {
@@ -65,9 +77,5 @@ public class RootIT {
         LOGJ.log(java.util.logging.Level.FINEST, "test");
         client.register(new LoggingFeature(LOGJ, LoggingFeature.Verbosity.PAYLOAD_ANY));
         return client;
-    }
-
-    protected WebTarget getTarget(String path) {
-        return getClient().target("http://localhost:" + System.getProperty("jetty.http.port", "9999") + path);
     }
 }
