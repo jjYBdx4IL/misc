@@ -11,7 +11,7 @@
 
     <groupId>com.github.jjYBdx4IL.utils</groupId>
     <artifactId>vmmgmt-utils</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
     <name>VM Management Utils</name>
     <description>VM management helpers</description>
     <inceptionYear>2017</inceptionYear>
@@ -101,8 +101,4 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-  <scm>
-    <tag>vmmgmt-utils-1.0</tag>
-  </scm>
 </project>
