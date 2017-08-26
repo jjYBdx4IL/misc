@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="         http://maven.apache.org/POM/4.0.0             http://maven.apache.org/maven-v4_0_0.xsd             ">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://maven.apache.org/POM/4.0.0             http://maven.apache.org/maven-v4_0_0.xsd             ">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>ecs</artifactId>
-    <version>1.4.2.1</version>
+    <version>1.4.2.2-SNAPSHOT</version>
 
     <name>ECS</name>
     <description>Repackaging of the Apache Jakarta ECS project</description>
@@ -76,10 +76,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-
-  <scm>
-    <tag>ecs-1.4.2.1</tag>
-  </scm>
 </project>
 
