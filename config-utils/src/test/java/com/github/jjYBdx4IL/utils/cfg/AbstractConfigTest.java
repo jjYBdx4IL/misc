@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 jjYBdx4IL (https://github.com/jjYBdx4IL)
+ * Copyright © 2017 jjYBdx4IL (https://github.com/jjYBdx4IL)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
