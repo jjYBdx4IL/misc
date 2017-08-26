@@ -322,7 +322,7 @@
                         <goal>nexus-staging:release</goal>
                     </goals>
                     <configuration>
-                        <tagNameFormat>@{project.version}</tagNameFormat>
+                        <tagNameFormat>@{project.artifactId}-@{project.version}</tagNameFormat>
                     </configuration>
                 </plugin>
                 <plugin>
