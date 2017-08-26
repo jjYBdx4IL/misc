@@ -226,9 +226,9 @@
                     </configuration>
                     <dependencies>
                         <dependency>
-                            <groupId>com.github.jjYBdx4IL.misc</groupId>
+                            <groupId>com.github.jjYBdx4IL</groupId>
                             <artifactId>checkstyle-configurations</artifactId>
-                            <version>1.0-SNAPSHOT</version>
+                            <version>1.0</version>
                         </dependency>
                     </dependencies>
                 </plugin>
