@@ -59,25 +59,34 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.jjYBdx4IL</groupId>
-            <artifactId>github-utils</artifactId>
-            <version>1.2-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.helger</groupId>
-            <artifactId>jcodemodel</artifactId>
-            <version>2.8.6</version>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.10.1</version>
         </dependency>
         <dependency>
-            <groupId>commons-cli</groupId>
-            <artifactId>commons-cli</artifactId>
-            <version>1.4</version>
+            <groupId>com.github.jjYBdx4IL.utils</groupId>
+            <artifactId>ci-utils</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jjYBdx4IL.utils</groupId>
+            <artifactId>cli-utils</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jjYBdx4IL.utils</groupId>
+            <artifactId>config-utils</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.helger</groupId>
+            <artifactId>jcodemodel</artifactId>
+            <version>2.8.6</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.mylyn.github</groupId>
@@ -88,6 +97,11 @@
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
             <version>4.8.0.201706111038-r</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jjYBdx4IL.utils</groupId>
+            <artifactId>proc-utils</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -230,7 +244,23 @@
                         </goals>
                         <configuration>
                             <excludeGroupIds>${project.groupId}</excludeGroupIds>
-                            <includeArtifactIds>gson,jsoup,commons-cli,commons-codec,commons-io,dom4j,xml-apis,commons-lang3,github-utils,slf4j-simple,slf4j-api,org.eclipse.egit.github.core,org.eclipse.jgit,jsch</includeArtifactIds>
+                            <includeArtifactIds>
+                                ant,
+                                ci-utils,
+                                commons-cli,commons-codec,commons-io,commons-lang3,
+                                cli-utils,
+                                config-utils,
+                                dom4j,
+                                jsoup,
+                                proc-utils,
+                                swing-utils,
+                                gson,
+                                slf4j-simple,slf4j-api,
+                                xml-apis,
+                                org.eclipse.egit.github.core,
+                                org.eclipse.jgit,
+                                jsch
+                            </includeArtifactIds>
                             <outputDirectory>${project.build.directory}/libs</outputDirectory>
                         </configuration>
                     </execution>

@@ -18,16 +18,14 @@ package com.github.jjYBdx4IL.misc.jutils.cmds;
 import com.github.jjYBdx4IL.misc.jutils.JUtilsCommandAnnotation;
 import com.github.jjYBdx4IL.misc.jutils.JUtilsCommandInterface;
 
-import com.github.jjYBdx4IL.utils.io.FileScanner;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
+import org.apache.tools.ant.DirectoryScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +35,8 @@ import org.slf4j.LoggerFactory;
  */
 @JUtilsCommandAnnotation(
         name = "grep",
-        help = "recursive grep starting in the current working directory",
-        usage = "<filename-regex> <content-regex>",
+        help = "recursive grep starting in the current working directory (glob is ant-style)",
+        usage = "<filename-glob> <content-regex>",
         minArgs = 2,
         maxArgs = 2
 )
@@ -50,32 +48,32 @@ public class RecursiveGrep implements JUtilsCommandInterface {
 
     @Override
     public int run(CommandLine line) {
-        final Pattern fileSearchPattern = Pattern.compile(line.getArgs()[0], Pattern.CASE_INSENSITIVE);
+        final String fileSearchGlob = line.getArgs()[0];
         final Pattern contentSearchPattern = Pattern.compile(line.getArgs()[1], Pattern.CASE_INSENSITIVE);
-        final AtomicInteger filesMatched = new AtomicInteger(0);
-        final AtomicInteger filesTotal = new AtomicInteger(0);
+        int filesMatched = 0;
+        int filesTotal = 0;
         optQuiet = line.hasOption(OPTNAME_QUIET);
 
         File rootDir = new File(System.getProperty("user.dir"));
-        FileScanner fileScanner = new FileScanner(fileSearchPattern) {
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setBasedir(rootDir);
+        scanner.setIncludes(new String[] { fileSearchGlob });
+        scanner.setCaseSensitive(false);
+        scanner.scan();
 
-            @Override
-            public void handleFile(File file) throws IOException {
-                filesTotal.incrementAndGet();
-                if (searchFileContents(file, contentSearchPattern)) {
-                    filesMatched.incrementAndGet();
-                }
-            }
-
-        }.disableFileListPopulation();
         try {
-            fileScanner.getFiles(rootDir);
+	        for (String file : scanner.getIncludedFiles()) {
+	        	filesTotal++;
+	            if (searchFileContents(new File(rootDir, file), contentSearchPattern)) {
+	                filesMatched++;
+	            }
+	        }
         } catch (IOException ex) {
-            throw new RuntimeException(ex);
+        	throw new RuntimeException(ex);
         }
 
         if (!optQuiet) {
-            System.out.println(String.format("%d/%d files matched.", filesMatched.intValue(), filesTotal.intValue()));
+            System.out.println(String.format("%d/%d files matched.", filesMatched, filesTotal));
         }
 
         return 0;

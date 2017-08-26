@@ -18,22 +18,18 @@ package com.github.jjYBdx4IL.misc.jutils.cmds;
 import com.github.jjYBdx4IL.misc.jutils.JUtilsCommandAnnotation;
 import com.github.jjYBdx4IL.misc.jutils.JUtilsCommandInterface;
 
-import com.github.jjYBdx4IL.utils.io.FileScanner;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
+import org.apache.tools.ant.DirectoryScanner;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Options;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -48,35 +44,31 @@ import org.slf4j.LoggerFactory;
 )
 public class MavenLocalRepoClassFileSearch implements JUtilsCommandInterface {
 
-    private static final Logger log = LoggerFactory.getLogger(MavenLocalRepoClassFileSearch.class);
-    private static final Pattern jarFilePattern
-            = Pattern.compile("^(?!.*-(sources|javadoc|tests)\\.jar$).*\\.jar$", Pattern.CASE_INSENSITIVE);
-
     @Override
     public int run(CommandLine line) {
         Pattern searchPattern = Pattern.compile(line.getArgs()[0], Pattern.CASE_INSENSITIVE);
-        final AtomicInteger filesMatched = new AtomicInteger(0);
-        final AtomicInteger filesTotal = new AtomicInteger(0);
+        int filesMatched = 0;
+        int filesTotal = 0;
 
         File repoDir = new File(System.getProperty("user.home"), ".m2/repository");
-        FileScanner fileScanner = new FileScanner(jarFilePattern) {
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setBasedir(repoDir);
+        scanner.setIncludes(new String[] { "**/*.jar" });
+        scanner.setCaseSensitive(false);
+        scanner.scan();
 
-            @Override
-            public void handleFile(File file) throws IOException {
-                filesTotal.incrementAndGet();
-                if (searchJarFile(file, searchPattern)) {
-                    filesMatched.incrementAndGet();
-                }
-            }
-
-        }.disableFileListPopulation();
         try {
-            fileScanner.getFiles(repoDir);
+	        for (String file : scanner.getIncludedFiles()) {
+	        	filesTotal++;
+	            if (searchJarFile(new File(repoDir, file), searchPattern)) {
+	                filesMatched++;
+	            }
+	        }
         } catch (IOException ex) {
-            throw new RuntimeException(ex);
+        	throw new RuntimeException(ex);
         }
-
-        System.out.println(String.format("%d/%d files matched.", filesMatched.intValue(), filesTotal.intValue()));
+        
+        System.out.println(String.format("%d/%d files matched.", filesMatched, filesTotal));
 
         return 0;
     }

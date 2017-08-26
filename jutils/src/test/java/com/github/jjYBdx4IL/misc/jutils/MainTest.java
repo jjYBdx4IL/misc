@@ -15,7 +15,7 @@
  */
 package com.github.jjYBdx4IL.misc.jutils;
 
-import com.github.jjYBdx4IL.utils.ProcRunner;
+import com.github.jjYBdx4IL.utils.proc.ProcRunner;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,6 +51,7 @@ public class MainTest {
     public static void beforeClass() throws URISyntaxException {
         workDir = new File(MainTest.class.getResource(".").toURI());
         workDir = new File(workDir, "exampledir");
+        LOG.info("workDir = " + workDir.getAbsolutePath());
     }
 
     private static void run(String... args) throws IOException {
@@ -144,14 +145,18 @@ public class MainTest {
         
         run("grep", emptyArg, emptyArg);
         assertEquals(outputBlob, 0, exitCode);
+        assertEquals(outputBlob, 1, output.size());
+        assertEquals("0/0 files matched.", output.get(0));
+        
+        run("grep", "**", emptyArg);
         assertEquals(outputBlob, 5, output.size());
         assertEquals("2/2 files matched.", output.get(4));
 
-        run("grep", emptyArg, emptyArg, "-q");
+        run("grep", "**", emptyArg, "-q");
         assertEquals(0, exitCode);
         assertEquals(outputBlob, 2, output.size());
 
-        run("-q", "grep", emptyArg, emptyArg);
+        run("-q", "grep", "**", emptyArg);
         assertEquals(0, exitCode);
         assertEquals(outputBlob, 2, output.size());
 
@@ -160,22 +165,27 @@ public class MainTest {
         assertEquals(outputBlob, 1, output.size());
         assertEquals(outputBlob, 1, countMatchesML(Pattern.quote(File.separator) + "ABC$"));
 
-        run("-q", "grep", "def", emptyArg);
+        run("-q", "grep", "**/ABC", emptyArg);
+        assertEquals(0, exitCode);
+        assertEquals(outputBlob, 1, output.size());
+        assertEquals(outputBlob, 1, countMatchesML(Pattern.quote(File.separator) + "ABC$"));
+        
+        run("-q", "grep", "def/**", emptyArg);
         assertEquals(0, exitCode);
         assertEquals(outputBlob, 1, output.size());
         assertEquals(outputBlob, 1, countMatchesML(Pattern.quote(File.separator) + "GHI$"));
 
-        run("-q", "grep", emptyArg, "abc");
+        run("-q", "grep", "**", "abc");
         assertEquals(0, exitCode);
         assertEquals(outputBlob, 1, output.size());
         assertEquals(outputBlob, 1, countMatchesML(Pattern.quote(File.separator) + "ABC$"));
 
-        run("-q", "grep", emptyArg, "GHi");
+        run("-q", "grep", "**", "GHi");
         assertEquals(0, exitCode);
         assertEquals(outputBlob, 1, output.size());
         assertEquals(outputBlob, 1, countMatchesML(Pattern.quote(File.separator) + "GHI$"));
 
-        run("-q", "grep", "a", "G");
+        run("-q", "grep", "a*", "G");
         assertEquals(0, exitCode);
         assertEquals(outputBlob, 0, output.size());
     }

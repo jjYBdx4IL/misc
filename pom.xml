@@ -58,19 +58,31 @@
     </scm>
 
     <modules>
+        <module>cache-utils</module>
         <module>checkstyle-configurations</module>
+        <module>ci-utils</module>
+        <module>class-utils</module>
+        <module>cli-utils</module>
+        <module>config-utils</module>
         <module>cms-webapp</module>
         <module>cms-dist</module>
         <module>cms-embedded-server</module>
         <module>cms-it</module>
         <module>cms-jpa</module>
         <module>cms-parent</module>
+        <module>env-utils</module>
         <module>ecs</module>
         <module>encryption-utils</module>
+        <module>junit4-utils</module>
         <module>jutils</module>
         <module>parser</module>
+        <module>proc-utils</module>
         <module>release-parent</module>
+        <module>swing-utils</module>
+        <module>vmmgmt-utils</module>
+        <module>vmmgmt-test-utils</module>
         <module>website-verifier</module>
+        <module>xml-dom4j-utils</module>
     </modules>
 
 </project>

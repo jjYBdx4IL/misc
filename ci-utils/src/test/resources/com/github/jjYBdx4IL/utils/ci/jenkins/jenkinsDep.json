@@ -1,0 +1,920 @@
+{
+  "edges":   [
+        {
+      "from": "maven",
+      "to": "android",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "android",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "android",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "checkstyle",
+      "type": "dep"
+    },
+        {
+      "from": "coherent-logic-fred-client-2nd-fork",
+      "to": "data",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "data",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "data",
+      "type": "dep"
+    },
+        {
+      "from": "test-utils",
+      "to": "data",
+      "type": "dep"
+    },
+        {
+      "from": "coherent-logic-fred-client-2nd-fork",
+      "to": "economics",
+      "type": "dep"
+    },
+        {
+      "from": "data",
+      "to": "economics",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "economics",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "economics",
+      "type": "dep"
+    },
+        {
+      "from": "coherent-logic-fred-client-2nd-fork",
+      "to": "evaluation",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "evaluation",
+      "type": "dep"
+    },
+        {
+      "from": "selenium-tools",
+      "to": "evaluation",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "evaluation",
+      "type": "dep"
+    },
+        {
+      "from": "test-utils",
+      "to": "evaluation",
+      "type": "dep"
+    },
+        {
+      "from": "text2image",
+      "to": "evaluation",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "fileserver",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "fileserver",
+      "type": "dep"
+    },
+        {
+      "from": "fileserver",
+      "to": "fileserver-distribution",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "fileserver-distribution",
+      "type": "dep"
+    },
+        {
+      "from": "gwt",
+      "to": "fonts",
+      "type": "dep"
+    },
+        {
+      "from": "gwt-webfonts",
+      "to": "fonts",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "fonts",
+      "type": "dep"
+    },
+        {
+      "from": "test-utils",
+      "to": "fonts",
+      "type": "dep"
+    },
+        {
+      "from": "test-utils",
+      "to": "github-utils",
+      "type": "dep"
+    },
+        {
+      "from": "gwt-webfonts",
+      "to": "gwt",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "gwt",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "gwt",
+      "type": "dep"
+    },
+        {
+      "from": "test-utils",
+      "to": "gwt",
+      "type": "dep"
+    },
+        {
+      "from": "text2image",
+      "to": "gwt",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "gwt-graphics",
+      "type": "dep"
+    },
+        {
+      "from": "gwt-graphics",
+      "to": "gwt-sandbox",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "gwt-sandbox",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "gwt-sandbox",
+      "type": "dep"
+    },
+        {
+      "from": "test-utils",
+      "to": "gwt-sandbox",
+      "type": "dep"
+    },
+        {
+      "from": "gwt-sandbox",
+      "to": "gwt-sandbox-distribution",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "gwt-sandbox-distribution",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "gwt-webfonts",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "gwt-webfonts",
+      "type": "dep"
+    },
+        {
+      "from": "james-mailbox",
+      "to": "james-integration",
+      "type": "dep"
+    },
+        {
+      "from": "james-protocols",
+      "to": "james-integration",
+      "type": "dep"
+    },
+        {
+      "from": "james-server",
+      "to": "james-integration",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "james-integration",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "james-integration",
+      "type": "dep"
+    },
+        {
+      "from": "shared-spring",
+      "to": "james-integration",
+      "type": "dep"
+    },
+        {
+      "from": "james-mailet",
+      "to": "james-jsieve",
+      "type": "dep"
+    },
+        {
+      "from": "james-mime4j-0.7.x",
+      "to": "james-jsieve",
+      "type": "dep"
+    },
+        {
+      "from": "james-mime4j-0.7.x",
+      "to": "james-mailbox",
+      "type": "dep"
+    },
+        {
+      "from": "james-mailbox",
+      "to": "james-protocols",
+      "type": "dep"
+    },
+        {
+      "from": "james-mime4j-0.7.x",
+      "to": "james-protocols",
+      "type": "dep"
+    },
+        {
+      "from": "james-jsieve",
+      "to": "james-server",
+      "type": "dep"
+    },
+        {
+      "from": "james-mailbox",
+      "to": "james-server",
+      "type": "dep"
+    },
+        {
+      "from": "james-mailet",
+      "to": "james-server",
+      "type": "dep"
+    },
+        {
+      "from": "james-protocols",
+      "to": "james-server",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "jenkins-tools",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "jenkins-tools",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "jetty-extensions",
+      "type": "dep"
+    },
+        {
+      "from": "github-utils",
+      "to": "jutils",
+      "type": "dep"
+    },
+        {
+      "from": "nagios-tools",
+      "to": "jutils",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "jutils",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "jutils",
+      "type": "dep"
+    },
+        {
+      "from": "test-utils",
+      "to": "jutils",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "license",
+      "type": "dep"
+    },
+        {
+      "from": "android",
+      "to": "mainsite",
+      "type": "dep"
+    },
+        {
+      "from": "fonts",
+      "to": "mainsite",
+      "type": "dep"
+    },
+        {
+      "from": "gwt",
+      "to": "mainsite",
+      "type": "dep"
+    },
+        {
+      "from": "james-integration",
+      "to": "mainsite",
+      "type": "dep"
+    },
+        {
+      "from": "james-server",
+      "to": "mainsite",
+      "type": "dep"
+    },
+        {
+      "from": "jetty-extensions",
+      "to": "mainsite",
+      "type": "dep"
+    },
+        {
+      "from": "osd",
+      "to": "mainsite",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "mainsite",
+      "type": "dep"
+    },
+        {
+      "from": "selenium-tools",
+      "to": "mainsite",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "mainsite",
+      "type": "dep"
+    },
+        {
+      "from": "shared-mock",
+      "to": "mainsite",
+      "type": "dep"
+    },
+        {
+      "from": "shared-spring",
+      "to": "mainsite",
+      "type": "dep"
+    },
+        {
+      "from": "test-utils",
+      "to": "mainsite",
+      "type": "dep"
+    },
+        {
+      "from": "github-utils",
+      "to": "maven",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "maven",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "misc",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "misc",
+      "type": "dep"
+    },
+        {
+      "from": "test-utils",
+      "to": "misc",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "nagios-tools",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "nagios-tools",
+      "type": "dep"
+    },
+        {
+      "from": "github-utils",
+      "to": "osd",
+      "type": "dep"
+    },
+        {
+      "from": "nagios-tools",
+      "to": "osd",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "osd",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "osd",
+      "type": "dep"
+    },
+        {
+      "from": "test-utils",
+      "to": "osd",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "paranoia-backup",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "paranoia-backup",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "selenium-evaluation",
+      "type": "dep"
+    },
+        {
+      "from": "selenium-tools",
+      "to": "selenium-evaluation",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "selenium-evaluation",
+      "type": "dep"
+    },
+        {
+      "from": "test-utils",
+      "to": "selenium-evaluation",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "selenium-tools",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "selenium-tools",
+      "type": "dep"
+    },
+        {
+      "from": "test-utils",
+      "to": "selenium-tools",
+      "type": "dep"
+    },
+        {
+      "from": "coherent-logic-fred-client-2nd-fork",
+      "to": "shared",
+      "type": "dep"
+    },
+        {
+      "from": "github-utils",
+      "to": "shared",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "shared",
+      "type": "dep"
+    },
+        {
+      "from": "test-utils",
+      "to": "shared",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "shared-mock",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "shared-mock",
+      "type": "dep"
+    },
+        {
+      "from": "android",
+      "to": "shared-spring",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "shared-spring",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "shared-spring",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "spring",
+      "type": "dep"
+    },
+        {
+      "from": "shared",
+      "to": "spring",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "test-utils",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "text2image",
+      "type": "dep"
+    },
+        {
+      "from": "fonts",
+      "to": "tools-ui",
+      "type": "dep"
+    },
+        {
+      "from": "gwt",
+      "to": "tools-ui",
+      "type": "dep"
+    },
+        {
+      "from": "gwt-webfonts",
+      "to": "tools-ui",
+      "type": "dep"
+    },
+        {
+      "from": "parent",
+      "to": "tools-ui",
+      "type": "dep"
+    }
+  ],
+  "clusters":   [
+        {
+      "vSize": 700,
+      "nodes":       [
+                {
+          "name": "jetty-extensions",
+          "fullName": "jetty-extensions",
+          "url": "http://localhost:9087/job/jetty-extensions/",
+          "x": 200,
+          "y": 200
+        },
+                {
+          "name": "spring",
+          "fullName": "spring",
+          "url": "http://localhost:9087/job/spring/",
+          "x": 600,
+          "y": 700
+        },
+                {
+          "name": "osd",
+          "fullName": "osd",
+          "url": "http://localhost:9087/job/osd/",
+          "x": 400,
+          "y": 600
+        },
+                {
+          "name": "shared-spring",
+          "fullName": "shared-spring",
+          "url": "http://localhost:9087/job/shared-spring/",
+          "x": 1200,
+          "y": 500
+        },
+                {
+          "name": "james-protocols",
+          "fullName": "james-protocols",
+          "url": "http://localhost:9087/job/james-protocols/",
+          "x": 600,
+          "y": 200
+        },
+                {
+          "name": "gwt",
+          "fullName": "gwt",
+          "url": "http://localhost:9087/job/gwt/",
+          "x": 1000,
+          "y": 500
+        },
+                {
+          "name": "economics",
+          "fullName": "economics",
+          "url": "http://localhost:9087/job/economics/",
+          "x": 200,
+          "y": 700
+        },
+                {
+          "name": "gwt-webfonts",
+          "fullName": "gwt-webfonts",
+          "url": "http://localhost:9087/job/gwt-webfonts/",
+          "x": 1200,
+          "y": 400
+        },
+                {
+          "name": "shared",
+          "fullName": "shared",
+          "url": "http://localhost:9087/job/shared/",
+          "x": 600,
+          "y": 300
+        },
+                {
+          "name": "james-integration",
+          "fullName": "james-integration",
+          "url": "http://localhost:9087/job/james-integration/",
+          "x": 1200,
+          "y": 600
+        },
+                {
+          "name": "github-utils",
+          "fullName": "github-utils",
+          "url": "http://localhost:9087/job/github-utils/",
+          "x": 400,
+          "y": 200
+        },
+                {
+          "name": "evaluation",
+          "fullName": "evaluation",
+          "url": "http://localhost:9087/job/evaluation/",
+          "x": 200,
+          "y": 500
+        },
+                {
+          "name": "data",
+          "fullName": "data",
+          "url": "http://localhost:9087/job/data/",
+          "x": 1000,
+          "y": 400
+        },
+                {
+          "name": "maven",
+          "fullName": "maven",
+          "url": "http://localhost:9087/job/maven/",
+          "x": 400,
+          "y": 300
+        },
+                {
+          "name": "coherent-logic-fred-client-2nd-fork",
+          "fullName": "coherent-logic-fred-client-2nd-fork",
+          "url": "http://localhost:9087/job/coherent-logic-fred-client-2nd-fork/",
+          "x": 200,
+          "y": 100
+        },
+                {
+          "name": "mainsite",
+          "fullName": "mainsite",
+          "url": "http://localhost:9087/job/mainsite/",
+          "x": 1000,
+          "y": 700
+        },
+                {
+          "name": "gwt-sandbox-distribution",
+          "fullName": "gwt-sandbox-distribution",
+          "url": "http://localhost:9087/job/gwt-sandbox-distribution/",
+          "x": 200,
+          "y": 600
+        },
+                {
+          "name": "selenium-evaluation",
+          "fullName": "selenium-evaluation",
+          "url": "http://localhost:9087/job/selenium-evaluation/",
+          "x": 0,
+          "y": 700
+        },
+                {
+          "name": "test-utils",
+          "fullName": "test-utils",
+          "url": "http://localhost:9087/job/test-utils/",
+          "x": 600,
+          "y": 100
+        },
+                {
+          "name": "shared-mock",
+          "fullName": "shared-mock",
+          "url": "http://localhost:9087/job/shared-mock/",
+          "x": 600,
+          "y": 500
+        },
+                {
+          "name": "misc",
+          "fullName": "misc",
+          "url": "http://localhost:9087/job/misc/",
+          "x": 600,
+          "y": 600
+        },
+                {
+          "name": "james-server",
+          "fullName": "james-server",
+          "url": "http://localhost:9087/job/james-server/",
+          "x": 0,
+          "y": 300
+        },
+                {
+          "name": "james-jsieve",
+          "fullName": "james-jsieve",
+          "url": "http://localhost:9087/job/james-jsieve/",
+          "x": 0,
+          "y": 100
+        },
+                {
+          "name": "james-mailet",
+          "fullName": "james-mailet",
+          "url": "http://localhost:9087/job/james-mailet/",
+          "x": 400,
+          "y": 0
+        },
+                {
+          "name": "jutils",
+          "fullName": "jutils",
+          "url": "http://localhost:9087/job/jutils/",
+          "x": 0,
+          "y": 500
+        },
+                {
+          "name": "paranoia-backup",
+          "fullName": "paranoia-backup",
+          "url": "http://localhost:9087/job/paranoia-backup/",
+          "x": 400,
+          "y": 700
+        },
+                {
+          "name": "james-mailbox",
+          "fullName": "james-mailbox",
+          "url": "http://localhost:9087/job/james-mailbox/",
+          "x": 400,
+          "y": 100
+        },
+                {
+          "name": "text2image",
+          "fullName": "text2image",
+          "url": "http://localhost:9087/job/text2image/",
+          "x": 200,
+          "y": 300
+        },
+                {
+          "name": "selenium-tools",
+          "fullName": "selenium-tools",
+          "url": "http://localhost:9087/job/selenium-tools/",
+          "x": 800,
+          "y": 400
+        },
+                {
+          "name": "parent",
+          "fullName": "parent",
+          "url": "http://localhost:9087/job/parent/",
+          "x": 200,
+          "y": 0
+        },
+                {
+          "name": "fileserver",
+          "fullName": "fileserver",
+          "url": "http://localhost:9087/job/fileserver/",
+          "x": 600,
+          "y": 400
+        },
+                {
+          "name": "fonts",
+          "fullName": "fonts",
+          "url": "http://localhost:9087/job/fonts/",
+          "x": 1000,
+          "y": 600
+        },
+                {
+          "name": "gwt-sandbox",
+          "fullName": "gwt-sandbox",
+          "url": "http://localhost:9087/job/gwt-sandbox/",
+          "x": 400,
+          "y": 400
+        },
+                {
+          "name": "android",
+          "fullName": "android",
+          "url": "http://localhost:9087/job/android/",
+          "x": 200,
+          "y": 400
+        },
+                {
+          "name": "jenkins-tools",
+          "fullName": "jenkins-tools",
+          "url": "http://localhost:9087/job/jenkins-tools/",
+          "x": 400,
+          "y": 500
+        },
+                {
+          "name": "tools-ui",
+          "fullName": "tools-ui",
+          "url": "http://localhost:9087/job/tools-ui/",
+          "x": 800,
+          "y": 700
+        },
+                {
+          "name": "james-mime4j-0.7.x",
+          "fullName": "james-mime4j-0.7.x",
+          "url": "http://localhost:9087/job/james-mime4j-0.7.x/",
+          "x": 0,
+          "y": 0
+        },
+                {
+          "name": "license",
+          "fullName": "license",
+          "url": "http://localhost:9087/job/license/",
+          "x": 800,
+          "y": 500
+        },
+                {
+          "name": "checkstyle",
+          "fullName": "checkstyle",
+          "url": "http://localhost:9087/job/checkstyle/",
+          "x": 800,
+          "y": 600
+        },
+                {
+          "name": "nagios-tools",
+          "fullName": "nagios-tools",
+          "url": "http://localhost:9087/job/nagios-tools/",
+          "x": 0,
+          "y": 400
+        },
+                {
+          "name": "fileserver-distribution",
+          "fullName": "fileserver-distribution",
+          "url": "http://localhost:9087/job/fileserver-distribution/",
+          "x": 0,
+          "y": 600
+        },
+                {
+          "name": "gwt-graphics",
+          "fullName": "gwt-graphics",
+          "url": "http://localhost:9087/job/gwt-graphics/",
+          "x": 0,
+          "y": 200
+        }
+      ],
+      "hSize": 1200
+    },
+        {
+      "vSize": 90,
+      "nodes":       [
+                {
+          "name": "C",
+          "fullName": "C",
+          "url": "http://localhost:9087/job/C/",
+          "x": 0,
+          "y": 0
+        },
+                {
+          "name": "daily",
+          "fullName": "daily",
+          "url": "http://localhost:9087/job/daily/",
+          "x": 150,
+          "y": 0
+        },
+                {
+          "name": "eclipse-problems-filter-plugin",
+          "fullName": "eclipse-problems-filter-plugin",
+          "url": "http://localhost:9087/job/eclipse-problems-filter-plugin/",
+          "x": 300,
+          "y": 0
+        },
+                {
+          "name": "github-misc-tests",
+          "fullName": "github-misc-tests",
+          "url": "http://localhost:9087/job/github-misc-tests/",
+          "x": 450,
+          "y": 0
+        }
+      ],
+      "hSize": 700
+    }
+  ]
+}

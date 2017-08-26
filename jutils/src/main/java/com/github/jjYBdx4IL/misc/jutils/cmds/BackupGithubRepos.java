@@ -17,7 +17,7 @@ package com.github.jjYBdx4IL.misc.jutils.cmds;
 
 import com.github.jjYBdx4IL.misc.jutils.JUtilsCommandAnnotation;
 import com.github.jjYBdx4IL.misc.jutils.JUtilsCommandInterface;
-import com.github.jjYBdx4IL.utils.ProcRunner;
+import com.github.jjYBdx4IL.utils.proc.ProcRunner;
 import com.github.jjYBdx4IL.utils.cfg.AtomicPropsFile;
 import com.github.jjYBdx4IL.utils.cfg.AtomicPropsFileSimpleGui;
 
