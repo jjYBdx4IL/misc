@@ -1,7 +1,5 @@
 language: java
 before_install:
-  - git clone https://github.com/jjYBdx4IL/misc
-  - mvn install -f misc/checkstyle-configurations    
   - git clone https://github.com/jjYBdx4IL/github-parent
   - mvn install -f github-parent -DskipTests
   - git clone https://github.com/jjYBdx4IL/github-test-utils
