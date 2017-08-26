@@ -16,10 +16,12 @@
 package com.github.jjYBdx4IL.test.selenium;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeFalse;
 
 import com.github.jjYBdx4IL.test.AdHocHttpServer;
 
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -27,6 +29,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+import java.awt.GraphicsEnvironment;
 import java.net.URL;
 
 /**
@@ -62,6 +65,11 @@ public class SeleniumTestBaseTest extends SeleniumTestBase {
         }
     }
 
+    @Before
+    public void before() {
+        assumeFalse(GraphicsEnvironment.isHeadless());
+    }
+    
     // TODO: CI env detection
     @Ignore
     @Test
