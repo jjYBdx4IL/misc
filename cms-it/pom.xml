@@ -26,7 +26,7 @@
         <dependency>
             <groupId>com.github.jjYBdx4IL</groupId>
             <artifactId>website-verifier</artifactId>
-            <version>${project.version}</version>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
