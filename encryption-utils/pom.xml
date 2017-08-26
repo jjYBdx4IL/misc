@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>encryption-utils</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
     <name>encryption-utils</name>
     <description>collection of small encryption helpers</description>
     <inceptionYear>2017</inceptionYear>
@@ -46,9 +46,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-
-  <scm>
-    <tag>encryption-utils-1.0</tag>
-  </scm>
 </project>
