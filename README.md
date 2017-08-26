@@ -11,6 +11,7 @@ The maven release plugin has issues with releasing subfolders of git repositorie
 ```
 # release plugin's pushChanges option is set to false!
 mvn release:prepare
+git push
 git push --all
 # now fix scm.url in release.properties manually! then run:
 mvn release:perform
