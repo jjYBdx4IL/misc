@@ -6,34 +6,15 @@
     <parent>
         <groupId>com.github.jjYBdx4IL</groupId>
         <artifactId>release-parent</artifactId>
-        <version>1.0-SNAPSHOT</version>
-        <relativePath>../release-parent</relativePath>
+        <version>1.0</version>
+        <relativePath/>
     </parent>
 
     <artifactId>encryption-utils</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
     <name>encryption-utils</name>
     <description>collection of small encryption helpers</description>
-    <url>https://github.com/jjYBdx4IL/encryption-utils</url>
     <inceptionYear>2017</inceptionYear>
-
-    <properties>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
-    </properties>
-
-    <issueManagement>
-        <system>Github Issues</system>
-        <url>https://github.com/jjYBdx4IL/encryption-utils/issues</url>
-    </issueManagement>
-
-    <scm>
-        <connection>scm:git:git://github.com/jjYBdx4IL/encryption-utils.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/jjYBdx4IL/encryption-utils.git</developerConnection>
-        <url>https://github.com/jjYBdx4IL/encryption-utils</url>
-        <tag>HEAD</tag>
-    </scm>
 
     <dependencies>
         <!-- sorted by artifactId -->
