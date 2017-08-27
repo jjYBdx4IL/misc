@@ -5,7 +5,7 @@ A Java command line client for miscellaneous tools.
 ## Functionality
 
 * github repositories listing and backup (uses command line git client by default, embedded jgit is available, too)
-* recursive grep allowing to filter both file names and line patterns (both regex)
+* recursive grep allowing to filter both file names (ant-style glob) and line patterns (regex)
 * jenkins: re-queue all projects
 * local maven repository search (class names and assets contained in jar files)
 
