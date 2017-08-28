@@ -75,7 +75,6 @@
         <module>ecs</module>
         <module>encryption-utils</module>
         <module>gfx-utils</module>
-        <module>html-parser</module>
         <module>jsoup-utils</module>
         <module>junit4-utils</module>
         <module>jutils</module>

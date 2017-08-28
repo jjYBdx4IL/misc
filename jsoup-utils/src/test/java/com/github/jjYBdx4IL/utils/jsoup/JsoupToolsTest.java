@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jjYBdx4IL.test;
+package com.github.jjYBdx4IL.utils.jsoup;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.*;
+
+import com.github.jjYBdx4IL.utils.jsoup.JsoupTools;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
