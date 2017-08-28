@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>parser</artifactId>
-    <version>1.1</version>
+    <version>1.2-SNAPSHOT</version>
     <name>Misc Simple Parsers</name>
     <description />
     <inceptionYear>2017</inceptionYear>
@@ -63,9 +63,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-  <scm>
-    <tag>parser-1.1</tag>
-  </scm>
 </project>
 
