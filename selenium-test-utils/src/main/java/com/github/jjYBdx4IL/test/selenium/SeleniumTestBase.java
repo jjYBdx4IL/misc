@@ -76,6 +76,7 @@ public class SeleniumTestBase {
     protected static final int CLICK_WAIT4ELEMENT_MILLIS = 120 * 1000;
     protected static final int CLICK_WAIT4ELEMENT_POLL_MILLIS = 2 * 1000;
     private static final Driver DEFAULT_DRIVER = Driver.CHROME;
+    private Driver defaultDriver = DEFAULT_DRIVER;
     private static long screenShotId = 0L;
     private String testName = null;
     private static boolean seleniumDriverRestartAfterEachTest = false;
@@ -205,8 +206,8 @@ public class SeleniumTestBase {
     /**
      * @return the driver
      */
-    public static WebDriver getDriver() {
-        return getDriver(DEFAULT_DRIVER);
+    public WebDriver getDriver() {
+        return getDriver(defaultDriver);
     }
 
     public static WebDriver getDriver(Driver driverType) {
@@ -364,6 +365,7 @@ public class SeleniumTestBase {
     public void waitForAttribute(final By locator, final String attrName, final Pattern pattern) {
         LOG.info("waitForAttribute(" + locator + ", " + attrName + ", " + pattern + ")");
         new WebDriverWait(getDriver(), DEFAULT_WAIT_SECS).until(new ExpectedCondition<Boolean>() {
+            @Override
             public Boolean apply(WebDriver driver) {
                 WebElement button = driver.findElement(locator);
                 String value = button.getAttribute(attrName);
@@ -579,5 +581,13 @@ public class SeleniumTestBase {
     public enum Driver {
 
         FIREFOX, CHROME, HTMLUNIT
+    }
+
+    public Driver getDefaultDriver() {
+        return defaultDriver;
+    }
+
+    public void setDefaultDriver(Driver defaultDriver) {
+        this.defaultDriver = defaultDriver;
     }
 }

@@ -15,13 +15,14 @@
  */
 package com.github.jjYBdx4IL.test;
 
-import java.io.IOException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.junit.After;
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
 
 /**
  * Unit tests for {@link URLTester}.
@@ -44,6 +45,8 @@ public class URLTesterTest extends HttpStatusCodeTestBase {
 
     /**
      * Test of assertExists method, of class URLTester.
+     * 
+     * @throws Exception on error
      */
     @Test
     public void testAssertExists() throws Exception {
@@ -57,6 +60,8 @@ public class URLTesterTest extends HttpStatusCodeTestBase {
 
     /**
      * Test of assertNotExists method, of class URLTester.
+     * 
+     * @throws Exception on error
      */
     @Test
     public void testAssertNotExists() throws Exception {
@@ -70,6 +75,8 @@ public class URLTesterTest extends HttpStatusCodeTestBase {
 
     /**
      * Test of assertNotFound method, of class URLTester.
+     * 
+     * @throws Exception on error
      */
     @Test
     public void testAssertNotFound() throws Exception {
@@ -78,6 +85,8 @@ public class URLTesterTest extends HttpStatusCodeTestBase {
 
     /**
      * Test of getContent method, of class URLTester.
+     * 
+     * @throws Exception on error
      */
     @Test
     public void testGetContent() throws Exception {
@@ -86,6 +95,8 @@ public class URLTesterTest extends HttpStatusCodeTestBase {
 
     /**
      * Test of assertContains method, of class URLTester.
+     * 
+     * @throws Exception on error
      */
     @Test
     public void testAssertContains() throws Exception {

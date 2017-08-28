@@ -68,6 +68,7 @@ public class SeleniumTestBaseTest extends SeleniumTestBase {
     @Before
     public void before() {
         assumeFalse(GraphicsEnvironment.isHeadless());
+        setDefaultDriver(Driver.HTMLUNIT);
     }
     
     // TODO: CI env detection
