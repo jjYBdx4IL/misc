@@ -1,0 +1,46 @@
+Name:	java
+State:	S (sleeping)
+Tgid:	1289
+Ngid:	0
+Pid:	1289
+PPid:	1272
+TracerPid:	0
+Uid:	119	119	119	119
+Gid:	128	128	128	128
+FDSize:	512
+Groups:	128 130 
+NStgid:	1289
+NSpid:	1289
+NSpgid:	1271
+NSsid:	1271
+VmPeak:	 7692136 kB
+VmSize:	 7691544 kB
+VmLck:	       0 kB
+VmPin:	       0 kB
+VmHWM:	  578464 kB
+VmRSS:	  577784 kB
+VmData:	 7583496 kB
+VmStk:	     136 kB
+VmExe:	       4 kB
+VmLib:	   22440 kB
+VmPTE:	    1600 kB
+VmPMD:	      36 kB
+VmSwap:	       0 kB
+Threads:	38
+SigQ:	0/64006
+SigPnd:	0000000000000000
+ShdPnd:	0000000000000000
+SigBlk:	0000000000000000
+SigIgn:	0000000000000001
+SigCgt:	2000000181005cce
+CapInh:	0000000000000000
+CapPrm:	0000000000000000
+CapEff:	0000000000000000
+CapBnd:	0000003fffffffff
+Seccomp:	0
+Cpus_allowed:	0f
+Cpus_allowed_list:	0-3
+Mems_allowed:	00000000,00000001
+Mems_allowed_list:	0
+voluntary_ctxt_switches:	104
+nonvoluntary_ctxt_switches:	18

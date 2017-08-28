@@ -59,11 +59,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.ant</groupId>
-            <artifactId>ant</artifactId>
-            <version>1.10.1</version>
-        </dependency>
-        <dependency>
             <groupId>com.github.jjYBdx4IL.utils</groupId>
             <artifactId>ci-utils</artifactId>
             <version>1.0</version>
@@ -74,14 +69,25 @@
             <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.6</version>
-        </dependency>
-        <dependency>
             <groupId>com.github.jjYBdx4IL.utils</groupId>
             <artifactId>config-utils</artifactId>
             <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jjYBdx4IL</groupId>
+            <artifactId>parser</artifactId>
+            <version>1.1-SNAPSHOT</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.10.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.6</version>
         </dependency>
         <dependency>
             <groupId>com.helger</groupId>
@@ -245,10 +251,11 @@
                                 cli-utils,
                                 config-utils,
                                 dom4j,
+                                gson,
                                 jsoup,
+                                parser,
                                 proc-utils,
                                 swing-utils,
-                                gson,
                                 slf4j-simple,slf4j-api,
                                 xml-apis,
                                 org.eclipse.egit.github.core,

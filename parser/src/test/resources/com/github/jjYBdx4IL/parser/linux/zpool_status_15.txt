@@ -1,0 +1,51 @@
+  pool: raid-5x3
+ state: ONLINE
+ scrub: scrub completed after 15h52m with 0 errors on Sun Mar 30 13:52:46 2014
+config:
+
+    NAME                                            STATE     READ WRITE CKSUM
+    raid-5x3                                        ONLINE       0     0     0
+      raidz1                                        ONLINE       0     0     0
+        ada5p2                                      ONLINE       0     0     0
+        gptid/a767b8ef-1c95-11e2-af4c-f46d049aaeca  ONLINE       0     0     0
+        ada8p2                                      ONLINE       0     0     0
+        ada10p2                                     ONLINE       0     0     0
+        ada7p2                                      ONLINE       0     0     0
+
+errors: No known data errors
+
+  pool: raid2
+ state: DEGRADED
+status: One or more devices could not be opened.  Sufficient replicas exist for
+    the pool to continue functioning in a degraded state.
+action: Attach the missing device and online it using 'zpool online'.
+   see: http://www.sun.com/msg/ZFS-8000-2Q
+ scrub: none requested
+config:
+
+    NAME                                            STATE     READ WRITE CKSUM
+    raid2                                           DEGRADED     0     0     0
+      raidz1                                        DEGRADED     0     0     0
+        gptid/5f3c0517-3ff2-11e2-9437-f46d049aaeca  ONLINE       0     0     0
+        gptid/5fe33556-3ff2-11e2-9437-f46d049aaeca  UNAVAIL      0     0     0  cannot open
+        gptid/60570005-3ff2-11e2-9437-f46d049aaeca  ONLINE       0     0     0
+        gptid/60ebeaa5-3ff2-11e2-9437-f46d049aaeca  ONLINE       0     0     0
+        gptid/61925b86-3ff2-11e2-9437-f46d049aaeca  ONLINE       0     0     0
+
+errors: No known data errors
+
+  pool: raid-5x3b
+ state: ONLINE
+ scrub: scrub completed after 15h52m with 0 errors on Sun Mar 30 13:52:46 2014
+config:
+
+    NAME                                            STATE     READ WRITE CKSUM
+    raid-5x3                                        ONLINE       0     0     0
+      raidz1                                        ONLINE       0     0     0
+        ada5p2                                      ONLINE       0     0     0
+        gptid/a767b8ef-1c95-11e2-af4c-f46d049aaeca  ONLINE       0     0     0
+        ada8p2                                      ONLINE       0     0     0
+        ada10p2                                     ONLINE       0     0     0
+        ada7p2                                      ONLINE       0     0     0
+
+errors: No known data errors

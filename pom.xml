@@ -75,6 +75,7 @@
         <module>ecs</module>
         <module>encryption-utils</module>
         <module>gfx-utils</module>
+        <module>html-parser</module>
         <module>jsoup-utils</module>
         <module>junit4-utils</module>
         <module>jutils</module>
@@ -85,6 +86,7 @@
         <module>release-parent</module>
         <module>selenium-test-utils</module>
         <module>swing-utils</module>
+        <module>text-utils</module>
         <module>vmmgmt-utils</module>
         <module>vmmgmt-test-utils</module>
         <module>website-verifier</module>

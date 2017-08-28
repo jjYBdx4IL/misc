@@ -1,0 +1,14 @@
+  pool: raid1
+ state: ONLINE
+  scan: scrub in progress since Sat Nov  8 11:38:50 2014
+    2,20G scanned out of 863G at 68,2M/s, 3h35m to go
+    0 repaired, 0,25% done
+config:
+
+	NAME                                                STATE     READ WRITE CKSUM
+	raid1                                               ONLINE       0     0     0
+	  mirror-0                                          ONLINE       0     0     0
+	    ata-ST31000340AS_5QJ0BXBL                       ONLINE       0     0     0
+	    ata-WDC_WD20EFRX-68EUZN0_WD-WMC4M1059943-part3  ONLINE       0     0     0
+
+errors: No known data errors

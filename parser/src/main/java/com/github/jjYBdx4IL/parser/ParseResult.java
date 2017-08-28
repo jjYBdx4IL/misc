@@ -20,34 +20,18 @@ package com.github.jjYBdx4IL.parser;
  *
  * @author Github jjYBdx4IL Projects
  */
-public class ParseException extends Exception {
+public class ParseResult {
+
+    private final String id;
+
+    public ParseResult(String id) {
+        this.id = id;
+    }
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	public ParseException() {
-        super();
-    }
-
-    public ParseException(String message) {
-        super(message);
-    }
-
-    public ParseException(String message, int lineNumber) {
-        super("failed to parse input at line " + lineNumber + ": " + message);
-    }
-
-    public ParseException(int lineNumber) {
-        super("failed to parse input at line " + lineNumber);
-    }
-
-    public ParseException(Throwable cause) {
-        super(cause);
-    }
-    
-    public ParseException(String message, Throwable cause) {
-        super(message, cause);
+     * @return the id
+     */
+    public String getId() {
+        return id;
     }
 }

@@ -1,0 +1,227 @@
+--------------------------------------------------
+TEST: com/oracle/net/sanity.sh
+  build: 0.0 seconds
+  shell: 0.06 seconds
+TEST RESULT: Passed. Execution successful
+garbage
+--------------------------------------------------
+TEST: com/sun/corba/transport/KeepAliveSockets.java
+  build: 0.216 seconds
+  compile: 0.216 seconds
+  main: 0.575 seconds
+  build: 0.0 seconds
+  main: 0.777 seconds
+  build: 0.001 seconds
+  main: 0.46 seconds
+  build: 0.0 seconds
+  main: 0.358 seconds
+TEST RESULT: Passed. Execution successful
+--------------------------------------------------
+TEST: java/net/InetAddress/CheckJNI.java
+JDK under test: (/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image)
+openjdk version "1.8.0-jenkins-2014-11-17_10-11-09"
+OpenJDK Runtime Environment (build 1.8.0-jenkins-2014-11-17_10-11-09-jenkins_2014_11_17_10_13-b00)
+OpenJDK 64-Bit Server VM (build 25.40-b18, mixed mode)
+
+
+ACTION: build -- Passed. Build successful
+REASON: Named class compiled on demand
+TIME:   0.028 seconds
+messages:
+command: build CheckJNI
+reason: Named class compiled on demand
+elapsed time (seconds): 0.028
+
+ACTION: compile -- Passed. Compilation successful
+REASON: .class file out of date or does not exist
+TIME:   0.028 seconds
+messages:
+command: compile -XDignore.symbol.file=true /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/InetAddress/CheckJNI.java
+reason: .class file out of date or does not exist
+elapsed time (seconds): 0.028
+rerun:
+HOME=/var/lib/jenkins \
+LANG=C \
+LC_ALL=C \
+PATH=/bin:/usr/bin \
+TZ=UTC \
+    /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image/bin/javac \
+        -J-ea \
+        -J-esa \
+        -J-Xmx512m \
+        -J-Dtest.vm.opts='-ea -esa -Xmx512m' \
+        -J-Dcompile.jdk=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image \
+        -J-Dtest.src.path=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/InetAddress \
+        -J-Dtest.src=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/InetAddress \
+        -J-Dtest.tool.vm.opts='-J-ea -J-esa -J-Xmx512m' \
+        -J-Dtest.class.path=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/2/java/net/InetAddress \
+        -J-Dtest.timeout.factor=4.0 \
+        -J-Dtest.classes=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/2/java/net/InetAddress \
+        -J-Dtest.class.path.prefix=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/2/java/net/InetAddress:/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/InetAddress \
+        -J-Dtest.jdk=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image \
+        -J-Dtest.java.opts= \
+        -J-Dtest.compiler.opts= \
+        -d /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/2/java/net/InetAddress -classpath /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/2/java/net/InetAddress:/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/InetAddress:/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image/lib/tools.jar -sourcepath /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/InetAddress -XDignore.symbol.file=true /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/InetAddress/CheckJNI.java
+
+ACTION: main -- Failed. Execution failed: `main' threw exception: java.net.ConnectException: Connection timed out
+REASON: User specified action: run main/othervm -Xcheck:jni CheckJNI 
+TIME:   63.27 seconds
+messages:
+command: main -Xcheck:jni CheckJNI
+reason: User specified action: run main/othervm -Xcheck:jni CheckJNI 
+elapsed time (seconds): 63.27
+STDOUT:
+Warning: SIGHUP handler expected:libjvm.so+0x82eec0  found:0x0000000000000001
+Signal Handlers:
+SIGSEGV: [libjvm.so+0x82ea30], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGBUS: [libjvm.so+0x82ea30], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGFPE: [libjvm.so+0x82ea30], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGPIPE: [libjvm.so+0x82ea30], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGXFSZ: [libjvm.so+0x82ea30], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGILL: [libjvm.so+0x82ea30], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGUSR1: SIG_DFL, sa_mask[0]=00000000000000000000000000000000, sa_flags=none
+SIGUSR2: [libjvm.so+0x82ed80], sa_mask[0]=00100000000000000000000000000000, sa_flags=SA_RESTART|SA_SIGINFO
+SIGHUP: SIG_IGN, sa_mask[0]=00000000000000000000000000000000, sa_flags=none
+SIGINT: [libjvm.so+0x82eec0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGTERM: [libjvm.so+0x82eec0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGQUIT: [libjvm.so+0x82eec0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+Testing IPv4 Socket/ServerSocket
+Testing IPv4 DatagramSocket
+Testing IPv6 Socket
+STDERR:
+java.net.ConnectException: Connection timed out
+	at java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:345)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.net.Socket.connect(Socket.java:589)
+	at java.net.Socket.connect(Socket.java:538)
+	at java.net.Socket.<init>(Socket.java:434)
+	at java.net.Socket.<init>(Socket.java:244)
+	at CheckJNI.main(CheckJNI.java:68)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at com.sun.javatest.regtest.MainWrapper$MainThread.run(MainWrapper.java:94)
+	at java.lang.Thread.run(Thread.java:745)
+
+JavaTest Message: Test threw exception: java.net.ConnectException: Connection timed out
+JavaTest Message: shutting down test
+
+STATUS:Failed.`main' threw exception: java.net.ConnectException: Connection timed out
+rerun:
+HOME=/var/lib/jenkins \
+LANG=C \
+LC_ALL=C \
+PATH=/bin:/usr/bin \
+TZ=UTC \
+CLASSPATH=/var/lib/jenkins/jobs/openjdk8-latest/workspace/jtreg/lib/javatest.jar:/var/lib/jenkins/jobs/openjdk8-latest/workspace/jtreg/lib/jtreg.jar:/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/2/java/net/InetAddress:/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/InetAddress:/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image/lib/tools.jar \
+    /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image/bin/java \
+        -Dtest.vm.opts='-ea -esa -Xmx512m' \
+        -Dcompile.jdk=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image \
+        -Dtest.src.path=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/InetAddress \
+        -Dtest.src=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/InetAddress \
+        -Dtest.tool.vm.opts='-J-ea -J-esa -J-Xmx512m' \
+        -Dtest.class.path=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/2/java/net/InetAddress \
+        -Dtest.timeout.factor=4.0 \
+        -Dtest.classes=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/2/java/net/InetAddress \
+        -Dtest.class.path.prefix=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/2/java/net/InetAddress:/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/InetAddress \
+        -Dtest.jdk=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image \
+        -Dtest.java.opts= \
+        -Dtest.compiler.opts= \
+        -ea -esa -Xmx512m -Xcheck:jni \
+        com.sun.javatest.regtest.MainWrapper /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/2/java/net/InetAddress/CheckJNI.jta
+
+TEST RESULT: Failed. Execution failed: `main' threw exception: java.net.ConnectException: Connection timed out
+--------------------------------------------------
+Timeout signalled after 60 seconds
+Agent[0]: Killing process
+TEST: java/net/Inet6Address/B6558853.java
+JDK under test: (/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image)
+openjdk version "1.8.0-jenkins-2014-11-17_10-11-09"
+OpenJDK Runtime Environment (build 1.8.0-jenkins-2014-11-17_10-11-09-jenkins_2014_11_17_10_13-b00)
+OpenJDK 64-Bit Server VM (build 25.40-b18, mixed mode)
+
+
+ACTION: build -- Passed. Build successful
+REASON: Named class compiled on demand
+TIME:   0.049 seconds
+messages:
+command: build B6558853
+reason: Named class compiled on demand
+elapsed time (seconds): 0.049
+
+ACTION: compile -- Passed. Compilation successful
+REASON: .class file out of date or does not exist
+TIME:   0.049 seconds
+messages:
+command: compile -XDignore.symbol.file=true /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/Inet6Address/B6558853.java
+reason: .class file out of date or does not exist
+elapsed time (seconds): 0.049
+rerun:
+HOME=/var/lib/jenkins \
+LANG=C \
+LC_ALL=C \
+PATH=/bin:/usr/bin \
+TZ=UTC \
+    /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image/bin/javac \
+        -J-ea \
+        -J-esa \
+        -J-Xmx512m \
+        -J-Dtest.vm.opts='-ea -esa -Xmx512m' \
+        -J-Dcompile.jdk=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image \
+        -J-Dtest.src.path=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/Inet6Address \
+        -J-Dtest.src=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/Inet6Address \
+        -J-Dtest.tool.vm.opts='-J-ea -J-esa -J-Xmx512m' \
+        -J-Dtest.class.path=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/1/java/net/Inet6Address \
+        -J-Dtest.timeout.factor=4.0 \
+        -J-Dtest.classes=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/1/java/net/Inet6Address \
+        -J-Dtest.class.path.prefix=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/1/java/net/Inet6Address:/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/Inet6Address \
+        -J-Dtest.jdk=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image \
+        -J-Dtest.java.opts= \
+        -J-Dtest.compiler.opts= \
+        -d /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/1/java/net/Inet6Address -classpath /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/1/java/net/Inet6Address:/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/Inet6Address:/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image/lib/tools.jar -sourcepath /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/Inet6Address -XDignore.symbol.file=true /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/Inet6Address/B6558853.java
+
+ACTION: main -- Error. Agent error: java.lang.InterruptedException; check console log for any additional details
+REASON: Assumed action based on file name: run main B6558853 
+TIME:   600.047 seconds
+messages:
+command: main B6558853
+reason: Assumed action based on file name: run main B6558853 
+Timeout signalled after 540 seconds
+elapsed time (seconds): 600.047
+rerun:
+HOME=/var/lib/jenkins \
+LANG=C \
+LC_ALL=C \
+PATH=/bin:/usr/bin \
+TZ=UTC \
+    /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image/bin/java \
+        -Dtest.vm.opts='-ea -esa -Xmx512m' \
+        -Dcompile.jdk=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image \
+        -Dtest.src.path=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/Inet6Address \
+        -Dtest.src=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/Inet6Address \
+        -Dtest.tool.vm.opts='-J-ea -J-esa -J-Xmx512m' \
+        -Dtest.class.path=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/1/java/net/Inet6Address \
+        -Dtest.timeout.factor=4.0 \
+        -Dtest.classes=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/1/java/net/Inet6Address \
+        -Dtest.class.path.prefix=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/1/java/net/Inet6Address:/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/Inet6Address \
+        -Dtest.jdk=/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image \
+        -Dtest.java.opts= \
+        -Dtest.compiler.opts= \
+        -classpath /var/lib/jenkins/jobs/openjdk8-latest/workspace/jtreg/lib/javatest.jar:/var/lib/jenkins/jobs/openjdk8-latest/workspace/jtreg/lib/jtreg.jar:/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image/lib/tools.jar:/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork/classes/1/java/net/Inet6Address:/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/jdk/test/java/net/Inet6Address:/var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/images/j2sdk-image/lib/tools.jar \
+        B6558853
+
+TEST RESULT: Error. Agent error: java.lang.InterruptedException; check console log for any additional details
+--------------------------------------------------
+Test results: passed: 2; failed: 1; error: 1
+Report written to /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTreport/html/report.html
+Results written to /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork
+Error: Some tests failed or other problems occurred.
+Summary: jdk_core
+FAILED: java/net/Inet6Address/B6558853.java
+FAILED: java/net/InetAddress/CheckJNI.java
+TEST STATS: name=jdk_core  run=4  pass=2  fail=2
+EXIT CODE: 3

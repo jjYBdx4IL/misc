@@ -20,34 +20,10 @@ package com.github.jjYBdx4IL.parser;
  *
  * @author Github jjYBdx4IL Projects
  */
-public class ParseException extends Exception {
+public class RegularExpression {
 
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	public ParseException() {
-        super();
-    }
-
-    public ParseException(String message) {
-        super(message);
-    }
-
-    public ParseException(String message, int lineNumber) {
-        super("failed to parse input at line " + lineNumber + ": " + message);
-    }
-
-    public ParseException(int lineNumber) {
-        super("failed to parse input at line " + lineNumber);
-    }
-
-    public ParseException(Throwable cause) {
-        super(cause);
-    }
-    
-    public ParseException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    public final static String JAVA_TYPENAME
+            = "(?:(?<pkgname>(?:[a-zA-Z_$][a-zA-Z\\d_$]*\\.)*[a-zA-Z_$][a-zA-Z\\d_$]*)\\.|)(?<simplename>[a-zA-Z_$][a-zA-Z\\d_$]*)";
+    public final static String JAVA_TYPENAME_ARG_PKGNAME = "pkgname";
+    public final static String JAVA_TYPENAME_ARG_SIMPLENAME = "simplename";
 }

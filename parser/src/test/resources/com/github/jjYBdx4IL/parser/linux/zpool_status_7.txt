@@ -1,0 +1,19 @@
+  pool: farcryz1
+ state: ONLINE
+status: One or more devices has experienced an unrecoverable error.  An
+    attempt was made to correct the error.  Applications are unaffected.
+action: Determine if the device needs to be replaced, and clear the errors
+    using 'zpool clear' or replace the device with 'zpool replace'.
+   see: http://www.sun.com/msg/ZFS-8000-9P
+ scrub: none requested
+config:
+
+    NAME        STATE     READ WRITE CKSUM
+    farcryz1    ONLINE       0     0     0
+      raidz1    ONLINE       0     0     0
+        da4     ONLINE      22     4     0
+        da3     ONLINE       0     0     0
+        da1     ONLINE       0     0     0
+        da2     ONLINE       0     0     0
+
+errors: No known data errors

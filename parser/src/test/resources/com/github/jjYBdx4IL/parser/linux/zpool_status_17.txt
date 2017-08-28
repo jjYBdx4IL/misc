@@ -1,0 +1,39 @@
+  pool: ext500g
+ state: UNAVAIL
+status: One or more devices could not be used because the label is missing 
+    or invalid.  There are insufficient replicas for the pool to continue
+    functioning.
+action: Destroy and re-create the pool from
+    a backup source.
+   see: http://zfsonlinux.org/msg/ZFS-8000-5E
+  scan: none requested
+config:
+
+    NAME                            STATE     READ WRITE CKSUM
+    ext500g                         UNAVAIL      0     0     0  insufficient replicas
+      HD501LJ_S0MUJ1QP303448_crypt  UNAVAIL      0     0     0
+
+  pool: raid1
+ state: ONLINE
+  scan: scrub repaired 0 in 11h0m with 0 errors on Tue Nov 25 03:24:08 2014
+config:
+
+    NAME                              STATE     READ WRITE CKSUM
+    raid1                             ONLINE       0     0     0
+      mirror-0                        ONLINE       0     0     0
+        ST31000340AS_5QJ0BXBL_crypt   ONLINE       0     0     0
+        WD20EFRX-68EUZN0-part3_crypt  ONLINE       0     0     0
+
+errors: No known data errors
+
+  pool: scratch
+ state: ONLINE
+  scan: none requested
+config:
+
+    NAME                            STATE     READ WRITE CKSUM
+    scratch                         ONLINE       0     0     0
+      WD20EFRX-68EUZN0-part4_crypt  ONLINE       0     0     0
+
+errors: No known data errors
+

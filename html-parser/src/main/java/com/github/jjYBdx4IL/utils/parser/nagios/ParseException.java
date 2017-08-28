@@ -13,40 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jjYBdx4IL.parser;
+package com.github.jjYBdx4IL.utils.parser.nagios;
 
 //CHECKSTYLE:OFF
 /**
  *
  * @author Github jjYBdx4IL Projects
  */
+@SuppressWarnings("serial")
 public class ParseException extends Exception {
-
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	public ParseException() {
-        super();
-    }
 
     public ParseException(String message) {
         super(message);
     }
 
-    public ParseException(String message, int lineNumber) {
-        super("failed to parse input at line " + lineNumber + ": " + message);
-    }
-
-    public ParseException(int lineNumber) {
-        super("failed to parse input at line " + lineNumber);
-    }
-
-    public ParseException(Throwable cause) {
-        super(cause);
-    }
-    
     public ParseException(String message, Throwable cause) {
         super(message, cause);
     }

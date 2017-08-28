@@ -1,0 +1,17 @@
+  pool: test
+ state: ONLINE
+status: One or more devices has experienced an unrecoverable error.  An
+        attempt was made to correct the error.  Applications are unaffected.
+action: Determine if the device needs to be replaced, and clear the errors
+        using 'zpool online' or replace the device with 'zpool replace'.
+   see: http://illumos.org/msg/ZFS-8000-9P
+ scrub: none requested
+config:
+
+        NAME                  STATE     READ WRITE CKSUM
+        test                  ONLINE       0     0     0
+          mirror              ONLINE       0     0     0
+            c0t0d0            ONLINE       0     0     2
+            c0t0d1            ONLINE       0     0     0
+
+errors: No known data errors

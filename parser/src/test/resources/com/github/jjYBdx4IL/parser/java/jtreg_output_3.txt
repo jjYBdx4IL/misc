@@ -1,0 +1,16 @@
+Directory "/var/lib/jenkins/jobs/openjdk8-latest/workspace/co/target/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork" not found: creating
+Directory "/var/lib/jenkins/jobs/openjdk8-latest/workspace/co/target/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTreport" not found: creating
+--------------------------------------------------
+TEST: java/lang/HashCode.java
+  build: 2.016 seconds
+  compile: 2.01 seconds
+  main: 0.077 seconds
+TEST RESULT: Passed. Execution successful
+--------------------------------------------------
+Test results: passed: 1
+Report written to /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTreport/html/report.html
+Results written to /var/lib/jenkins/jobs/openjdk8-latest/workspace/tmp/build/linux-x86_64-normal-server-release/testoutput/jdk_core/JTwork
+Error: Some tests failed or other problems occurred.
+Summary: jdk_core
+TEST STATS: name=jdk_core  run=1  pass=1  fail=0
+

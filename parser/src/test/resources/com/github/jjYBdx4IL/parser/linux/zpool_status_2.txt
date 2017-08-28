@@ -1,0 +1,12 @@
+  pool: raid1
+ state: ONLINE
+  scan: resilvered 22,6G in 0h10m with 0 errors on Fri Nov  7 06:52:22 2014
+config:
+
+	NAME                                                STATE     READ WRITE CKSUM
+	raid1                                               ONLINE       0     0     0
+	  mirror-0                                          ONLINE       0     0     0
+	    ata-ST31000340AS_5QJ0BXBL                       ONLINE       0     0     0
+	    ata-WDC_WD20EFRX-68EUZN0_WD-WMC4M1059943-part3  ONLINE       0     0     0
+
+errors: No known data errors
