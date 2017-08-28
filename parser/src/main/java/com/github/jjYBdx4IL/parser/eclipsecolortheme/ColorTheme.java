@@ -82,8 +82,14 @@ public class ColorTheme {
     private Format annotation = null;
     @XmlElement
     private Format staticMethod = null;
+    /**
+     * Also sets the bracket color for xml tags.
+     */
     @XmlElement
     private Format localVariable = null;
+    /**
+     * Also sets the color for xml tags.
+     */
     @XmlElement
     private Format localVariableDeclaration = null;
     @XmlElement

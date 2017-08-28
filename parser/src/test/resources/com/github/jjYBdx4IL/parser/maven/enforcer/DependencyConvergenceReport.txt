@@ -1,0 +1,74 @@
+[INFO] 
+[INFO] --- maven-enforcer-plugin:1.4.1:enforce (enforce) @ java-evaluation ---
+[WARNING] 
+Dependency convergence error for com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.8 paths to dependency are:
++-com.github.jjYBdx4IL.evaluation:java-evaluation:1.0-SNAPSHOT
+  +-com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.8
+and
++-com.github.jjYBdx4IL.evaluation:java-evaluation:1.0-SNAPSHOT
+  +-org.glassfish.jersey.media:jersey-media-json-jackson:2.25.1
+    +-com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.8.4
+      +-com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.4
+
+[WARNING] 
+Dependency convergence error for com.fasterxml.jackson.core:jackson-databind:2.8.8 paths to dependency are:
++-com.github.jjYBdx4IL.evaluation:java-evaluation:1.0-SNAPSHOT
+  +-com.fasterxml.jackson.core:jackson-databind:2.8.8
+and
++-com.github.jjYBdx4IL.evaluation:java-evaluation:1.0-SNAPSHOT
+  +-com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.8
+    +-com.fasterxml.jackson.core:jackson-databind:2.8.8
+and
++-com.github.jjYBdx4IL.evaluation:java-evaluation:1.0-SNAPSHOT
+  +-org.glassfish.jersey.media:jersey-media-json-jackson:2.25.1
+    +-com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.8.4
+      +-com.fasterxml.jackson.core:jackson-databind:2.8.4
+and
++-com.github.jjYBdx4IL.evaluation:java-evaluation:1.0-SNAPSHOT
+  +-org.glassfish.jersey.media:jersey-media-json-jackson:2.25.1
+    +-com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.8.4
+      +-com.fasterxml.jackson.core:jackson-databind:2.8.4
+
+[WARNING] Rule 2: org.apache.maven.plugins.enforcer.DependencyConvergence failed with message:
+Failed while enforcing releasability the error(s) are [
+Dependency convergence error for com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.8 paths to dependency are:
++-com.github.jjYBdx4IL.evaluation:java-evaluation:1.0-SNAPSHOT
+  +-com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.8
+and
++-com.github.jjYBdx4IL.evaluation:java-evaluation:1.0-SNAPSHOT
+  +-org.glassfish.jersey.media:jersey-media-json-jackson:2.25.1
+    +-com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.8.4
+      +-com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.4
+, 
+Dependency convergence error for com.fasterxml.jackson.core:jackson-databind:2.8.8 paths to dependency are:
++-com.github.jjYBdx4IL.evaluation:java-evaluation:1.0-SNAPSHOT
+  +-com.fasterxml.jackson.core:jackson-databind:2.8.8
+and
++-com.github.jjYBdx4IL.evaluation:java-evaluation:1.0-SNAPSHOT
+  +-com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.8
+    +-com.fasterxml.jackson.core:jackson-databind:2.8.8
+and
++-com.github.jjYBdx4IL.evaluation:java-evaluation:1.0-SNAPSHOT
+  +-org.glassfish.jersey.media:jersey-media-json-jackson:2.25.1
+    +-com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.8.4
+      +-com.fasterxml.jackson.core:jackson-databind:2.8.4
+and
++-com.github.jjYBdx4IL.evaluation:java-evaluation:1.0-SNAPSHOT
+  +-org.glassfish.jersey.media:jersey-media-json-jackson:2.25.1
+    +-com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.8.4
+      +-com.fasterxml.jackson.core:jackson-databind:2.8.4
+]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 02:46 min
+[INFO] Finished at: 2017-08-27T23:43:06+02:00
+[INFO] Final Memory: 57M/319M
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-enforcer-plugin:1.4.1:enforce (enforce) on project java-evaluation: Some Enforcer rules have failed. Look above for specific messages explaining why the rule failed. -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
