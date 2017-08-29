@@ -243,25 +243,26 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <excludeGroupIds>${project.groupId}</excludeGroupIds>
-                            <includeArtifactIds>
-                                ant,
-                                ci-utils,
-                                commons-cli,commons-codec,commons-io,commons-lang3,
-                                cli-utils,
-                                config-utils,
-                                dom4j,
-                                gson,
-                                jsoup,
-                                parser,
-                                proc-utils,
-                                swing-utils,
-                                slf4j-simple,slf4j-api,
-                                xml-apis,
-                                org.eclipse.egit.github.core,
-                                org.eclipse.jgit,
-                                jsch
-                            </includeArtifactIds>
+                        	<includeScope>runtime</includeScope>
+<!--                             <excludeGroupIds>${project.groupId}</excludeGroupIds> -->
+<!--                             <includeArtifactIds> -->
+<!--                                 ant, -->
+<!--                                 ci-utils, -->
+<!--                                 commons-cli,commons-codec,commons-io,commons-lang3, -->
+<!--                                 cli-utils, -->
+<!--                                 config-utils, -->
+<!--                                 dom4j, -->
+<!--                                 gson, -->
+<!--                                 jsoup, -->
+<!--                                 parser, -->
+<!--                                 proc-utils, -->
+<!--                                 swing-utils, -->
+<!--                                 slf4j-simple,slf4j-api, -->
+<!--                                 xml-apis, -->
+<!--                                 org.eclipse.egit.github.core, -->
+<!--                                 org.eclipse.jgit, -->
+<!--                                 jsch -->
+<!--                             </includeArtifactIds> -->
                             <outputDirectory>${project.build.directory}/libs</outputDirectory>
                         </configuration>
                     </execution>
