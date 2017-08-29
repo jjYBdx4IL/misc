@@ -37,6 +37,7 @@ import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
@@ -65,6 +66,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
@@ -81,7 +83,8 @@ public class OSDAppTest extends AbstractHandler {
     @Before
     public void before() throws Exception {
         assumeFalse(GraphicsEnvironment.isHeadless());
-        
+        assumeFalse(SystemUtils.IS_OS_WINDOWS);
+
         server = new Server(0);
         server.setHandler(this);
         server.start();
@@ -158,7 +161,7 @@ public class OSDAppTest extends AbstractHandler {
     @Before
     public void before2() throws IOException {
         assumeFalse(GraphicsEnvironment.isHeadless());
-        
+
         FileUtils.cleanDirectory(tempDir);
         defaultScreen = GraphicsEnvironment.getLocalGraphicsEnvironment()
             .getDefaultScreenDevice();
@@ -205,16 +208,20 @@ public class OSDAppTest extends AbstractHandler {
             this.nagiosRes = nagiosRes;
         }
 
+        LOG.info("cmd: " + cmd);
         cmd = cmd.replaceFirst("(--" + OSDApp.OPTNAME_DISK_STANDBY_SCRPIT + "\\s+)\\S+",
             "$1" + diskStandbyScriptFile.getAbsolutePath());
+        LOG.info("cmd: " + cmd);
         cmd = cmd.replaceFirst("(--" + OSDApp.OPTNAME_NAGIOS_URL + "\\s+)\\S+",
             "$1" + getUrl("/nagios").toExternalForm());
+        LOG.info("cmd: " + cmd);
         cmd = cmd.replaceFirst("(--" + OSDApp.OPTNAME_JENKINS_URL + "\\s+)\\S+",
             "$1" + getUrl("/jenkins" + JenkinsPoller.API_XML_URL_EXT).toExternalForm()
                 .replaceFirst(JenkinsPoller.API_XML_URL_EXT + "$", ""));
+        LOG.info("cmd: " + cmd);
         widthCmdArg = Integer.parseInt(cmd.replaceFirst("^.*\\s+-w\\s+(\\S+)(|\\s+.*)$", "$1"));
         String[] cmdArgs = cmd.trim().split("\\s+");
-        LOG.info(StringUtils.join(cmdArgs, " "));
+        LOG.info("cmd: " + StringUtils.join(cmdArgs, " "));
 
         ProcessBuilder pb = new ProcessBuilder(cmdArgs);
         pb.redirectOutput(stdoutDump);
@@ -228,9 +235,10 @@ public class OSDAppTest extends AbstractHandler {
         }
         exitValue = ProcessUtil.reliableDestroy(p);
 
-        stdout = IOUtils.toString(new FileInputStream(stdoutDump), "UTF-8");
-        stderr = IOUtils.toString(new FileInputStream(stderrDump), "UTF-8");
+        stdout = IOUtils.toString(stdoutDump.toURI(), "UTF-8");
+        stderr = IOUtils.toString(stderrDump.toURI(), "UTF-8");
         LOG.info("stdout:" + System.lineSeparator() + stdout);
+        LOG.info("stderr:" + System.lineSeparator() + stderr);
         exitValue = p.exitValue();
         return exitValue;
     }
@@ -343,10 +351,13 @@ public class OSDAppTest extends AbstractHandler {
     private static String getREADMESnippet(String snippetName) throws IOException {
         String readme = IOUtils.toString(OSDAppTest.class.getResourceAsStream("/README"), "UTF-8");
         assertNotNull(readme);
+        LOG.info("readme: " + readme);
         String cmd = Snippets.extract(readme).get(snippetName);
         assertNotNull(snippetName, cmd);
+        LOG.info("cmd: " + cmd);
         cmd = cmd.replaceAll("(\\\\\\s*)?\r?\n", " ");
-        cmd = cmd.replaceFirst("(-jar\\s+)(\\S+)", "$1" + targetDir + File.separator + "$2");
+        cmd = cmd.replaceFirst("(-jar\\s+)(\\S+)",
+            "$1" + (targetDir.getAbsolutePath() + File.separator).replace("\\", "\\\\") + "$2");
         cmd = cmd.replace("eth0", getNonLoopbackNetDevNameIfPossible());
         return cmd;
     }

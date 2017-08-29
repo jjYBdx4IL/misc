@@ -141,36 +141,34 @@ public class MainTest {
     
     @Test
     public void testGrep() throws IOException {
-        String emptyArg = SystemUtils.IS_OS_WINDOWS ? "\"\"" : "";
-        
-        run("grep", emptyArg, emptyArg);
+        run("grep", "", "");
         assertEquals(outputBlob, 0, exitCode);
         assertEquals(outputBlob, 1, output.size());
         assertEquals("0/0 files matched.", output.get(0));
         
-        run("grep", "**", emptyArg);
+        run("grep", "**", "");
         assertEquals(outputBlob, 5, output.size());
         assertEquals("2/2 files matched.", output.get(4));
 
-        run("grep", "**", emptyArg, "-q");
+        run("grep", "**", "", "-q");
         assertEquals(0, exitCode);
         assertEquals(outputBlob, 2, output.size());
 
-        run("-q", "grep", "**", emptyArg);
+        run("-q", "grep", "**", "");
         assertEquals(0, exitCode);
         assertEquals(outputBlob, 2, output.size());
 
-        run("-q", "grep", "ABC", emptyArg);
+        run("-q", "grep", "ABC", "");
         assertEquals(0, exitCode);
         assertEquals(outputBlob, 1, output.size());
         assertEquals(outputBlob, 1, countMatchesML(Pattern.quote(File.separator) + "ABC$"));
 
-        run("-q", "grep", "**/ABC", emptyArg);
+        run("-q", "grep", "**/ABC", "");
         assertEquals(0, exitCode);
         assertEquals(outputBlob, 1, output.size());
         assertEquals(outputBlob, 1, countMatchesML(Pattern.quote(File.separator) + "ABC$"));
         
-        run("-q", "grep", "def/**", emptyArg);
+        run("-q", "grep", "def/**", "");
         assertEquals(0, exitCode);
         assertEquals(outputBlob, 1, output.size());
         assertEquals(outputBlob, 1, countMatchesML(Pattern.quote(File.separator) + "GHI$"));

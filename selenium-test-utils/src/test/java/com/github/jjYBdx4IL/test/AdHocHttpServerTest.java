@@ -100,7 +100,7 @@ public class AdHocHttpServerTest {
     public void testRedirect() throws MalformedURLException, IOException {
         URL url2 = server.addStaticContent("/test2", new AdHocHttpServer.StaticResponse("CONTENT2"));
         URL url1 = server.addStaticContent("/test1",
-                new AdHocHttpServer.StaticResponse(url2.toExternalForm(), HttpServletResponse.SC_MOVED_PERMANENTLY));
+            new AdHocHttpServer.StaticResponse(url2.toExternalForm(), HttpServletResponse.SC_MOVED_PERMANENTLY));
         assertEquals("CONTENT2", IOUtils.toString(url1, "UTF-8"));
     }
 
@@ -116,7 +116,7 @@ public class AdHocHttpServerTest {
         assertEquals("CONTENT1", IOUtils.toString(url1, "UTF-8"));
         assertEquals("CONTENT2", IOUtils.toString(url2, "UTF-8"));
 
-        assertEquals("aaa\n", IOUtils.toString(server.computeServerURL("/a.txt"), "UTF-8"));
+        assertEquals("aaa\n", IOUtils.toString(server.computeServerURL("/a.txt"), "UTF-8").replaceAll("\r?\n", "\n"));
     }
 
 }

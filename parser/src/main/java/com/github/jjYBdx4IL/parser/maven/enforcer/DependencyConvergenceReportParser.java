@@ -110,7 +110,7 @@ public class DependencyConvergenceReportParser {
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
-        XMLStreamWriter xml = outputFactory.createXMLStreamWriter(baos);
+        XMLStreamWriter xml = outputFactory.createXMLStreamWriter(baos, "UTF-8");
 
         for (MavenDependency dep : list) {
             xml.writeStartElement("dependency");
@@ -131,6 +131,8 @@ public class DependencyConvergenceReportParser {
             xml.writeCharacters(System.lineSeparator());
         }
 
+        xml.flush();
+        
         return baos.toString("UTF-8");
     }
 }

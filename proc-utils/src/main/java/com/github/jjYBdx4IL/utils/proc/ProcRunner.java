@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,11 +45,11 @@ public class ProcRunner {
     private final List<String> mOutput = new ArrayList<>();
 
     public ProcRunner(boolean includeErrorStream, List<String> command) {
-        mProcessBuilder = new ProcessBuilder(command).redirectErrorStream(includeErrorStream);
+        mProcessBuilder = new ProcessBuilder(escapeArgs(command)).redirectErrorStream(includeErrorStream);
     }
 
     public ProcRunner(boolean includeErrorStream, String... command) {
-        mProcessBuilder = new ProcessBuilder(command).redirectErrorStream(includeErrorStream);
+        mProcessBuilder = new ProcessBuilder(escapeArgs(command)).redirectErrorStream(includeErrorStream);
     }
     
     public ProcRunner(List<String> command) {
@@ -63,6 +64,30 @@ public class ProcRunner {
         mProcessBuilder.directory(directory);
     }
 
+    protected List<String> escapeArgs(String... args) {
+        List<String> _args = new ArrayList<>(args.length);
+        if (SystemUtils.IS_OS_UNIX) {
+            Collections.addAll(_args, args);
+        } else {
+            for (String arg : args) {
+                _args.add("\"" + arg + "\"");
+            }
+        }
+        return _args;
+    }
+    
+    protected List<String> escapeArgs(List<String> args) {
+        List<String> _args = new ArrayList<>(args.size());
+        if (SystemUtils.IS_OS_UNIX) {
+            _args.addAll(args);
+        } else {
+            for (String arg : args) {
+                _args.add("\"" + arg + "\"");
+            }
+        }
+        return _args;
+    }
+    
     /**
      * No timeout.
      * 

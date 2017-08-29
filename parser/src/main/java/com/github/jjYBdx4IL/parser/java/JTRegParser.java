@@ -128,7 +128,7 @@ public class JTRegParser {
 
         public void toAntJUnitXML(OutputStream os) throws XMLStreamException {
             XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
-            XMLStreamWriter xml = outputFactory.createXMLStreamWriter(os);
+            XMLStreamWriter xml = outputFactory.createXMLStreamWriter(os, "UTF-8");
 
             xml.writeStartDocument("UTF-8", "1.0");
             xml.writeStartElement(TESTSUITE);

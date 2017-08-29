@@ -90,6 +90,6 @@ public class DependencyConvergenceReportParserTest {
             "    <groupId>com.fasterxml.jackson.module</groupId>\n" +
             "    <artifactId>jackson-module-jaxb-annotations</artifactId>\n" +
             "    <version>2.8.8</version>\n" +
-            "</dependency>\n", xmlFragment);
+            "</dependency>\n", xmlFragment.replaceAll("\r?\n", "\n"));
     }
 }
