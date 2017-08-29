@@ -75,11 +75,13 @@
         <module>ecs</module>
         <module>encryption-utils</module>
         <module>gfx-utils</module>
+        <module>io-utils</module>
         <module>jsoup-utils</module>
         <module>junit4-utils</module>
         <module>jutils</module>
         <module>math-utils</module>
         <module>net-utils</module>
+        <module>osdapp</module>
         <module>parser</module>
         <module>proc-utils</module>
         <module>release-parent</module>

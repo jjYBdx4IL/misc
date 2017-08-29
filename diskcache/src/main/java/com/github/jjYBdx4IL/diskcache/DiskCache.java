@@ -245,10 +245,11 @@ public class DiskCache implements Closeable {
     }
 
     /**
-     *
-     * @param key
+     * Get data referenced by key.
+     * 
+     * @param key the key
      * @return returns null if the key was not found or the data has expired.
-     * @throws IOException
+     * @throws IOException on error
      */
     public byte[] get(String key) throws IOException {
         return get(key, this.expiryMillis);
@@ -266,10 +267,11 @@ public class DiskCache implements Closeable {
     }
 
     /**
-     *
-     * @param key
+     * Get a stream to the data referenced by key.
+     * 
+     * @param key the key
      * @param _expiryMillis -1 or less to ignore expiration
-     * @return
+     * @return the stream
      */
     public InputStream getStream(String key, long _expiryMillis) {
 

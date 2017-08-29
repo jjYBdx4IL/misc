@@ -3,3 +3,6 @@ env:
   - PUBLIC_CI=true
 jdk:
   - oraclejdk8
+before_install:
+  - mvn install -f release-parent
+
