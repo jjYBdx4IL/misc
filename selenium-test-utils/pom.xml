@@ -17,7 +17,7 @@
     <inceptionYear>2017</inceptionYear>
 
     <properties>
-        <selenium.version>3.5.2</selenium.version>
+        <selenium.version>3.5.3</selenium.version>
         <jetty.version>9.4.6.v20170531</jetty.version>
     </properties>
 
