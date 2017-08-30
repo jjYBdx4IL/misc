@@ -2,7 +2,6 @@ package org.apache.ecs;
 
 import static org.junit.Assert.assertEquals;
 
-import org.apache.ecs.filter.CharacterFilter;
 import org.apache.ecs.html.Body;
 import org.apache.ecs.html.Font;
 import org.apache.ecs.html.H1;
@@ -12,6 +11,7 @@ import org.apache.ecs.html.Html;
 import org.apache.ecs.html.Option;
 import org.apache.ecs.html.Title;
 import org.apache.ecs.xml.XML;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +19,11 @@ import org.slf4j.LoggerFactory;
 public class HtmlGenTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(HtmlGenTest.class);
+
+    @BeforeClass
+    public static void beforeClass() {
+        LOG.info(ECSDefaults.debugString());
+    }
 
     @Test
     public void testHtmlGeneration() {
@@ -36,8 +41,15 @@ public class HtmlGenTest {
 
         String result = doc.toString();
         LOG.debug(result);
-        assertEquals("<html><head><title></title></head><body><option value='foo'>bar</option></body></html>",
-            result);
+        assertEquals("<html>\n" +
+            "    <head>\n" +
+            "        <title></title>\n" +
+            "    </head>\n" +
+            "    <body>\n" +
+            "        <option value='foo'>bar</option>\n" +
+            "    </body>\n" +
+            "</html>",
+            result.replace("\r", "").replace("\t", "    "));
     }
 
     @Test
@@ -52,11 +64,25 @@ public class HtmlGenTest {
                     .setColor(HtmlColor.WHITE)
                     .setFace("Times")
                     .addElement("The big dog & the little cat chased each other.")));
-        assertEquals("<html><head><title>Demo</title></head>" +
-            "<body><h1>Demo Header</h1><h3>Sub Header:</h3>" +
-            "<font color='#FFFFFF' face='Times' size='+1'>" +
-            "The big dog & the little cat chased each other.</font></body></html>",
-            html.toString());
+        assertEquals("<html>\n" +
+            "    <head>\n" +
+            "        <title>\n" +
+            "            Demo\n" +
+            "        </title>\n" +
+            "    </head>\n" +
+            "    <body>\n" +
+            "        <h1>\n" +
+            "            Demo Header\n" +
+            "        </h1>\n" +
+            "        <h3>\n" +
+            "            Sub Header:\n" +
+            "        </h3>\n" +
+            "        <font color='#FFFFFF' face='Times' size='+1'>\n" +
+            "            The big dog &#38; the little cat chased each other.\n" +
+            "        </font>\n" +
+            "    </body>\n" +
+            "</html>",
+            html.toString().replace("\r", "").replace("\t", "    "));
     }
 
     @Test
@@ -69,11 +95,24 @@ public class HtmlGenTest {
                 .setColor(HtmlColor.WHITE)
                 .setFace("Times")
                 .setTagText("The big dog & the little cat chased each other."));
-        assertEquals("<html><head><title>Demo</title></head>" +
-            "<body><h1>Demo Header</h1><h3>Sub Header:</h3>" +
-            "<font color='#FFFFFF' face='Times' size='+1'>" +
-            "The big dog & the little cat chased each other.</font></body></html>",
-            doc.toString());
+        assertEquals("<html>\n" +
+            "    <head>\n" +
+            "        <title>\n" +
+            "            Demo\n" +
+            "        </title>\n" +
+            "    </head>\n" +
+            "    <body>\n" +
+            "        <h1>\n" +
+            "            Demo Header\n" +
+            "        </h1>\n" +
+            "        <h3>\n" +
+            "            Sub Header:\n" +
+            "        </h3>\n" +
+            "        <font color='#FFFFFF' face='Times' size='+1'>The big dog &#38; the little cat chased each other.</font>\n"
+            +
+            "    </body>\n" +
+            "</html>",
+            doc.toString().replace("\r", "").replace("\t", "    "));
     }
 
     @Test
@@ -83,8 +122,15 @@ public class HtmlGenTest {
 
         String result = doc.toString();
         LOG.debug(result);
-        assertEquals("<html><head><title></title></head><body><customElement></customElement></body></html>",
-            result);
+        assertEquals("<html>\n" + 
+            "    <head>\n" + 
+            "        <title></title>\n" + 
+            "    </head>\n" + 
+            "    <body>\n" + 
+            "        <customElement></customElement>\n" + 
+            "    </body>\n" + 
+            "</html>",
+            result.replace("\r", "").replace("\t", "    "));
     }
 
 }

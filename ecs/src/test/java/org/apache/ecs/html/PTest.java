@@ -8,6 +8,7 @@ public class PTest {
 
     @Test
     public void testP() {
-        assertEquals("<p align='left'>&", new P("&", "left").toString("UTF-8"));
+        assertEquals("<p align='left'>\n" + 
+            "    &#38;", new P("&", "left").toString("UTF-8").replace("\r", "").replace("\t", "    "));
     }
 }
