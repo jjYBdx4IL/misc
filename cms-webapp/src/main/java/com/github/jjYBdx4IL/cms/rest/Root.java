@@ -4,6 +4,7 @@ import static j2html.TagCreator.a;
 import static j2html.TagCreator.attrs;
 import static j2html.TagCreator.body;
 import static j2html.TagCreator.button;
+import static j2html.TagCreator.div;
 import static j2html.TagCreator.document;
 import static j2html.TagCreator.each;
 import static j2html.TagCreator.form;
@@ -14,6 +15,7 @@ import static j2html.TagCreator.img;
 import static j2html.TagCreator.input;
 import static j2html.TagCreator.link;
 import static j2html.TagCreator.meta;
+import static j2html.TagCreator.span;
 import static j2html.TagCreator.table;
 import static j2html.TagCreator.tbody;
 import static j2html.TagCreator.td;
@@ -24,6 +26,7 @@ import com.github.jjYBdx4IL.cms.jpa.dto.KeyValuePair;
 import com.github.jjYBdx4IL.cms.jpa.dto.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.tx.Tx;
 import com.github.jjYBdx4IL.cms.jpa.tx.TxRo;
+import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,9 +35,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -44,26 +45,23 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import j2html.tags.Tag;
 
-@Path("/")
+@Path("")
 public class Root {
 
     private static final Logger LOG = LoggerFactory.getLogger(Root.class);
 
     private static final String SIGNIN_IMG_LOC = "assets/google_signin_buttons/web/1x/btn_google_signin_light_normal_web.png";
-    private static final String SESSION_USER_ID = "session.user.id";
 
     @Context
     UriInfo uriInfo;
-
     @Inject
     public EntityManager em;
-    @Context
-    public HttpServletRequest request;
+    @Inject
+    private SessionData session;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -74,10 +72,13 @@ public class Root {
         List<KeyValuePair> pairs = QueryFactory.getAll(em).getResultList();
 
         return htmlDoc("Embedded Jetty + Jersey + JPA + J2HTML Demo",
-            isAuthenticated()
-                ? a("Logout").withHref("logout")
-                : a(img().withSrc(SIGNIN_IMG_LOC)).withHref("login"),
-            h3("Please enter key-value pair " + request),
+            session.isAuthenticated()
+                ? div(span("logged in as: " + session.getEmail() + " ("),
+                    a("logout").withHref("logout"),
+                    span(")"))
+                : a(img().withSrc(SIGNIN_IMG_LOC))
+                    .withHref(uriInfo.getBaseUriBuilder().path(GoogleLogin.class).build().toString()),
+            h3("Please enter key-value pair"),
             table(
                 attrs("#table-example"),
                 tbody(
@@ -113,25 +114,17 @@ public class Root {
     }
 
     @GET
-    @Path("/login")
-    public Response login() {
-        LOG.trace("login()");
-        HttpSession session = request.getSession();
-        session.setAttribute(SESSION_USER_ID, "someId");
-        return Response.temporaryRedirect(UriBuilder.fromResource(Root.class).path(Root.class).build()).status(HttpServletResponse.SC_FOUND)
-            .build();
-    }
-    
-    @GET
     @Path("/logout")
     public Response logout() {
         LOG.trace("logout()");
-        HttpSession session = request.getSession();
-        session.removeAttribute(SESSION_USER_ID);
-        return Response.temporaryRedirect(UriBuilder.fromResource(Root.class).path(Root.class).build()).status(HttpServletResponse.SC_FOUND)
+
+        session.logout();
+
+        return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path(Root.class).build())
+            .status(HttpServletResponse.SC_FOUND)
             .build();
     }
-    
+
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/error")
@@ -152,8 +145,4 @@ public class Root {
                     bodyTags)));
     }
 
-    public boolean isAuthenticated() {
-        HttpSession session = request.getSession();
-        return session.getAttribute(SESSION_USER_ID) != null;
-    }
 }

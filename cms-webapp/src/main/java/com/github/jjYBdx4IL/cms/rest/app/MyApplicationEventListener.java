@@ -1,4 +1,4 @@
-package com.github.jjYBdx4IL.cms.rest;
+package com.github.jjYBdx4IL.cms.rest.app;
 
 import org.glassfish.jersey.server.monitoring.ApplicationEvent;
 import org.glassfish.jersey.server.monitoring.ApplicationEventListener;

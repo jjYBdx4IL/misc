@@ -1,4 +1,4 @@
-package com.github.jjYBdx4IL.cms.rest;
+package com.github.jjYBdx4IL.cms.rest.app;
 
 import org.glassfish.hk2.api.Factory;
 import org.h2.Driver;

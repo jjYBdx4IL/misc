@@ -1,4 +1,4 @@
-package com.github.jjYBdx4IL.cms.rest;
+package com.github.jjYBdx4IL.cms.rest.app;
 
 import static j2html.TagCreator.iff;
 

@@ -1,5 +1,9 @@
 package com.github.jjYBdx4IL.cms;
 
+import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
+import com.github.jjYBdx4IL.cms.jpa.dto.ConfigValue;
+import com.github.jjYBdx4IL.utils.env.Env;
+
 import org.eclipse.jetty.plus.jndi.Resource;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
@@ -9,11 +13,18 @@ import org.hibernate.cfg.AvailableSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.naming.NamingException;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -39,6 +50,11 @@ public class ServerEmfRunner extends AbstractLifeCycle {
     @Override
     protected void doStart() throws Exception {
         getEmfInstance();
+
+        // do some db initialization when running in development environment:
+        if (System.getProperty("basedir") != null) {
+            doDevelInit();
+        }
     }
 
     @Override
@@ -63,4 +79,33 @@ public class ServerEmfRunner extends AbstractLifeCycle {
         LOG.info("created " + emf);
     }
 
+    private void doDevelInit() throws FileNotFoundException, IOException {
+        LOG.info("doDevelInit()");
+        File cfgFile = new File(Env.getConfigDir(ServerEmfRunner.class).getParentFile(),
+            "com.google.api.client.GoogleOauth2ExampleTest" + File.separator +
+                "googleOauth2Client.properties");
+        EntityManager em = emf.createEntityManager();
+        try {
+            Properties p = new Properties();
+            try (InputStream is = new FileInputStream(cfgFile)) {
+                p.load(is);
+            }
+            em.getTransaction().begin();
+            updateConfigValue(em, ConfigKey.KEY_GOOGLE_OAUTH2_CLIENT_ID, p.getProperty("clientId"));
+            updateConfigValue(em, ConfigKey.KEY_GOOGLE_OAUTH2_CLIENT_SECRET, p.getProperty("clientSecret"));
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+    }
+
+    private void updateConfigValue(EntityManager em, ConfigKey key, String value) {
+        ConfigValue configValue = em.find(ConfigValue.class, key);
+        if (configValue == null) {
+            configValue = new ConfigValue(key, value);
+        } else {
+            configValue.setValue(value);
+        }
+        em.persist(configValue);
+    }
 }

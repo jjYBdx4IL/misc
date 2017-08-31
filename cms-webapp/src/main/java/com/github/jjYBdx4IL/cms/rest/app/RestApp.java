@@ -1,4 +1,6 @@
-package com.github.jjYBdx4IL.cms.rest;
+package com.github.jjYBdx4IL.cms.rest.app;
+
+import com.github.jjYBdx4IL.cms.rest.Root;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
@@ -16,9 +18,11 @@ public class RestApp extends ResourceConfig {
             public void configure() {
                 bindFactory(EmfFactory.class).to(EntityManagerFactory.class).in(Singleton.class);
                 bindFactory(EmFactory.class).to(EntityManager.class).in(RequestScoped.class);
+                bindFactory(SessionDataFactory.class).to(SessionData.class).in(RequestScoped.class);
             }
         });
         packages(true, getClass().getPackage().getName());
+        packages(true, Root.class.getPackage().getName());
     }
 
 }
