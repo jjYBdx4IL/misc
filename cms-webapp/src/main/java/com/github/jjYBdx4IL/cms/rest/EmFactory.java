@@ -20,29 +20,35 @@ public class EmFactory implements Factory<EntityManager> {
 
     @Inject
     public EmFactory(EntityManagerFactory emf, CloseableService closeService) {
-        LOG.info("init()");
+        LOG.trace("init()");
         this.closeService = closeService;
         this.emf = emf;
     }
 
     @Override
     public EntityManager provide() {
-        LOG.info("provide()");
+        LOG.trace("provide()");
         final EntityManager em = emf.createEntityManager();
-        LOG.info("created " + em);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("created " + em);
+        }
         this.closeService.add(new Closeable() {
             @Override
             public void close() {
-                LOG.info("closing " + em);
-                em.close();
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("closing " + em);
+                }
             }
         });
         return em;
     }
 
     @Override
-    public void dispose(EntityManager instance) {
-        LOG.info("dispose() " + instance);
+    public void dispose(EntityManager em) {
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("dispose() " + em);
+        }
+        em.close();
     }
 
 }

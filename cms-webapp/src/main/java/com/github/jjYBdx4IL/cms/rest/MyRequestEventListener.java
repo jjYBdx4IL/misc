@@ -1,5 +1,7 @@
 package com.github.jjYBdx4IL.cms.rest;
 
+import static j2html.TagCreator.iff;
+
 import com.github.jjYBdx4IL.cms.jpa.tx.Tx;
 import com.github.jjYBdx4IL.cms.jpa.tx.TxRo;
 
@@ -33,23 +35,29 @@ public class MyRequestEventListener implements RequestEventListener {
 
     @Override
     public void onEvent(RequestEvent event) {
-        LOG.info("onEvent(): " + event.getType() + " " + event.getUriInfo().getPath() + " " + this);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("onEvent(): " + event.getType() + " " + event.getUriInfo().getPath() + " " + this);
+        }
         switch (event.getType()) {
             case RESOURCE_METHOD_START:
-                LOG.info("Resource method "
-                    + event.getUriInfo().getMatchedResourceMethod()
-                        .getHttpMethod()
-                    + " started for request " + requestNumber);
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("Resource method "
+                        + event.getUriInfo().getMatchedResourceMethod()
+                            .getHttpMethod()
+                        + " started for request " + requestNumber);
+                }
                 beginTransaction(event);
                 break;
             case ON_EXCEPTION:
             case FINISHED:
-                LOG.info("Request " + requestNumber
-                    + " finished. Processing time "
-                    + (System.currentTimeMillis() - startTime) + " ms.");
-                // this can be used for transaction handling:
-                LOG.info("exception thrown: " + event.getException());
-                LOG.info("" + event.getUriInfo().getMatchedResources());
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("Request " + requestNumber
+                        + " finished. Processing time "
+                        + (System.currentTimeMillis() - startTime) + " ms.");
+                    // this can be used for transaction handling:
+                    LOG.trace("exception thrown: " + event.getException());
+                    LOG.trace("" + event.getUriInfo().getMatchedResources());
+                }
                 endTransaction(event);
                 break;
             default:
@@ -59,17 +67,23 @@ public class MyRequestEventListener implements RequestEventListener {
 
     protected void beginTransaction(RequestEvent event) {
         Method method = event.getUriInfo().getMatchedResourceMethod().getInvocable().getDefinitionMethod();
-        LOG.info("method: " + method);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("method: " + method);
+        }
         if (!method.isAnnotationPresent(TxRo.class) && !method.isAnnotationPresent(Tx.class)) {
             return;
         }
         for (Object object : event.getUriInfo().getMatchedResources()) {
             EntityManager em = getInjectedEntityManager(object);
             if (em == null) {
-                LOG.info("skipping starting transaction on " + object);
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("skipping starting transaction on " + object);
+                }
                 continue;
             }
-            LOG.info("starting transaction on " + object);
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("starting transaction on " + object);
+            }
             EntityTransaction transaction = em.getTransaction();
             if (method.isAnnotationPresent(TxRo.class)) {
                 transaction.setRollbackOnly();
@@ -82,38 +96,49 @@ public class MyRequestEventListener implements RequestEventListener {
         for (Object object : event.getUriInfo().getMatchedResources()) {
             EntityManager em = getInjectedEntityManager(object);
             if (em == null) {
-                LOG.info("skipping rollback/commit processing on " + object);
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("skipping rollback/commit processing on " + object);
+                }
                 continue;
             }
             EntityTransaction tx = em.getTransaction();
-            if (tx.getRollbackOnly()) {
-                LOG.info("rolling back transaction because read-only is set");
+            if (!tx.isActive() ) {
+                LOG.trace("transaction not active");
+            }
+            else if (tx.getRollbackOnly()) {
+                LOG.trace("rolling back transaction because read-only is set");
                 em.getTransaction().rollback();
             } else if (event.getException() != null) {
-                LOG.info("rolling back transaction because an exception was thrown");
+                LOG.trace("rolling back transaction because an exception was thrown");
                 em.getTransaction().rollback();
             } else {
-                LOG.info("committing transaction");
+                LOG.trace("committing transaction");
                 em.getTransaction().commit();
             }
         }
     }
 
     protected EntityManager getInjectedEntityManager(Object object) {
-        LOG.info("getInjectedEntityManager() " + object);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("getInjectedEntityManager() " + object);
+        }
         Class<?> klazz = object.getClass();
         String fieldName = findInjectedEntityManagerFieldName(klazz);
         if (fieldName == null) {
             return null;
         }
         EntityManager em = null;
-        LOG.info("retrieving entity manager from instance " + object);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("retrieving entity manager from instance " + object);
+        }
         try {
             em = (EntityManager) klazz.getField(fieldName).get(object);
         } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
             throw new RuntimeException(e);
         }
-        LOG.info("em = " + em);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("em = " + em);
+        }
         if (em == null) {
             throw new RuntimeException("couldn't find injected EntityManager");
         }
@@ -128,7 +153,9 @@ public class MyRequestEventListener implements RequestEventListener {
             return "".equals(fieldName) ? null : fieldName;
         }
         for (Field field : klazz.getFields()) {
-            LOG.info("field: " + field + " " + field.getType().equals(EntityManager.class));
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("field: " + field + " " + field.getType().equals(EntityManager.class));
+            }
             if (field.isAnnotationPresent(Inject.class) && field.getType().equals(EntityManager.class)) {
                 if (fieldName != null) {
                     throw new RuntimeException("duplicate found");

@@ -61,6 +61,7 @@ public class EmfFactory implements Factory<EntityManagerFactory> {
                 props.put(AvailableSettings.SHOW_SQL, "true");
                 props.put(AvailableSettings.JPA_JDBC_DRIVER, Driver.class.getName());
                 props.put(AvailableSettings.JPA_JDBC_URL, jdbcUrl);
+                //props.put("connection.pool_size", "100");
                 emf = Persistence.createEntityManagerFactory("default", props);
                 LOG.info("created " + emf);
                 isOwner = true;

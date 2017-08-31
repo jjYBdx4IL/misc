@@ -37,7 +37,9 @@ public class MyApplicationEventListener implements ApplicationEventListener {
     @Override
     public RequestEventListener onRequest(RequestEvent requestEvent) {
         requestCnt++;
-        LOG.info("Request " + requestCnt + " started.");
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Request " + requestCnt + " started.");
+        }
         // return the listener instance that will handle this request.
         return new MyRequestEventListener(requestCnt);
     }
