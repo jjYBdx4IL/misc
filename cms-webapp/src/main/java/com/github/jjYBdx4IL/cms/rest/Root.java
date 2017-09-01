@@ -73,7 +73,7 @@ public class Root {
 
         return htmlDoc("Embedded Jetty + Jersey + JPA + J2HTML Demo",
             session.isAuthenticated()
-                ? div(span("logged in as: " + session.getEmail() + " ("),
+                ? div(span("logged in as: " + session.getUser().getEmail() + " ("),
                     a("logout").withHref("logout"),
                     span(")"))
                 : a(img().withSrc(SIGNIN_IMG_LOC))

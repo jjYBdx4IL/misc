@@ -2,6 +2,8 @@ package com.github.jjYBdx4IL.cms.rest;
 
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
 import com.github.jjYBdx4IL.cms.jpa.dto.QueryFactory;
+import com.github.jjYBdx4IL.cms.jpa.dto.User;
+import com.github.jjYBdx4IL.cms.jpa.tx.Tx;
 import com.github.jjYBdx4IL.cms.jpa.tx.TxRo;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
@@ -18,6 +20,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -67,7 +71,7 @@ public class GoogleLogin {
 
     // https://console.developers.google.com/apis/credentials
     @GET
-    @TxRo
+    @Tx
     @Path("googleOauth2Callback")
     public Response callback(@QueryParam("code") String code, @QueryParam("state") String state) throws IOException {
         LOG.trace("callback()");
@@ -96,8 +100,7 @@ public class GoogleLogin {
         // user's verified Google ID
         // contained in the token response:
         String callbackUrl = uriInfo.getBaseUriBuilder().path(GoogleLogin.class).path(GoogleLogin.class, "callback")
-            .build()
-            .toASCIIString();
+            .build().toASCIIString();
         GoogleTokenResponse tokenResponse = codeFlow.newTokenRequest(code).setRedirectUri(callbackUrl)
             .execute(); // POST request to Google token API
         Payload payload = tokenResponse.parseIdToken().getPayload();
@@ -124,12 +127,25 @@ public class GoogleLogin {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("email not verified").build();
         }
 
-        session.setUserId(payload.getSubject());
-        session.setEmail(payload.getEmail());
+        List<User> users = QueryFactory.getUserByGoogleUid(em, payload.getSubject()).getResultList();
+        User user = null;
+        if (!users.isEmpty()) {
+            user = users.get(0);
+        } else {
+            user = new User();
+            user.setGoogleUniqueId(payload.getSubject());
+            user.setCreatedAt(new Date());
+        }
+
+        user.setLastLoginAt(new Date());
+        user.setLoginCount(user.getLoginCount() + 1);
+        user.setEmail(payload.getEmail());
+        em.persist(user);
+
+        session.setUser(user);
 
         return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path(Root.class).build())
-            .status(HttpServletResponse.SC_FOUND)
-            .build();
+            .status(HttpServletResponse.SC_FOUND).build();
     }
 
     private GoogleAuthorizationCodeFlow getGAuthCodeFlow() {

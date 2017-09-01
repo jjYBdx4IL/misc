@@ -19,6 +19,17 @@ public class QueryFactory {
     private QueryFactory() {
     }
 
+    public static TypedQuery<User> getUserByGoogleUid(EntityManager em, String uid) {
+        final CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        final CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
+        final Root<User> userRoot = criteriaQuery.from(User.class);
+        Predicate predicateUser = criteriaBuilder.equal(
+            userRoot.get(User_.googleUniqueId),
+            uid);
+        criteriaQuery.where(predicateUser);
+        return em.createQuery(criteriaQuery);
+    }
+    
     public static TypedQuery<KeyValuePair> getByKey(EntityManager em, String key) {
         final CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         final CriteriaQuery<KeyValuePair> criteriaQuery = criteriaBuilder.createQuery(KeyValuePair.class);
