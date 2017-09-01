@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jjYBdx4IL.utils.security;
+package com.github.jjYBdx4IL.utils.text;
 
 //CHECKSTYLE:OFF
 import static org.junit.Assert.assertEquals;
 
-import com.github.jjYBdx4IL.utils.security.PasswordGenerator;
+import com.github.jjYBdx4IL.utils.text.PasswordGenerator;
 
 import org.junit.Test;
 import org.slf4j.Logger;

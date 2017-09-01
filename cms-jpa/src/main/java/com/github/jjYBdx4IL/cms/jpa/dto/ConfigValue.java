@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 
 /**
@@ -17,6 +19,14 @@ public class ConfigValue implements Serializable {
      * 
      */
     private static final long serialVersionUID = 1L;
+
+    @Id
+    @Basic
+    @Enumerated(EnumType.STRING) 
+    private ConfigKey key;
+
+    @Basic
+    private String value;
 
     public ConfigValue() {
     }
@@ -55,12 +65,5 @@ public class ConfigValue implements Serializable {
     public void setValue(String value) {
         this.value = value;
     }
-
-    @Id
-    @Basic
-    private ConfigKey key;
-
-    @Basic
-    private String value;
 
 }

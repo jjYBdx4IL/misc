@@ -19,6 +19,20 @@ public class QueryFactory {
     private QueryFactory() {
     }
 
+    public static TypedQuery<Article> getArticleDisplayList(EntityManager em, String tag) {
+        final CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        final CriteriaQuery<Article> criteriaQuery = criteriaBuilder.createQuery(Article.class);
+        final Root<Article> root = criteriaQuery.from(Article.class);
+        if (tag != null) {
+            Predicate predicate = criteriaBuilder.equal(
+                root.get(Article_.tags),
+                tag);
+            criteriaQuery.where(predicate);
+        }
+        criteriaQuery.orderBy(criteriaBuilder.desc(root.get(Article_.createdAt)));
+        return em.createQuery(criteriaQuery);
+    }
+
     public static TypedQuery<User> getUserByGoogleUid(EntityManager em, String uid) {
         final CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         final CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
@@ -29,26 +43,7 @@ public class QueryFactory {
         criteriaQuery.where(predicateUser);
         return em.createQuery(criteriaQuery);
     }
-    
-    public static TypedQuery<KeyValuePair> getByKey(EntityManager em, String key) {
-        final CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        final CriteriaQuery<KeyValuePair> criteriaQuery = criteriaBuilder.createQuery(KeyValuePair.class);
-        final Root<KeyValuePair> userRoot = criteriaQuery.from(KeyValuePair.class);
-        Predicate predicateEmail = criteriaBuilder.equal(
-            userRoot.get(KeyValuePair_.key),
-            key);
-        criteriaQuery.where(predicateEmail);
-        return em.createQuery(criteriaQuery);
-    }
 
-    public static TypedQuery<KeyValuePair> getAll(EntityManager em) {
-        final CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        final CriteriaQuery<KeyValuePair> criteriaQuery = criteriaBuilder.createQuery(KeyValuePair.class);
-        criteriaQuery.from(KeyValuePair.class);
-        return em.createQuery(criteriaQuery);
-    }
-    
-    
     public static String getConfigValue(EntityManager em, ConfigKey key) {
         final CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         final CriteriaQuery<ConfigValue> criteriaQuery = criteriaBuilder.createQuery(ConfigValue.class);

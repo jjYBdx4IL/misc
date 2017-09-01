@@ -7,6 +7,8 @@ import com.github.jjYBdx4IL.utils.env.Env;
 import org.eclipse.jetty.plus.jndi.Resource;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
+import org.eclipse.jetty.util.component.LifeCycle;
+import org.eclipse.jetty.util.component.LifeCycle.Listener;
 import org.h2.Driver;
 import org.hibernate.boot.SchemaAutoTooling;
 import org.hibernate.cfg.AvailableSettings;
@@ -34,7 +36,7 @@ import javax.persistence.Persistence;
  * @author jjYBdx4IL
  *
  */
-public class ServerEmfRunner extends AbstractLifeCycle {
+public class ServerEmfRunner implements Listener {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServerEmfRunner.class);
 
@@ -47,7 +49,6 @@ public class ServerEmfRunner extends AbstractLifeCycle {
         this.jdbcUrl = jdbcUrl;
     }
 
-    @Override
     protected void doStart() throws Exception {
         getEmfInstance();
 
@@ -57,7 +58,6 @@ public class ServerEmfRunner extends AbstractLifeCycle {
         }
     }
 
-    @Override
     protected void doStop() throws Exception {
         if (emf != null) {
             LOG.info("closing " + emf);
@@ -74,6 +74,7 @@ public class ServerEmfRunner extends AbstractLifeCycle {
         props.put(AvailableSettings.JPA_JDBC_URL, jdbcUrl);
         emf = Persistence.createEntityManagerFactory("default", props);
 
+        LOG.info("binding jpa/emf for " + server + " to " + emf);
         new Resource(server, "jpa/emf", emf);
 
         LOG.info("created " + emf);
@@ -91,8 +92,8 @@ public class ServerEmfRunner extends AbstractLifeCycle {
                 p.load(is);
             }
             em.getTransaction().begin();
-            updateConfigValue(em, ConfigKey.KEY_GOOGLE_OAUTH2_CLIENT_ID, p.getProperty("clientId"));
-            updateConfigValue(em, ConfigKey.KEY_GOOGLE_OAUTH2_CLIENT_SECRET, p.getProperty("clientSecret"));
+            updateConfigValue(em, ConfigKey.GOOGLE_OAUTH2_CLIENT_ID, p.getProperty("clientId"));
+            updateConfigValue(em, ConfigKey.GOOGLE_OAUTH2_CLIENT_SECRET, p.getProperty("clientSecret"));
             em.getTransaction().commit();
         } finally {
             em.close();
@@ -108,4 +109,35 @@ public class ServerEmfRunner extends AbstractLifeCycle {
         }
         em.persist(configValue);
     }
+
+    @Override
+    public void lifeCycleStarting(LifeCycle event) {
+        try {
+            doStart();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void lifeCycleStarted(LifeCycle event) {
+    }
+
+    @Override
+    public void lifeCycleFailure(LifeCycle event, Throwable cause) {
+    }
+
+    @Override
+    public void lifeCycleStopping(LifeCycle event) {
+    }
+
+    @Override
+    public void lifeCycleStopped(LifeCycle event) {
+        try {
+            doStop();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

@@ -15,7 +15,8 @@
  */
 package com.github.jjYBdx4IL.cms;
 
-import org.eclipse.jetty.util.component.AbstractLifeCycle;
+import org.eclipse.jetty.util.component.LifeCycle;
+import org.eclipse.jetty.util.component.LifeCycle.Listener;
 import org.h2.Driver;
 import org.h2.engine.Constants;
 import org.h2.tools.Server;
@@ -34,7 +35,7 @@ import java.util.Properties;
  *
  * @author jjYBdx4IL
  */
-public class H2FrontendRunner extends AbstractLifeCycle {
+public class H2FrontendRunner implements Listener {
 
     private static final Logger LOG = LoggerFactory.getLogger(H2FrontendRunner.class);
 
@@ -46,7 +47,6 @@ public class H2FrontendRunner extends AbstractLifeCycle {
         this.jdbcUrl = jdbcUrl;
     }
     
-    @Override
     protected void doStart() throws Exception {
         LOG.info("starting h2 managment frontend");
 
@@ -83,11 +83,41 @@ public class H2FrontendRunner extends AbstractLifeCycle {
         LOG.info("H2 frontend available on localhost:" + H2_FRONTEND_PORT);
     }
 
-    @Override
     protected void doStop() throws Exception {
         LOG.info("stopping h2 managment frontend");
         if (h2FrontendServer != null) {
-            h2FrontendServer.stop();
+            h2FrontendServer.shutdown();
+            h2FrontendServer = null;
+        }
+    }
+
+    @Override
+    public void lifeCycleStarting(LifeCycle event) {
+        try {
+            doStart();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void lifeCycleStarted(LifeCycle event) {
+    }
+
+    @Override
+    public void lifeCycleFailure(LifeCycle event, Throwable cause) {
+    }
+
+    @Override
+    public void lifeCycleStopping(LifeCycle event) {
+    }
+
+    @Override
+    public void lifeCycleStopped(LifeCycle event) {
+        try {
+            doStop();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

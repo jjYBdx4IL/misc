@@ -2,11 +2,17 @@ package com.github.jjYBdx4IL.cms.rest.app;
 
 import com.github.jjYBdx4IL.cms.jpa.dto.User;
 
+import java.io.Serializable;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.core.Context;
 
-public class SessionData {
+public class SessionData implements Serializable {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
     public static final String SESSION_ATTRNAME = "session.data";
 

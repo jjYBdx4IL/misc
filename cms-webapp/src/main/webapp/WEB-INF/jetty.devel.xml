@@ -3,43 +3,10 @@
 
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
 
-    <Set name="dumpAfterStart">true</Set>
-
-    <!-- this file isnt deployed to production and only intended for use with mvn jetty:run command
-    during development. In production, the embedded jetty server will configure this data resource -->
-
-    <New class="org.eclipse.jetty.plus.jndi.Resource">
+    <Call class="com.github.jjYBdx4IL.cms.EmbeddedMain" name="setup">
         <Arg>
             <Ref refid="Server" />
         </Arg>
-        <Arg>jdbc/url</Arg>
-        <Arg>
-            <New id="jdbcUrl" class="java.lang.String">
-                <Arg>jdbc:h2:<SystemProperty name="basedir" default="."/>/target/h2db</Arg>
-            </New>
-        </Arg>
-    </New>
-    <!--
-    <Call name="addManaged">
-        <Arg>
-            <New id="h2FrontendRunner" class="com.github.jjYBdx4IL.cms.H2FrontendRunner">
-                <Arg>
-                    <Ref refid="jdbcUrl" />
-                </Arg>
-            </New>
-        </Arg>
     </Call>
-    -->
-    <Call name="addManaged">
-        <Arg>
-            <New id="emfRunner" class="com.github.jjYBdx4IL.cms.ServerEmfRunner">
-                <Arg>
-                    <Ref refid="Server" />
-                </Arg>
-                <Arg>
-                    <Ref refid="jdbcUrl" />
-                </Arg>
-            </New>
-        </Arg>
-    </Call>
+    
 </Configure>

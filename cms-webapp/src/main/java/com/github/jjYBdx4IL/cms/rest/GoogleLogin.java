@@ -6,13 +6,13 @@ import com.github.jjYBdx4IL.cms.jpa.dto.User;
 import com.github.jjYBdx4IL.cms.jpa.tx.Tx;
 import com.github.jjYBdx4IL.cms.jpa.tx.TxRo;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
+import com.github.jjYBdx4IL.utils.text.PasswordGenerator;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-@SuppressWarnings("deprecation")
 @Path("googleLogin")
 public class GoogleLogin {
 
@@ -53,7 +52,7 @@ public class GoogleLogin {
         LOG.trace("login()");
 
         // this is per login:
-        String stateSecret = RandomStringUtils.randomAlphanumeric(16, 17);
+        String stateSecret = PasswordGenerator.generate55(20);
         session.setGoogleOauth2StateSecret(stateSecret);
 
         // set up the code flow support instance:
@@ -149,8 +148,8 @@ public class GoogleLogin {
     }
 
     private GoogleAuthorizationCodeFlow getGAuthCodeFlow() {
-        String clientId = QueryFactory.getConfigValue(em, ConfigKey.KEY_GOOGLE_OAUTH2_CLIENT_ID);
-        String clientSecret = QueryFactory.getConfigValue(em, ConfigKey.KEY_GOOGLE_OAUTH2_CLIENT_SECRET);
+        String clientId = QueryFactory.getConfigValue(em, ConfigKey.GOOGLE_OAUTH2_CLIENT_ID);
+        String clientSecret = QueryFactory.getConfigValue(em, ConfigKey.GOOGLE_OAUTH2_CLIENT_SECRET);
         return new GoogleAuthorizationCodeFlow(
             new NetHttpTransport(), new JacksonFactory(), clientId, clientSecret,
             Arrays.asList(new String[] { "openid", "email" }));

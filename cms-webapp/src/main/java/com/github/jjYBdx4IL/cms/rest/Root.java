@@ -1,8 +1,8 @@
 package com.github.jjYBdx4IL.cms.rest;
 
 import static j2html.TagCreator.a;
-import static j2html.TagCreator.attrs;
 import static j2html.TagCreator.body;
+import static j2html.TagCreator.br;
 import static j2html.TagCreator.button;
 import static j2html.TagCreator.div;
 import static j2html.TagCreator.document;
@@ -16,13 +16,10 @@ import static j2html.TagCreator.input;
 import static j2html.TagCreator.link;
 import static j2html.TagCreator.meta;
 import static j2html.TagCreator.span;
-import static j2html.TagCreator.table;
-import static j2html.TagCreator.tbody;
-import static j2html.TagCreator.td;
+import static j2html.TagCreator.textarea;
 import static j2html.TagCreator.title;
-import static j2html.TagCreator.tr;
 
-import com.github.jjYBdx4IL.cms.jpa.dto.KeyValuePair;
+import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.jpa.dto.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.tx.Tx;
 import com.github.jjYBdx4IL.cms.jpa.tx.TxRo;
@@ -31,6 +28,7 @@ import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -47,6 +45,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import j2html.tags.ContainerTag;
 import j2html.tags.Tag;
 
 @Path("")
@@ -69,45 +68,49 @@ public class Root {
     public String get() {
         LOG.trace("get()");
 
-        List<KeyValuePair> pairs = QueryFactory.getAll(em).getResultList();
+        List<Article> articles = QueryFactory.getArticleDisplayList(em, null).getResultList();
 
+        ContainerTag loginButton = div(session.isAuthenticated()
+            ? div(span("logged in as: " + session.getUser().getEmail() + " ("),
+                a("logout").withHref("logout"), span(")"))
+            : a(img().withSrc(SIGNIN_IMG_LOC))
+                .withHref(uriInfo.getBaseUriBuilder().path(GoogleLogin.class).build().toString()))
+                    .withClass("loginButton");
+        ContainerTag articleList = div(each(articles, article -> div(
+            div(article.getTitle()).withClass("title"),
+            div(article.getContent()).withClass("content")).withClass("article"))).withClass("articles");
+        ContainerTag editForm = div(session.isAuthenticated()
+            ? form().withMethod("post").with(
+                input().withName("title").withPlaceholder("title").isRequired(),
+                br(),
+                textarea().withName("content").isRequired(),
+                br(),
+                input().withType("submit").withName("submitButton").withValue("save"))
+            : null).withClass("editForm");
         return htmlDoc("Embedded Jetty + Jersey + JPA + J2HTML Demo",
-            session.isAuthenticated()
-                ? div(span("logged in as: " + session.getUser().getEmail() + " ("),
-                    a("logout").withHref("logout"),
-                    span(")"))
-                : a(img().withSrc(SIGNIN_IMG_LOC))
-                    .withHref(uriInfo.getBaseUriBuilder().path(GoogleLogin.class).build().toString()),
-            h3("Please enter key-value pair"),
-            table(
-                attrs("#table-example"),
-                tbody(
-                    each(pairs, kvp -> tr(
-                        td(kvp.getKey()),
-                        td(kvp.getValue()))))),
-            form().withMethod("post").with(
-                input().withName("key").withPlaceholder("key").isRequired(),
-                input().withName("value").withPlaceholder("value").isRequired(),
-                button("add").withType("submit")));
+            div(loginButton, articleList, editForm).withClass("cssgrid"));
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Tx
-    public Response post(@FormParam("key") String key, @FormParam("value") String value) {
+    public Response post(@FormParam("title") String title, @FormParam("content") String content) {
         LOG.trace("post()");
 
-        if (key == null || key.isEmpty()) {
-            return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("key required").build();
+        if (title == null || title.isEmpty()) {
+            return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("title required").build();
         }
-        if (value == null || value.isEmpty()) {
-            return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("value required").build();
+        if (content == null || content.isEmpty()) {
+            return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("content required").build();
         }
 
-        KeyValuePair kvp = new KeyValuePair();
-        kvp.setKey(key);
-        kvp.setValue(value);
-        em.persist(kvp);
+        Article article = new Article();
+        article.setTitle(title);
+        article.setContent(content);
+        article.setOwner(session.getUser());
+        article.setCreatedAt(new Date());
+        article.setLastModified(article.getCreatedAt());
+        em.persist(article);
 
         return Response.temporaryRedirect(uriInfo.getAbsolutePathBuilder().build()).status(HttpServletResponse.SC_FOUND)
             .build();

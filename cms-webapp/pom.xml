@@ -37,6 +37,9 @@
                             <goal>start</goal>
                         </goals>
                         <phase>pre-integration-test</phase>
+                        <configuration>
+                            <skip>${skipITs}</skip>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>jetty-it-stop</id>
@@ -44,6 +47,9 @@
                             <goal>stop</goal>
                         </goals>
                         <phase>post-integration-test</phase>
+                        <configuration>
+                            <skip>${skipITs}</skip>
+                        </configuration>
                     </execution>
                 </executions>
                 <configuration>
@@ -51,7 +57,8 @@
                         may get declared twice, once explicitly with provided scope, and once through the plugin's dependencies, which leads to class 
                         loading errors like "class not found" -->
                     <useProvidedScope>false</useProvidedScope>
-                    <scanIntervalSeconds>1</scanIntervalSeconds>
+                    <!-- an even faster way to reload code changes is to use the eclipse debugger -->
+                    <scanIntervalSeconds>0</scanIntervalSeconds>
                     <webApp>
                         <overrideDescriptor>${project.basedir}/src/main/webapp/WEB-INF/web.devel.xml</overrideDescriptor>
                         <resourceBases>

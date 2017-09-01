@@ -9,9 +9,12 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
@@ -19,27 +22,37 @@ import javax.persistence.Version;
 @SuppressWarnings("serial")
 @Entity
 @Table(indexes={
-    @Index(name="OWNER_CREATEDAT_INDEX", unique=false, columnList="OWNER,CREATEDAT")
+    @Index(name="CREATEDAT_INDEX", unique=false, columnList="createdAt")
 })
 public class Article implements Serializable {
 
     @Id
     @GeneratedValue
     private Long id;
-    @Basic
-    @Column(name="OWNER")
+    
+    @Basic(optional = false)
+    @ManyToOne(fetch=FetchType.LAZY, optional = false)
+    @JoinColumn(name = "owner")
     private User owner;
+    
     @OneToMany(cascade = {CascadeType.ALL})
     private Collection<Tag> tags = new ArrayList<>();
-    @Basic
+    
+    @Basic(optional = false)
+    @Column(columnDefinition = "TEXT")
     private String title;
-    @Basic
+    
+    @Basic(optional = false)
+    @Column(columnDefinition = "TEXT")
     private String content;
-    @Basic
-    @Column(name="CREATEDAT")
+    
+    @Basic(optional = false)
+    @Column(name="createdAt")
     private Date createdAt;
-    @Basic
+    
+    @Basic(optional = false)
     private Date lastModified;
+    
     @Version
     private int version;
 
@@ -67,30 +80,34 @@ public class Article implements Serializable {
         this.owner = owner;
     }
 
-    /**
-     * @return the values
-     */
     public Collection<Tag> getTags() {
         return tags;
     }
 
-    /**
-     * @param values the values to set
-     */
-    public void setValues(Collection<Tag> tags) {
+    public void setTags(Collection<Tag> tags) {
         this.tags = tags;
     }
 
-    /**
-     * @return the id
-     */
     public Long getId() {
         return id;
     }
 
-    /**
-     * @return the version
-     */
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Date lastModified) {
+        this.lastModified = lastModified;
+    }
+
     public int getVersion() {
         return version;
     }

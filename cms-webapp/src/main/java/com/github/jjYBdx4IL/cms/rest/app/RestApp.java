@@ -5,6 +5,8 @@ import com.github.jjYBdx4IL.cms.rest.Root;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
@@ -12,6 +14,8 @@ import javax.persistence.EntityManagerFactory;
 
 public class RestApp extends ResourceConfig {
 
+    private static final Logger LOG = LoggerFactory.getLogger(RestApp.class);
+    
     public RestApp() {
         register(new AbstractBinder() {
             @Override
