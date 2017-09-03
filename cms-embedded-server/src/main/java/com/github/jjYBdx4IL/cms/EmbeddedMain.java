@@ -276,19 +276,4 @@ public class EmbeddedMain {
         return System.getProperty("basedir") != null;
     }
 
-    private static void prependHandler(Server server, Handler _handler) {
-        Handler handler = server.getHandler();
-        if (handler instanceof HandlerCollection) {
-            HandlerCollection handlerCollection = (HandlerCollection) handler;
-            Handler[] srcHandlers = handlerCollection.getHandlers();
-            Handler[] handlers = new Handler[srcHandlers.length + 1];
-            handlers[0] = _handler;
-            for (int i = 1; i <= srcHandlers.length; i++) {
-                handlers[i] = srcHandlers[i - 1];
-            }
-            handlerCollection.setHandlers(handlers);
-        } else {
-            LOG.error("failed to add session handler to server handlers, " + handler);
-        }
-    }
 }

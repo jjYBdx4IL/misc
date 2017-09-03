@@ -17,7 +17,6 @@ public class SessionData implements Serializable {
     public static final String SESSION_ATTRNAME = "session.data";
 
     private User user = null;
-    private String email = null;
     private String googleOauth2StateSecret = null;
 
     public User getUser() {

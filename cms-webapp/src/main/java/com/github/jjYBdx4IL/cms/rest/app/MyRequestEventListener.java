@@ -1,7 +1,5 @@
 package com.github.jjYBdx4IL.cms.rest.app;
 
-import static j2html.TagCreator.iff;
-
 import com.github.jjYBdx4IL.cms.jpa.tx.Tx;
 import com.github.jjYBdx4IL.cms.jpa.tx.TxRo;
 

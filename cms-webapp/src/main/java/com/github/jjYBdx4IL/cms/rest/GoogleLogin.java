@@ -143,7 +143,7 @@ public class GoogleLogin {
 
         session.setUser(user);
 
-        return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path(Root.class).build())
+        return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path(Home.class).build())
             .status(HttpServletResponse.SC_FOUND).build();
     }
 

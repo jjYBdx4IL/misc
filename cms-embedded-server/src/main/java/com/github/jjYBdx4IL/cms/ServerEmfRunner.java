@@ -85,6 +85,10 @@ public class ServerEmfRunner implements Listener {
         File cfgFile = new File(Env.getConfigDir(ServerEmfRunner.class).getParentFile(),
             "com.google.api.client.GoogleOauth2ExampleTest" + File.separator +
                 "googleOauth2Client.properties");
+        if (!cfgFile.exists()) {
+            LOG.error("config file not found: " + cfgFile.getAbsolutePath());
+            return;
+        }
         EntityManager em = emf.createEntityManager();
         try {
             Properties p = new Properties();
