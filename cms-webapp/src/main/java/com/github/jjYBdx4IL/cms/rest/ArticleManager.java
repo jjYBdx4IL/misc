@@ -1,10 +1,11 @@
 package com.github.jjYBdx4IL.cms.rest;
 
+import static j2html.TagCreator.br;
 import static j2html.TagCreator.div;
 import static j2html.TagCreator.each;
-import static j2html.TagCreator.h3;
-import static j2html.TagCreator.i;
-import static j2html.TagCreator.span;
+import static j2html.TagCreator.form;
+import static j2html.TagCreator.input;
+import static j2html.TagCreator.textarea;
 
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.jpa.dto.QueryFactory;
@@ -57,56 +58,50 @@ public class ArticleManager {
 
         List<Article> articles = QueryFactory.getArticleDisplayList(em, null).getResultList();
 
-        ContainerTag titleRow = div(
-            h3("Article Manager").withClass("col-6 articleManagerTitle"),
-            htmlBuilder.iconTextLink("col-6", "add_box", "Create new", ArticleManager.class, "create"))
-                .withClass("row articleManagerTitleBar");
         ContainerTag articleListRow = div(
-            each(articles, article -> div(
-                div(article.getTitle()).withClass("articleTitle"))
-                    .withClass("col-12 article")))
-                        .withClass("row");
+            each(articles,
+                article -> div(
+                    div(article.getTitle()).withClass("articleTitle")
+                ).withClass("col-12 article")
+            )
+        ).withClass("row");
 
-        htmlBuilder.mainAdd(div(titleRow, articleListRow).withClass("container articleManager"));
+        htmlBuilder.setPageTitle("Article Manager")
+            .addPageTitleSubItem("add_box", "Create new", ArticleManager.class, "create")
+            .mainAdd(
+                div(articleListRow).withClass("container articleManager")
+            );
 
         return htmlBuilder.toString();
-        //
-        // List<Article> articles = QueryFactory.getArticleDisplayList(em,
-        // null).getResultList();
-        //
-        // ContainerTag loginButton = div(session.isAuthenticated()
-        // ? div(span("logged in as: " + session.getUser().getEmail() + " ("),
-        // a("logout").withHref("logout"), span(")"))
-        // : a(img().withSrc(""))
-        // .withHref(uriInfo.getBaseUriBuilder().path(GoogleLogin.class).build().toString()))
-        // .withClass("loginButton");
-        // ContainerTag articleList = div(each(articles, article -> div(
-        // div(article.getTitle()).withClass("title"),
-        // div(article.getContent()).withClass("content")).withClass("article"))).withClass("articles");
-        // ContainerTag editForm = div(session.isAuthenticated()
-        // ? form().withMethod("post").with(
-        // input().withName("title").withPlaceholder("title").isRequired(),
-        // br(),
-        // textarea().withName("content").isRequired(),
-        // br(),
-        // input().withType("submit").withName("submitButton").withValue("save"))
-        // : null).withClass("editForm");
-        // return HtmlUtils.htmlDoc("Embedded Jetty + Jersey + JPA + J2HTML
-        // Demo",
-        // div(loginButton, articleList, editForm).withClass("cssgrid"));
     }
+
     @GET
     @Produces(MediaType.TEXT_HTML)
     @TxRo
     @Path("create")
     public String create() {
         LOG.trace("create()");
-        return "";
+
+        ContainerTag formRow = div(
+            form().withMethod("post").with(
+                input().withName("title").withPlaceholder("title").isRequired(),
+                br(),
+                textarea().withName("content").isRequired(),
+                br(),
+                input().withType("submit").withName("submitButton").withValue("save")
+            ).withClass("col-12 editForm")
+        ).withClass("row");
+
+        htmlBuilder.setPageTitle("Create New Article")
+            .mainAdd(div(formRow).withClass("container articleManager"));
+
+        return htmlBuilder.toString();
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Tx
+    @Path("create")
     public Response post(@FormParam("title") String title, @FormParam("content") String content) {
         LOG.trace("post()");
 
@@ -125,7 +120,8 @@ public class ArticleManager {
         article.setLastModified(article.getCreatedAt());
         em.persist(article);
 
-        return Response.temporaryRedirect(uriInfo.getAbsolutePathBuilder().build()).status(HttpServletResponse.SC_FOUND)
+        return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path(ArticleManager.class).build())
+            .status(HttpServletResponse.SC_FOUND)
             .build();
     }
 

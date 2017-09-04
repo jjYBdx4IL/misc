@@ -93,4 +93,13 @@ main a.iconTextLink:active {
     color: black;
 }
 
+form input {
+	width: 90%;
+}
+
+form textarea {
+    width: 90%;
+    height: 24em;
+}
+
 

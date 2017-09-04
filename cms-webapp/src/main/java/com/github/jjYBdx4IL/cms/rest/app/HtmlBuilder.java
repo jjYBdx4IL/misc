@@ -35,6 +35,7 @@ public class HtmlBuilder {
 
     private UriInfo uriInfo = null;
     private String title = null;
+    private String pageTitle = "";
     private String lang = "en";
     private String description = null;
     private String author = null;
@@ -44,8 +45,9 @@ public class HtmlBuilder {
     private SessionData session = null;
     private final List<String> cssUrls = new ArrayList<>();
     private final List<String> scriptUrls = new ArrayList<>();
-    private final ContainerTag _main = main();
+    private final List<DomContent> mainContent = new ArrayList<>();
     private final ContainerTag _footer = footer();
+    private final List<ContainerTag> pageTitleRowSubItems = new ArrayList<>();
 
     private HtmlBuilder() {
     }
@@ -53,23 +55,7 @@ public class HtmlBuilder {
     public static HtmlBuilder createDefault() {
         HtmlBuilder htmlBuilder = new HtmlBuilder();
 
-        htmlBuilder.addCssUrl("assets/style.css");
-        htmlBuilder.addCssUrl("assets/simplegrid.css");
-        // spinning icons: https://www.w3schools.com/w3css/w3css_icons.asp
-        // <!-- https://material.io/icons/ -->
-        htmlBuilder.addCssUrl("https://fonts.googleapis.com/icon?family=Material+Icons");
-        htmlBuilder.addCssUrl("https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css");
-        htmlBuilder.addScriptUrl("http://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js");
-        htmlBuilder.addScriptUrl("https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
-        htmlBuilder.addScriptUrl("assets/header.js");
-
-        htmlBuilder.setTitle("Page Title");
-
         return htmlBuilder;
-    }
-
-    public ContainerTag getMain() {
-        return _main;
     }
 
     public ContainerTag getFooter() {
@@ -118,6 +104,20 @@ public class HtmlBuilder {
     }
 
     public String toString() {
+        String baseUri = uriInfo.getBaseUriBuilder().build().toString();
+
+        addCssUrl(baseUri + "assets/style.css");
+        addCssUrl(baseUri + "assets/simplegrid.css");
+        // spinning icons: https://www.w3schools.com/w3css/w3css_icons.asp
+        // <!-- https://material.io/icons/ -->
+        addCssUrl("https://fonts.googleapis.com/icon?family=Material+Icons");
+        addCssUrl("https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css");
+        addScriptUrl("http://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js");
+        addScriptUrl("https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
+        addScriptUrl(baseUri + "assets/header.js");
+
+        setTitle("Page Title");
+
         if (session.isAuthenticated()) {
             setSignOutLink(uriInfo.getBaseUriBuilder().path(Logout.class).build().toString());
         } else {
@@ -129,11 +129,16 @@ public class HtmlBuilder {
 
         ContainerTag menu = null;
         if (session.isAuthenticated()) {
-            menu = Grid.container(Grid.row(
-                iconTextLink("col-6", "view_list", "Article Manager", ArticleManager.class),
-                Grid.cell(6, "Menu item 2"),
-                Grid.cell(12, "Menu item 3"))).withClass("container menu");
+            menu = Grid.container(
+                Grid.row(
+                    iconTextLink("col-6", "view_list", "Article Manager", ArticleManager.class),
+                    Grid.cell(6, "Menu item 2"),
+                    Grid.cell(12, "Menu item 3")
+                    )
+                ).withClass("container menu");
         }
+
+        ContainerTag _main = constructMainSection();
 
         return document(
             html(
@@ -143,26 +148,38 @@ public class HtmlBuilder {
                     author != null ? meta().attr("author", author) : null,
                     meta().attr("http-equiv", "Content-Type").attr("content", "text/html;charset=UTF-8"),
                     meta().attr("name", "viewport").attr("content", "width=device-width, initial-scale=1"),
-                    each(cssUrls,
+                    each(
+                        cssUrls,
                         stylesheet -> link().withRel("stylesheet").withType("text/css").withHref(stylesheet)),
-                    each(scriptUrls,
-                        script -> script().withType("text/javascript").withSrc(script))),
-                body(header(div(div(
-                    h3(a(title).withHref(homeLink)).withClass("col-8-sm"),
-                    div().condWith(signInLink != null, a("sign in").withHref(signInLink).withClass("signin"))
-                        .condWith(session.isAuthenticated(),
-                            i("menu").withClass("menuIcon material-icons").attr("title",
-                                "Menu"))
-                        .condWith(signOutLink != null,
-                            a("exit_to_app").withHref(signOutLink).withClass("signout material-icons").attr("title",
-                                signoutTooltipText))
-                        .withClass("col-4-sm right")).withClass("row")).withClass("container titlebar"))
-                            .condWith(menu != null, menu),
-                    _main, _footer)).attr("lang", lang));
+                    each(
+                        scriptUrls, script -> script().withType("text/javascript").withSrc(script))
+                    ),
+                body(
+                    header(
+                        div(
+                            div(
+                                h3(a(title).withHref(homeLink)).withClass("col-8-sm"),
+                                div().condWith(signInLink != null,
+                                    a("sign in").withHref(signInLink).withClass("signin")
+                                ).condWith(session.isAuthenticated(),
+                                    i("menu").withClass("menuIcon material-icons").attr("title", "Menu")
+                                ).condWith(signOutLink != null,
+                                    a("exit_to_app").withHref(signOutLink).withClass("signout material-icons")
+                                        .attr("title", signoutTooltipText)
+                                ).withClass("col-4-sm right")
+                                ).withClass("row")
+                            ).withClass("container titlebar")
+                        ).condWith(menu != null, menu),
+                    _main, _footer
+                    )
+                ).attr("lang", lang)
+            );
     }
 
     public HtmlBuilder mainAdd(DomContent... dc) {
-        _main.with(dc);
+        for (DomContent _dc : dc) {
+            mainContent.add(_dc);
+        }
         return this;
     }
 
@@ -191,8 +208,10 @@ public class HtmlBuilder {
 
     public ContainerTag iconTextLink(String cssClass, String materialIconId, String text, Class<?> resource,
         String method) {
-        return iconTextLink(cssClass, materialIconId, text,
-            uriInfo.getBaseUriBuilder().path(resource).path(method).toString());
+        return iconTextLink(
+            cssClass, materialIconId, text,
+            uriInfo.getBaseUriBuilder().path(resource).path(method).toString()
+            );
     }
 
     public ContainerTag iconTextLink(String cssClass, String materialIconId, String text, Class<?> resource) {
@@ -200,7 +219,60 @@ public class HtmlBuilder {
     }
 
     public ContainerTag iconTextLink(String cssClass, String materialIconId, String text, String href) {
-        return a(i(materialIconId).withClass("material-icons"), span(text))
-            .withHref(href).withClass(cssClass + " iconTextLink");
+        return a(
+            i(materialIconId).withClass("material-icons"), span(text)
+            ).withHref(href).withClass((cssClass != null ? cssClass + " " : "") + "iconTextLink");
+    }
+
+    public String getPageTitle() {
+        return pageTitle;
+    }
+
+    public HtmlBuilder setPageTitle(String pageTitle) {
+        this.pageTitle = pageTitle != null ? pageTitle : "";
+        return this;
+    }
+
+    public HtmlBuilder addPageTitleSubItem(String materialIconId, String text, Class<?> resource, String method) {
+        pageTitleRowSubItems.add(
+            iconTextLink(null, materialIconId, text, resource, method)
+            );
+        return this;
+    }
+
+    public HtmlBuilder addPageTitleSubItem(String materialIconId, String text, Class<?> resource) {
+        pageTitleRowSubItems.add(
+            iconTextLink(null, materialIconId, text, resource)
+            );
+        return this;
+    }
+
+    public HtmlBuilder addPageTitleSubItem(String materialIconId, String text, String href) {
+        pageTitleRowSubItems.add(
+            iconTextLink(null, materialIconId, text, href)
+            );
+        return this;
+    }
+
+    private ContainerTag constructMainSection() {
+        ContainerTag _main = main();
+        if (!pageTitle.isEmpty() || !pageTitleRowSubItems.isEmpty()) {
+            String colClass = (pageTitle.isEmpty() || pageTitleRowSubItems.isEmpty())
+                ? "col-12"
+                : "col-6";
+            ContainerTag pageTitleRow = div().withClass("row pageTitleRow");
+            pageTitleRow.condWith(!pageTitle.isEmpty(), h3(pageTitle).withClass(colClass + " pageTitle"));
+            if (!pageTitleRowSubItems.isEmpty()) {
+                ContainerTag subItems = div(
+                    pageTitleRowSubItems.toArray(new ContainerTag[pageTitleRowSubItems.size()])
+                    ).withClass(colClass + " pageTitleSubItems");
+                pageTitleRow.with(subItems);
+            }
+            _main.with(div(pageTitleRow).withClass("container pageTitleContainer"));
+        }
+        for (DomContent dc : mainContent) {
+            _main.with(dc);
+        }
+        return _main;
     }
 }
