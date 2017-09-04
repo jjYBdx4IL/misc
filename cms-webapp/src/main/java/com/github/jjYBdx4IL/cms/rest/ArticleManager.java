@@ -1,5 +1,6 @@
 package com.github.jjYBdx4IL.cms.rest;
 
+import static j2html.TagCreator.a;
 import static j2html.TagCreator.br;
 import static j2html.TagCreator.div;
 import static j2html.TagCreator.each;
@@ -28,10 +29,12 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import j2html.tags.ContainerTag;
@@ -58,11 +61,14 @@ public class ArticleManager {
 
         List<Article> articles = QueryFactory.getArticleDisplayList(em, null).getResultList();
 
+        UriBuilder urlTpl = uriInfo.getAbsolutePathBuilder().path(ArticleManager.class, "edit");
+
         ContainerTag articleListRow = div(
             each(articles,
-                article -> div(
+                article -> a(
                     div(article.getTitle()).withClass("articleTitle")
-                ).withClass("col-12 article")
+                ).withHref(urlTpl.build(article.getId()).toString())
+                    .withClass("col-12 article")
             )
         ).withClass("row");
 
@@ -102,7 +108,7 @@ public class ArticleManager {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Tx
     @Path("create")
-    public Response post(@FormParam("title") String title, @FormParam("content") String content) {
+    public Response createSave(@FormParam("title") String title, @FormParam("content") String content) {
         LOG.trace("post()");
 
         if (title == null || title.isEmpty()) {
@@ -118,6 +124,72 @@ public class ArticleManager {
         article.setOwner(session.getUser());
         article.setCreatedAt(new Date());
         article.setLastModified(article.getCreatedAt());
+        em.persist(article);
+
+        return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path(ArticleManager.class).build())
+            .status(HttpServletResponse.SC_FOUND)
+            .build();
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @TxRo
+    @Path("edit/{articleId}")
+    public Response edit(@PathParam("articleId") long articleId) {
+        LOG.trace("edit()");
+
+        Article article = em.find(Article.class, articleId);
+        
+        if (article == null) {
+            return Response.status(HttpServletResponse.SC_NOT_FOUND).entity("not found").build();
+        }
+        
+        if (article.getOwner().getGoogleUniqueId() == null
+            || !article.getOwner().getGoogleUniqueId().equals(session.getUser().getGoogleUniqueId())) {
+            return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("access denied").build();
+        }
+        
+        ContainerTag formRow = div(
+            form().withMethod("post").with(
+                input().withName("title").withPlaceholder("title").isRequired().withValue(article.getTitle()),
+                br(),
+                textarea().withName("content").isRequired().withText(article.getContent()),
+                br(),
+                input().withType("submit").withName("submitButton").withValue("save")
+            ).withClass("col-12 editForm")
+        ).withClass("row");
+
+        htmlBuilder.setPageTitle("Create New Article")
+            .mainAdd(div(formRow).withClass("container articleManager"));
+
+        return Response.ok().entity(htmlBuilder.toString())
+            .build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Tx
+    @Path("edit/{articleId}")
+    public Response editSave(@PathParam("articleId") long articleId,
+        @FormParam("title") String title, @FormParam("content") String content) {
+        LOG.trace("edit()");
+
+        if (title == null || title.isEmpty()) {
+            return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("title required").build();
+        }
+        if (content == null || content.isEmpty()) {
+            return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("content required").build();
+        }
+
+        Article article = em.find(Article.class, articleId);
+        
+        if (!session.getUser().hasWriteAccessTo(article)) {
+            return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("access denied").build();
+        }
+        
+        article.setTitle(title);
+        article.setContent(content);
+        article.setLastModified(new Date());
         em.persist(article);
 
         return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path(ArticleManager.class).build())

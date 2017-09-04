@@ -97,4 +97,13 @@ public class User implements Serializable {
         return version;
     }
 
+    public boolean hasWriteAccessTo(Article article) {
+        if (article == null || article.getOwner() == null || article.getOwner().getGoogleUniqueId() == null) {
+            return false;
+        }
+        if (getGoogleUniqueId() == null) {
+            return false;
+        }
+        return getGoogleUniqueId().equals(article.getOwner().getGoogleUniqueId());
+    }
 }
