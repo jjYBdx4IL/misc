@@ -10,6 +10,7 @@ import static j2html.TagCreator.textarea;
 
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.jpa.dto.QueryFactory;
+import com.github.jjYBdx4IL.cms.jpa.dto.Tag;
 import com.github.jjYBdx4IL.cms.jpa.tx.Tx;
 import com.github.jjYBdx4IL.cms.jpa.tx.TxRo;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
@@ -18,8 +19,11 @@ import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -31,6 +35,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -88,18 +93,12 @@ public class ArticleManager {
     public String create() {
         LOG.trace("create()");
 
-        ContainerTag formRow = div(
-            form().withMethod("post").with(
-                input().withName("title").withPlaceholder("title").isRequired(),
-                br(),
-                textarea().withName("content").isRequired(),
-                br(),
-                input().withType("submit").withName("submitButton").withValue("save")
-            ).withClass("col-12 editForm")
-        ).withClass("row");
+        ContainerTag formRow = articleEditForm(null);
 
         htmlBuilder.setPageTitle("Create New Article")
-            .mainAdd(div(formRow).withClass("container articleManager"));
+            .setJsValue("tagSearchApiEndpoint",
+                uriInfo.getBaseUriBuilder().path(ArticleManager.class).path("tagSearch").build().toString()
+            ).mainAdd(div(formRow).withClass("container articleManager"));
 
         return htmlBuilder.toString();
     }
@@ -108,8 +107,11 @@ public class ArticleManager {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Tx
     @Path("create")
-    public Response createSave(@FormParam("title") String title, @FormParam("content") String content) {
-        LOG.trace("post()");
+    public Response createSave(
+        @FormParam("title") String title,
+        @FormParam("content") String content,
+        @FormParam("tags") String tagsValue) {
+        LOG.trace("createSave()");
 
         if (title == null || title.isEmpty()) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("title required").build();
@@ -118,12 +120,18 @@ public class ArticleManager {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("content required").build();
         }
 
+        Set<Tag> tags = parseTags(tagsValue);
+        if (tags == null) {
+            return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("bad tag name").build();
+        }
+
         Article article = new Article();
         article.setTitle(title);
         article.setContent(content);
         article.setOwner(session.getUser());
         article.setCreatedAt(new Date());
         article.setLastModified(article.getCreatedAt());
+        article.setTags(tags);
         em.persist(article);
 
         return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path(ArticleManager.class).build())
@@ -139,28 +147,22 @@ public class ArticleManager {
         LOG.trace("edit()");
 
         Article article = em.find(Article.class, articleId);
-        
+
         if (article == null) {
             return Response.status(HttpServletResponse.SC_NOT_FOUND).entity("not found").build();
         }
-        
+
         if (article.getOwner().getGoogleUniqueId() == null
             || !article.getOwner().getGoogleUniqueId().equals(session.getUser().getGoogleUniqueId())) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("access denied").build();
         }
-        
-        ContainerTag formRow = div(
-            form().withMethod("post").with(
-                input().withName("title").withPlaceholder("title").isRequired().withValue(article.getTitle()),
-                br(),
-                textarea().withName("content").isRequired().withText(article.getContent()),
-                br(),
-                input().withType("submit").withName("submitButton").withValue("save")
-            ).withClass("col-12 editForm")
-        ).withClass("row");
 
-        htmlBuilder.setPageTitle("Create New Article")
-            .mainAdd(div(formRow).withClass("container articleManager"));
+        ContainerTag formRow = articleEditForm(article);
+
+        htmlBuilder.setPageTitle("Edit Article")
+            .setJsValue("tagSearchApiEndpoint",
+                uriInfo.getBaseUriBuilder().path(ArticleManager.class).path("tagSearch").build().toString()
+            ).mainAdd(div(formRow).withClass("container articleManager"));
 
         return Response.ok().entity(htmlBuilder.toString())
             .build();
@@ -170,9 +172,12 @@ public class ArticleManager {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Tx
     @Path("edit/{articleId}")
-    public Response editSave(@PathParam("articleId") long articleId,
-        @FormParam("title") String title, @FormParam("content") String content) {
-        LOG.trace("edit()");
+    public Response editSave(
+        @PathParam("articleId") long articleId,
+        @FormParam("title") String title,
+        @FormParam("content") String content,
+        @FormParam("tags") String tagsValue) {
+        LOG.trace("editSave()");
 
         if (title == null || title.isEmpty()) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("title required").build();
@@ -181,15 +186,21 @@ public class ArticleManager {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("content required").build();
         }
 
-        Article article = em.find(Article.class, articleId);
+        Set<Tag> tags = parseTags(tagsValue);
+        if (tags == null) {
+            return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("bad tag name").build();
+        }
         
+        Article article = em.find(Article.class, articleId);
+
         if (!session.getUser().hasWriteAccessTo(article)) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("access denied").build();
         }
-        
+
         article.setTitle(title);
         article.setContent(content);
         article.setLastModified(new Date());
+        article.setTags(tags);
         em.persist(article);
 
         return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path(ArticleManager.class).build())
@@ -197,4 +208,71 @@ public class ArticleManager {
             .build();
     }
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @TxRo
+    @Path("tagSearch")
+    public Response tagSearch(@QueryParam("term") String term) {
+        LOG.trace("tagSearch()");
+
+        if (term == null) {
+            return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("term param required").build();
+        }
+
+        List<Tag> tags = QueryFactory.getTags(em, term).getResultList();
+
+        List<String> tagNames = new ArrayList<>();
+        tags.forEach(tag -> tagNames.add(tag.getName()));
+
+        return Response.ok().entity(tagNames).build();
+    }
+
+    protected ContainerTag articleEditForm(Article article) {
+        return div(
+            form().withMethod("post").with(
+                input().withName("title").withPlaceholder("title").isRequired()
+                    .withValue(article != null ? article.getTitle() : ""),
+                br(),
+                textarea().withName("content").isRequired()
+                    .withText(article != null ? article.getContent() : ""),
+                br(),
+                input().withName("tags").withId("tags").withPlaceholder("Tags")
+                    .withValue(createTagsString(article)),
+                br(),
+                input().withType("submit").withName("submitButton").withValue("save")
+            ).withClass("col-12 editForm")
+        ).withClass("row");
+    }
+
+    protected Set<Tag> parseTags(String tagsValue) {
+        Set<Tag> tags = new HashSet<>();
+        for (String tagName : tagsValue.split("[\\s,]+")) {
+            if (tagName.isEmpty()) {
+                continue;
+            }
+            if (!Tag.NAME_PATTERN.matcher(tagName).find()) {
+                return null;
+            }
+            List<Tag> _tags = QueryFactory.getTag(em, tagName).getResultList();
+            Tag tag;
+            if (!_tags.isEmpty()) {
+                tag = _tags.get(0);
+            } else {
+                tag = new Tag();
+                tag.setName(tagName);
+                tag.setDescription("");
+            }
+            tags.add(tag);
+        }
+        return tags;
+    }
+    
+    protected String createTagsString(Article article) {
+        if (article == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        article.getTags().forEach(tag -> sb.append(sb.length() != 0 ? ", " : "").append(tag.getName()));
+        return sb.toString();
+    }
 }

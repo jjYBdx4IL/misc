@@ -23,13 +23,18 @@ import com.github.jjYBdx4IL.cms.rest.Home;
 import com.github.jjYBdx4IL.cms.rest.LoginSelect;
 import com.github.jjYBdx4IL.cms.rest.Logout;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.UriInfo;
 
 import j2html.tags.ContainerTag;
 import j2html.tags.DomContent;
+import j2html.tags.UnescapedText;
 
 public class HtmlBuilder {
 
@@ -48,6 +53,7 @@ public class HtmlBuilder {
     private final List<DomContent> mainContent = new ArrayList<>();
     private final ContainerTag _footer = footer();
     private final List<ContainerTag> pageTitleRowSubItems = new ArrayList<>();
+    private final Map<String, String> jsValues = new HashMap<>();
 
     private HtmlBuilder() {
     }
@@ -103,9 +109,15 @@ public class HtmlBuilder {
         this.signOutLink = signOutLink;
     }
 
+    public HtmlBuilder setJsValue(String varName, String value) {
+        jsValues.put(varName, value);
+        return this;
+    }
+
     public String toString() {
         String baseUri = uriInfo.getBaseUriBuilder().build().toString();
 
+        setJsValue("assetsUri", baseUri + "assets/");
         addCssUrl(baseUri + "assets/style.css");
         addCssUrl(baseUri + "assets/simplegrid.css");
         // spinning icons: https://www.w3schools.com/w3css/w3css_icons.asp
@@ -115,6 +127,7 @@ public class HtmlBuilder {
         addScriptUrl("http://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js");
         addScriptUrl("https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
         addScriptUrl(baseUri + "assets/header.js");
+        addScriptUrl(baseUri + "assets/tag-autocomplete.js");
 
         setTitle("Page Title");
 
@@ -148,6 +161,7 @@ public class HtmlBuilder {
                     author != null ? meta().attr("author", author) : null,
                     meta().attr("http-equiv", "Content-Type").attr("content", "text/html;charset=UTF-8"),
                     meta().attr("name", "viewport").attr("content", "width=device-width, initial-scale=1"),
+                    createJsValuesScript(),
                     each(
                         cssUrls,
                         stylesheet -> link().withRel("stylesheet").withType("text/css").withHref(stylesheet)),
@@ -274,5 +288,17 @@ public class HtmlBuilder {
             _main.with(dc);
         }
         return _main;
+    }
+
+    private ContainerTag createJsValuesScript() {
+        if (jsValues.isEmpty()) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        jsValues.forEach((k, v) -> sb.append("    var ").append(k).append(" = '")
+            .append(StringEscapeUtils.escapeEcmaScript(v)).append("';\n")
+        );
+        return script().withType("text/javascript")
+            .with(new UnescapedText(StringEscapeUtils.escapeHtml4(sb.toString())));
     }
 }

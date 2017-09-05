@@ -19,6 +19,28 @@ public class QueryFactory {
     private QueryFactory() {
     }
 
+    public static TypedQuery<Tag> getTag(EntityManager em, String tagName) {
+        if (tagName == null) {
+            throw new IllegalArgumentException();
+        }
+        final CriteriaBuilder cb = em.getCriteriaBuilder();
+        final CriteriaQuery<Tag> cq = cb.createQuery(Tag.class);
+        final Root<Tag> root = cq.from(Tag.class);
+        cq.where(cb.equal(cb.lower(root.get(Tag_.name)), tagName.toLowerCase()));
+        return em.createQuery(cq);
+    }
+
+    public static TypedQuery<Tag> getTags(EntityManager em, String tagPrefix) {
+        final CriteriaBuilder cb = em.getCriteriaBuilder();
+        final CriteriaQuery<Tag> cq = cb.createQuery(Tag.class);
+        final Root<Tag> root = cq.from(Tag.class);
+        if (tagPrefix != null) {
+            cq.where(cb.like(cb.lower(root.get(Tag_.name)), tagPrefix + "%"));
+        }
+        cq.orderBy(cb.asc(root.get(Tag_.name)));
+        return em.createQuery(cq);
+    }
+
     public static TypedQuery<Article> getArticleDisplayList(EntityManager em, String tag) {
         final CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         final CriteriaQuery<Article> criteriaQuery = criteriaBuilder.createQuery(Article.class);

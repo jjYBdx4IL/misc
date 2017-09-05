@@ -8,10 +8,10 @@ header {
 	background: black;
 	color: white;
 	height: 40px;
-/* 	height: auto; */
+	/* 	height: auto; */
 	position: fixed;
 	top: 0px;
-    transition: top 200ms ease-in-out;
+	transition: top 200ms ease-in-out;
 	width: 100%;
 	z-index: 210;
 	overflow: hidden;
@@ -40,14 +40,14 @@ header div.row>div {
 
 /* a.signout { */
 header .titlebar .material-icons {
-    top: -0.16em;
-    position: relative;
+	top: -0.16em;
+	position: relative;
 	font-size: 2em;
 	padding-left: 0.5em;
 }
 
 .container .row .iconTextLink * {
-    vertical-align: middle;
+	vertical-align: middle;
 }
 
 .signin:hover {
@@ -59,7 +59,7 @@ header .titlebar .material-icons {
 }
 
 header a:link {
-    text-decoration: none;
+	text-decoration: none;
 	color: white;
 }
 
@@ -75,22 +75,21 @@ header a:active {
 	color: white;
 }
 
-
 main a.iconTextLink:link {
-    text-decoration: none;
-    color: black;
+	text-decoration: none;
+	color: black;
 }
 
 main a.iconTextLink:visited {
-    color: black;
+	color: black;
 }
 
 main a.iconTextLink:hover {
-    color: black;
+	color: black;
 }
 
 main a.iconTextLink:active {
-    color: black;
+	color: black;
 }
 
 form input {
@@ -98,8 +97,12 @@ form input {
 }
 
 form textarea {
-    width: 90%;
-    height: 24em;
+	width: 90%;
+	height: 24em;
 }
 
-
+/* jquery */
+.ui-autocomplete-loading {
+	background: white url("images/spinner.gif") right center no-repeat;
+	background-size: 16px;
+}

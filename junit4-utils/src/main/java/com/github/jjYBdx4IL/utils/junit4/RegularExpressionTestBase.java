@@ -55,7 +55,7 @@ public class RegularExpressionTestBase {
         Matcher m = p.matcher(input);
 
         if (expectedValues.length == 0) {
-            assertFalse("regex does not match the test string", m.find());
+            assertTrue("regex does not match the test string", m.find());
             return;
         }
 

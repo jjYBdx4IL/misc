@@ -1,6 +1,8 @@
 package com.github.jjYBdx4IL.cms.jpa.dto;
 
 import java.io.Serializable;
+import java.util.regex.Pattern;
+
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,6 +17,8 @@ import javax.persistence.Version;
 @Entity
 public class Tag implements Serializable {
 
+    public static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9-]+$");
+    
     public Tag() {
     }
 
@@ -22,7 +26,9 @@ public class Tag implements Serializable {
     @GeneratedValue
     private Long id;
     @Basic
-    private String value;
+    private String name;
+    @Basic
+    private String description;
     @Version
     private int version;
 
@@ -36,15 +42,15 @@ public class Tag implements Serializable {
     /**
      * @return the value
      */
-    public String getValue() {
-        return value;
+    public String getName() {
+        return name;
     }
 
     /**
      * @param value the value to set
      */
-    public void setValue(String value) {
-        this.value = value;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -54,18 +60,38 @@ public class Tag implements Serializable {
         return version;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("SomeValue [");
-        builder.append("id=");
-        builder.append(id);
-        builder.append(", value=");
-        builder.append(value);
-        builder.append(", version=");
-        builder.append(version);
-        builder.append("]");
-        return builder.toString();
+    public String getDescription() {
+        return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((name == null) ? 0 : name.toLowerCase().hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Tag other = (Tag) obj;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equalsIgnoreCase(other.name))
+            return false;
+        return true;
+    }
+
+    
 }
