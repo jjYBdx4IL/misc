@@ -7,6 +7,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -42,17 +44,15 @@ public class QueryFactory {
     }
 
     public static TypedQuery<Article> getArticleDisplayList(EntityManager em, String tag) {
-        final CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        final CriteriaQuery<Article> criteriaQuery = criteriaBuilder.createQuery(Article.class);
-        final Root<Article> root = criteriaQuery.from(Article.class);
+        final CriteriaBuilder cb = em.getCriteriaBuilder();
+        final CriteriaQuery<Article> cq = cb.createQuery(Article.class);
+        final Root<Article> root = cq.from(Article.class);
         if (tag != null) {
-            Predicate predicate = criteriaBuilder.equal(
-                root.get(Article_.tags),
-                tag);
-            criteriaQuery.where(predicate);
+            final Join<Article, Tag> tagRoot = root.join(Article_.tags, JoinType.INNER);
+            cq.where(cb.equal(cb.lower(tagRoot.get(Tag_.name)), tag));
         }
-        criteriaQuery.orderBy(criteriaBuilder.desc(root.get(Article_.createdAt)));
-        return em.createQuery(criteriaQuery);
+        cq.orderBy(cb.desc(root.get(Article_.createdAt)));
+        return em.createQuery(cq);
     }
 
     public static TypedQuery<User> getUserByGoogleUid(EntityManager em, String uid) {

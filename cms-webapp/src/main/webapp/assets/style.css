@@ -101,6 +101,20 @@ form textarea {
 	height: 24em;
 }
 
+.tagLineHeader {
+    font-size: 0.82em;
+}
+
+.tag {
+	background: #ccf;
+/* 	border: 2px solid blue; */
+/*     border-radius: 1em; */
+    display: inline;
+    font-size: 0.82em;
+    padding: 0 0.2em;
+    margin: 0 0.2em;
+}
+
 /* jquery */
 .ui-autocomplete-loading {
 	background: white url("images/spinner.gif") right center no-repeat;

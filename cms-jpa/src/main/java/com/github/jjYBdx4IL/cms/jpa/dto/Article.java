@@ -21,38 +21,38 @@ import javax.persistence.Version;
 
 @SuppressWarnings("serial")
 @Entity
-@Table(indexes={
-    @Index(name="CREATEDAT_INDEX", unique=false, columnList="createdAt")
+@Table(indexes = {
+    @Index(name = "CREATEDAT_INDEX", unique = false, columnList = "createdAt")
 })
 public class Article implements Serializable {
 
     @Id
     @GeneratedValue
     private Long id;
-    
+
     @Basic(optional = false)
-    @ManyToOne(fetch=FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "owner")
     private User owner;
-    
-    @OneToMany(cascade = {CascadeType.ALL})
+
+    @OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
     private Collection<Tag> tags = new ArrayList<>();
-    
+
     @Basic(optional = false)
     @Column(columnDefinition = "TEXT")
     private String title;
-    
+
     @Basic(optional = false)
     @Column(columnDefinition = "TEXT")
     private String content;
-    
+
     @Basic(optional = false)
-    @Column(name="createdAt")
+    @Column(name = "createdAt")
     private Date createdAt;
-    
+
     @Basic(optional = false)
     private Date lastModified;
-    
+
     @Version
     private int version;
 
