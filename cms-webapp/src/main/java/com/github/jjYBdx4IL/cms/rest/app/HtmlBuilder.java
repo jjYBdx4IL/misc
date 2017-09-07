@@ -7,6 +7,7 @@ import static j2html.TagCreator.document;
 import static j2html.TagCreator.each;
 import static j2html.TagCreator.footer;
 import static j2html.TagCreator.h3;
+import static j2html.TagCreator.h4;
 import static j2html.TagCreator.head;
 import static j2html.TagCreator.header;
 import static j2html.TagCreator.html;
@@ -18,10 +19,12 @@ import static j2html.TagCreator.script;
 import static j2html.TagCreator.span;
 import static j2html.TagCreator.title;
 
+import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.rest.ArticleManager;
 import com.github.jjYBdx4IL.cms.rest.Home;
 import com.github.jjYBdx4IL.cms.rest.LoginSelect;
 import com.github.jjYBdx4IL.cms.rest.Logout;
+import com.github.jjYBdx4IL.cms.rest.Search;
 
 import org.apache.commons.text.StringEscapeUtils;
 
@@ -30,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import j2html.tags.ContainerTag;
@@ -47,6 +51,7 @@ public class HtmlBuilder {
     private String signInLink = null;
     private String signOutLink = null;
     private String homeLink = null;
+    private boolean noIndex = false;
     private SessionData session = null;
     private final List<String> cssUrls = new ArrayList<>();
     private final List<String> scriptUrls = new ArrayList<>();
@@ -62,6 +67,10 @@ public class HtmlBuilder {
         HtmlBuilder htmlBuilder = new HtmlBuilder();
 
         return htmlBuilder;
+    }
+
+    public void enableNoIndex() {
+        noIndex = true;
     }
 
     public ContainerTag getFooter() {
@@ -137,6 +146,8 @@ public class HtmlBuilder {
             setSignInLink(uriInfo.getBaseUriBuilder().path(LoginSelect.class).build().toString());
         }
 
+        String searchLink = uriInfo.getBaseUriBuilder().path(Search.class).build().toString();
+
         String signoutTooltipText = "Sign out." +
             (session.isAuthenticated() ? "\nCurrently signed in as:\n" + session.getUser().getEmail() : "");
 
@@ -159,6 +170,7 @@ public class HtmlBuilder {
                     title != null ? title(title) : null,
                     description != null ? meta().attr("description", description) : null,
                     author != null ? meta().attr("author", author) : null,
+                    noIndex ? meta().attr("name", "robots").attr("content", "noindex") : null,
                     meta().attr("http-equiv", "Content-Type").attr("content", "text/html;charset=UTF-8"),
                     meta().attr("name", "viewport").attr("content", "width=device-width, initial-scale=1"),
                     createJsValuesScript(),
@@ -173,14 +185,17 @@ public class HtmlBuilder {
                         div(
                             div(
                                 h3(a(title).withHref(homeLink)).withClass("col-8-sm"),
-                                div().condWith(signInLink != null,
-                                    a("sign in").withHref(signInLink).withClass("signin")
-                                ).condWith(session.isAuthenticated(),
-                                    i("menu").withClass("menuIcon material-icons").attr("title", "Menu")
-                                ).condWith(signOutLink != null,
-                                    a("exit_to_app").withHref(signOutLink).withClass("signout material-icons")
-                                        .attr("title", signoutTooltipText)
-                                ).withClass("col-4-sm right")
+                                div().with(
+                                    a("search").withHref(searchLink).withClass("material-icons")
+                                    ).condWith(session.isAuthenticated(),
+                                        i("menu").withClass("menuIcon material-icons").attr("title", "Menu")
+                                    ).condWith(signOutLink != null,
+                                        a("exit_to_app").withHref(signOutLink).withClass("signout material-icons")
+                                            .attr("title", signoutTooltipText)
+                                    ).condWith(signInLink != null,
+                                        a("vpn_key").withHref(signInLink).withClass("material-icons")
+                                        .attr("title", "Sign in")
+                                    ).withClass("col-4-sm right")
                                 ).withClass("row")
                             ).withClass("container titlebar")
                         ).condWith(menu != null, menu),
@@ -301,4 +316,21 @@ public class HtmlBuilder {
         return script().withType("text/javascript")
             .with(new UnescapedText(StringEscapeUtils.escapeHtml4(sb.toString())));
     }
+
+    public ContainerTag createArticleListRow(List<Article> articles) {
+        UriBuilder uriBuilder = uriInfo.getBaseUriBuilder().path(Home.class, "byTag");
+        return div(
+            each(articles,
+                article -> div(
+                    h4(article.getTitle()).withClass("articleTitle"),
+                    div(article.getContent()).withClass("articleContent"),
+                    span("Tags: ").withClass("tagLineHeader"),
+                    each(article.getTags(),
+                        tag -> a(tag.getName()).withHref(uriBuilder.build(tag.getName()).toString()).withClass("tag")
+                    )
+                    ).withClass("col-12 article")
+            )
+            ).withClass("row");
+    }
+
 }

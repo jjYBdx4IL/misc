@@ -1,5 +1,9 @@
 package com.github.jjYBdx4IL.cms.jpa.dto;
 
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +28,7 @@ import javax.persistence.Version;
 @Table(indexes = {
     @Index(name = "CREATEDAT_INDEX", unique = false, columnList = "createdAt")
 })
+@Indexed
 public class Article implements Serializable {
 
     @Id
@@ -40,10 +45,12 @@ public class Article implements Serializable {
 
     @Basic(optional = false)
     @Column(columnDefinition = "TEXT")
+    @Field(store=Store.NO)
     private String title;
 
     @Basic(optional = false)
     @Column(columnDefinition = "TEXT")
+    @Field(store=Store.NO)
     private String content;
 
     @Basic(optional = false)

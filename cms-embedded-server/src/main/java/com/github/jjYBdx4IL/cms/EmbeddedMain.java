@@ -153,11 +153,13 @@ public class EmbeddedMain {
 
         // database/JPA
         String jdbcUrl = "jdbc:h2:" + new File(cwd, "data/db/h2").getAbsolutePath();
+        File searchIndexDir = new File(cwd, "data/searchindex");
         if (isDevel()) {
             jdbcUrl = "jdbc:h2:" + new File(Maven.getMavenBasedir(), "target/h2db").getAbsolutePath();
+            searchIndexDir = new File(Maven.getMavenBasedir(), "target/searchindex");
         }
         new Resource(server, "jdbc/url", jdbcUrl);
-        server.addLifeCycleListener(new ServerEmfRunner(server, jdbcUrl));
+        server.addLifeCycleListener(new ServerEmfRunner(server, jdbcUrl, searchIndexDir));
 
         // H2 frontend
         // lifecycle handlers run outside webapps, so can't make use of jndi

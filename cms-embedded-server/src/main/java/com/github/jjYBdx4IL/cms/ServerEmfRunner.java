@@ -43,10 +43,12 @@ public class ServerEmfRunner implements Listener {
     private EntityManagerFactory emf = null;
     private final Server server;
     private final String jdbcUrl;
+    private final File searchIndexDir;
 
-    public ServerEmfRunner(Server server, String jdbcUrl) {
+    public ServerEmfRunner(Server server, String jdbcUrl, File searchIndexDir) {
         this.server = server;
         this.jdbcUrl = jdbcUrl;
+        this.searchIndexDir = searchIndexDir;
     }
 
     protected void doStart() throws Exception {
@@ -72,6 +74,8 @@ public class ServerEmfRunner implements Listener {
         props.put(AvailableSettings.SHOW_SQL, "true");
         props.put(AvailableSettings.JPA_JDBC_DRIVER, Driver.class.getName());
         props.put(AvailableSettings.JPA_JDBC_URL, jdbcUrl);
+        props.put("hibernate.search.default.directory_provider", "filesystem");
+        props.put("hibernate.search.default.indexBase", searchIndexDir.getAbsolutePath());
         emf = Persistence.createEntityManagerFactory("default", props);
 
         LOG.info("binding jpa/emf for " + server + " to " + emf);

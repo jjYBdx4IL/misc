@@ -35,6 +35,7 @@ public class RootIT {
 
         // GET non-existing element
         Response response = (Response) invocationBuilder.get();
+        assertNotNull(response);
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
         //assertTrue(response.readEntity(String.class).contains("<h3>Please enter key-value pair</h3>"));
     }
