@@ -11,6 +11,9 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * 
@@ -21,6 +24,7 @@ import javax.persistence.Version;
 @Table(indexes={
     @Index(name="USER_GOOGLE_UID_INDEX", unique=true, columnList="GOOGLE_UID")
 })
+@XmlAccessorType(XmlAccessType.NONE)
 public class User implements Serializable {
 
     public User() {
@@ -31,6 +35,7 @@ public class User implements Serializable {
     private Long id;
     @Basic
     @Column(name="GOOGLE_UID")
+    @XmlElement
     private String googleUniqueId;
     @Basic
     private String email;

@@ -8,6 +8,7 @@ import static j2html.TagCreator.form;
 import static j2html.TagCreator.input;
 import static j2html.TagCreator.textarea;
 
+import com.github.jjYBdx4IL.cms.jaxb.dto.ExportDump;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.jpa.dto.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Tag;
@@ -19,6 +20,7 @@ import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -41,6 +43,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 import j2html.tags.ContainerTag;
 
@@ -190,7 +195,7 @@ public class ArticleManager {
         if (tags == null) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("bad tag name").build();
         }
-        
+
         Article article = em.find(Article.class, articleId);
 
         if (!session.getUser().hasWriteAccessTo(article)) {
@@ -225,6 +230,25 @@ public class ArticleManager {
         tags.forEach(tag -> tagNames.add(tag.getName()));
 
         return Response.ok().entity(tagNames).build();
+    }
+
+    @GET
+    @Produces({MediaType.APPLICATION_XML, MediaType.TEXT_XML})
+    @TxRo
+    @Path("export")
+    public Response export() throws JAXBException {
+        LOG.trace("export()");
+
+        JAXBContext jaxbContext = JAXBContext.newInstance(ExportDump.class);
+        Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+        // output pretty printed
+        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        List<Article> articles = QueryFactory.getArticleDisplayList(em, null).getResultList();
+        jaxbMarshaller.marshal(new ExportDump(articles), baos);
+
+        return Response.ok().entity(baos.toString()).build();
     }
 
     protected ContainerTag articleEditForm(Article article) {
@@ -266,7 +290,7 @@ public class ArticleManager {
         }
         return tags;
     }
-    
+
     protected String createTagsString(Article article) {
         if (article == null) {
             return "";

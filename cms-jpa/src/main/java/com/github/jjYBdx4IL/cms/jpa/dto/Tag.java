@@ -8,6 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Version;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * 
@@ -15,17 +18,23 @@ import javax.persistence.Version;
  */
 @SuppressWarnings("serial")
 @Entity
+@XmlAccessorType(XmlAccessType.NONE)
 public class Tag implements Serializable {
 
     public static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9-]+$");
     
     public Tag() {
     }
+    
+    public Tag(String name) {
+        this.name = name;
+    }
 
     @Id
     @GeneratedValue
     private Long id;
     @Basic
+    @XmlElement
     private String name;
     @Basic
     private String description;

@@ -22,6 +22,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 
 @SuppressWarnings("serial")
 @Entity
@@ -29,6 +32,7 @@ import javax.persistence.Version;
     @Index(name = "CREATEDAT_INDEX", unique = false, columnList = "createdAt")
 })
 @Indexed
+@XmlAccessorType(XmlAccessType.NONE)
 public class Article implements Serializable {
 
     @Id
@@ -36,28 +40,34 @@ public class Article implements Serializable {
     private Long id;
 
     @Basic(optional = false)
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "owner")
+    @XmlElement
     private User owner;
 
     @ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+    @XmlElement
     private Collection<Tag> tags = new ArrayList<>();
 
     @Basic(optional = false)
     @Column(columnDefinition = "TEXT")
     @Field(store=Store.NO)
+    @XmlElement
     private String title;
 
     @Basic(optional = false)
     @Column(columnDefinition = "TEXT")
     @Field(store=Store.NO)
+    @XmlElement
     private String content;
 
     @Basic(optional = false)
     @Column(name = "createdAt")
+    @XmlElement
     private Date createdAt;
 
     @Basic(optional = false)
+    @XmlElement
     private Date lastModified;
 
     @Version

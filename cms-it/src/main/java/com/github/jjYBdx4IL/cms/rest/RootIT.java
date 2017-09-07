@@ -5,6 +5,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import com.github.jjYBdx4IL.cms.jaxb.dto.ExportDump;
+import com.github.jjYBdx4IL.cms.jpa.dto.Article;
+import com.github.jjYBdx4IL.cms.jpa.dto.Tag;
 import com.github.jjYBdx4IL.utils.text.PasswordGenerator;
 import com.github.jjYBdx4IL.wsverifier.WebsiteVerifier;
 
@@ -16,6 +19,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
@@ -25,6 +29,8 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 
 public class RootIT {
 
@@ -34,7 +40,7 @@ public class RootIT {
     private static final String rootUrl = "http://localhost:" + System.getProperty("jetty.http.port", "9999") + "/";
 
     @Test
-    public void testWorkflow() {
+    public void testWorkflow() throws Exception {
         // GET empty main page
         Response response = (Response) getTarget("").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
@@ -97,6 +103,27 @@ public class RootIT {
         response = (Response) getTarget("search?q=notexisting389jk4387d").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
         assertFalse(response.readEntity(String.class).contains(title));
+        
+        // check export
+        response = (Response) getTarget("articleManager/export").request(MediaType.TEXT_XML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        responseContent = response.readEntity(String.class); 
+     
+        JAXBContext jaxbContext = JAXBContext.newInstance(ExportDump.class);
+        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+        ExportDump dump = (ExportDump) jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(responseContent.getBytes()));
+
+        Article article = null;
+        for (Article _article : dump.getArticles()) {
+            if (title.equals(_article.getTitle())) {
+                article = _article;
+                break;
+            }
+        }
+        assertEquals(content, article.getContent());
+        assertEquals(1, article.getTags().size());
+        assertTrue(article.getTags().contains(new Tag(tag)));
+        assertEquals("1", article.getOwner().getGoogleUniqueId());
     }
 
     @Test
