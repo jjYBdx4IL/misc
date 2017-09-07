@@ -21,6 +21,8 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,14 +43,28 @@ public class WebsiteVerifierTest extends AbstractHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebsiteVerifierTest.class);
 
-    @Test
-    public void test() throws Exception {
-        Server server = new Server(0);
+    Server server = null;
+    String serverUrl = null;
+
+    @Before
+    public void before() throws Exception {
+        server = new Server(0);
         server.setHandler(this);
         server.start();
-        String serverUrl = getURL(server).toExternalForm();
+        serverUrl = getURL().toExternalForm();
         LOG.info("server URL: " + serverUrl);
+    }
 
+    @After
+    public void after() throws Exception {
+        if (server != null) {
+            server.stop();
+            server = null;
+        }
+    }
+
+    @Test
+    public void test() throws Exception {
         WebsiteVerifier verifier = new WebsiteVerifier();
         assertFalse(verifier.verify(serverUrl));
         assertFalse(verifier.isOk());
@@ -63,11 +79,18 @@ public class WebsiteVerifierTest extends AbstractHandler {
         Set<String> referralUrls = verifier.getPagesContainingUrl(serverUrl + "a.png");
         assertEquals(1, referralUrls.size());
         assertTrue(referralUrls.contains(serverUrl));
-
-        server.stop();
+    }
+    
+    @Test
+    public void testBadInitialUrl() {
+        WebsiteVerifier verifier = new WebsiteVerifier();
+        assertFalse(verifier.verify(serverUrl + "//lakjsdasf8usadfn/a/s/df"));
+        assertFalse(verifier.isOk());
+        // check resultToString for this special case:
+        verifier.resultToString();
     }
 
-    public URL getURL(Server server) throws MalformedURLException, UnknownHostException {
+    public URL getURL() throws MalformedURLException, UnknownHostException {
         ServerConnector connector = (ServerConnector) server.getConnectors()[0];
         InetAddress addr = InetAddress.getLocalHost();
         return new URL(

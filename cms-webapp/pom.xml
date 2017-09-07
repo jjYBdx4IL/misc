@@ -98,7 +98,7 @@
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <packagingExcludes>**/*.cache.ttf,**/hosted.html,WEB-INF/web.devel.xml,WEB-INF/jetty-env.xml,WEB-INF/jetty.devel.xml</packagingExcludes>
+                    <packagingExcludes>**/*.cache.ttf,**/hosted.html,WEB-INF/web.devel.xml,WEB-INF/jetty.devel.xml</packagingExcludes>
                     <!-- do NOT archive classes, or jetty:run's auto-reload does not work -->
                     <archiveClasses>false</archiveClasses>
                     <attachClasses>true</attachClasses>

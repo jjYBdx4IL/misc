@@ -9,9 +9,9 @@ Linux command line tools. Cygwin should be supported, too.
 
 ## allow port < 1024 access to regular user on web server machine:
 
-apt-get install authbind
-touch /etc/authbind/byport/80 /etc/authbind/byport/443
-chmod 777 /etc/authbind/byport/80 /etc/authbind/byport/443
+    apt-get install authbind
+    touch /etc/authbind/byport/80 /etc/authbind/byport/443
+    chmod 777 /etc/authbind/byport/80 /etc/authbind/byport/443
 
 ## start jetty on server start
 
@@ -23,17 +23,17 @@ Add this to /etc/rc.local (on debian based machines):
 
 ## deploy update
 
-mvn clean install
-mvn antrun:run@go-live -Ddeployment.sshacct=web@gruust.stream
+    mvn clean install
+    mvn antrun:run@go-live -Ddeployment.sshacct=web@gruust.stream
 
 ## database managment frontend
 
 The server includes a database managment frontend that can be accessed using a web browser
 by pointing it to http://localhost:8083. Redirect the port via:
 
-    ssh -L 8083:localhost:8083 web@gruust.stream
+    ssh -L 8084:localhost:8083 web@gruust.stream
 
-Live backups can be done by issuing the sql statement "backup to data/db-backup-<date>.zip".
+Live backups can be done by issuing the sql statement "backup to 'data/db-backup-<date>.zip'".
 
 The managment frontend's main purpose is to be able to configure the server via database
 entries, ie. not having to use a bunch of config files and thus having an easy one-stop
@@ -58,9 +58,9 @@ After that, change into /etc/letsencrypt/live/<your-domain> directory and do:
     openssl pkcs12 -inkey privkey.pem -in cert.pem -export -out jetty.pkcs12 -passout pass:password
     rm -f keystore
     keytool -importkeystore -srckeystore jetty.pkcs12 -srcstoretype PKCS12 -destkeystore keystore -deststorepass password -srcstorepass password
-    mv -f keystore /home/web/gwt-example-dist/data/.
-    chown web.web /home/web/gwt-example-dist/data/keystore
-    chmod 600 /home/web/gwt-example-dist/data/keystore
+    mv -f keystore /home/web/cms-dist/data/.
+    chown web.web /home/web/cms-dist/data/keystore
+    chmod 600 /home/web/cms-dist/data/keystore
 
 ## INTEGRATION TESTS
 

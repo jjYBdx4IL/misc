@@ -49,7 +49,7 @@ public class QueryFactory {
         final Root<Article> root = cq.from(Article.class);
         if (tag != null) {
             final Join<Article, Tag> tagRoot = root.join(Article_.tags, JoinType.INNER);
-            cq.where(cb.equal(cb.lower(tagRoot.get(Tag_.name)), tag));
+            cq.where(cb.equal(cb.lower(tagRoot.get(Tag_.name)), tag.toLowerCase()));
         }
         cq.orderBy(cb.desc(root.get(Article_.createdAt)));
         return em.createQuery(cq);

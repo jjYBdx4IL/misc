@@ -2,11 +2,9 @@ package com.github.jjYBdx4IL.cms;
 
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigValue;
-import com.github.jjYBdx4IL.utils.env.Env;
 
 import org.eclipse.jetty.plus.jndi.Resource;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle.Listener;
 import org.h2.Driver;
@@ -55,7 +53,7 @@ public class ServerEmfRunner implements Listener {
         getEmfInstance();
 
         // do some db initialization when running in development environment:
-        if (System.getProperty("basedir") != null) {
+        if (EmbeddedMain.isDevel) {
             doDevelInit();
         }
     }
@@ -86,9 +84,7 @@ public class ServerEmfRunner implements Listener {
 
     private void doDevelInit() throws FileNotFoundException, IOException {
         LOG.info("doDevelInit()");
-        File cfgFile = new File(Env.getConfigDir(ServerEmfRunner.class).getParentFile(),
-            "com.google.api.client.GoogleOauth2ExampleTest" + File.separator +
-                "googleOauth2Client.properties");
+        File cfgFile = new File(EmbeddedMain.configDir, "googleOauth2Client.properties");
         if (!cfgFile.exists()) {
             LOG.error("config file not found: " + cfgFile.getAbsolutePath());
             return;

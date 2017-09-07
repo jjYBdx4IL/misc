@@ -1,10 +1,16 @@
 package com.github.jjYBdx4IL.cms.rest;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import com.github.jjYBdx4IL.utils.text.PasswordGenerator;
 import com.github.jjYBdx4IL.wsverifier.WebsiteVerifier;
 
+import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -15,8 +21,7 @@ import java.util.logging.LogRecord;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -29,15 +34,69 @@ public class RootIT {
     private static final String rootUrl = "http://localhost:" + System.getProperty("jetty.http.port", "9999") + "/";
 
     @Test
-    public void testGetMainPage() {
-        WebTarget webTarget = getClient().target(rootUrl);
-        Invocation.Builder invocationBuilder = webTarget.request(MediaType.TEXT_HTML);
-
-        // GET non-existing element
-        Response response = (Response) invocationBuilder.get();
-        assertNotNull(response);
+    public void testWorkflow() {
+        // GET empty main page
+        Response response = (Response) getTarget("").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
-        //assertTrue(response.readEntity(String.class).contains("<h3>Please enter key-value pair</h3>"));
+
+        // devel login
+        response = (Response) getTarget("devel/login").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+
+        final String title = "t" + PasswordGenerator.generate55(11);
+        final String content = "c" + PasswordGenerator.generate55(11);
+        final String tag = "a" + PasswordGenerator.generate55(11);
+        
+        final String titleB = "t" + PasswordGenerator.generate55(11);
+        final String contentB = "c" + PasswordGenerator.generate55(11);
+        final String tagB = "a" + PasswordGenerator.generate55(11);
+
+        response = (Response) getTarget("articleManager/create").request()
+            .post(Entity.entity(String.format("title=%s&content=%s&tags=%s", title, content, tag),
+                MediaType.APPLICATION_FORM_URLENCODED));
+        assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
+
+        response = (Response) getTarget("articleManager/create").request()
+            .post(Entity.entity(String.format("title=%s&content=%s&tags=%s", titleB, contentB, tagB),
+                MediaType.APPLICATION_FORM_URLENCODED));
+        assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
+        
+        // check for updated main page
+        response = (Response) getTarget("").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        assertTrue(response.readEntity(String.class).contains(title));
+
+        // check /byTag/...
+        response = (Response) getTarget("byTag/" + tag).request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        String responseContent = response.readEntity(String.class); 
+        assertTrue(responseContent.contains(title));
+        assertFalse(responseContent.contains(titleB));
+
+        response = (Response) getTarget("byTag/" + tag.toLowerCase()).request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        assertTrue(response.readEntity(String.class).contains(title));
+
+        response = (Response) getTarget("byTag/" + tag.toUpperCase()).request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        assertTrue(response.readEntity(String.class).contains(title));
+
+        response = (Response) getTarget("byTag/notexisting12345asd").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        assertFalse(response.readEntity(String.class).contains(title));
+
+        // check /search?q=...
+        response = (Response) getTarget("search?q=" + title).request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        assertTrue(response.readEntity(String.class).contains(title));
+        
+        response = (Response) getTarget("search?q=" + content).request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        assertTrue(response.readEntity(String.class).contains(title));
+        
+        response = (Response) getTarget("search?q=notexisting389jk4387d").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        assertFalse(response.readEntity(String.class).contains(title));
     }
 
     @Test
@@ -48,31 +107,32 @@ public class RootIT {
         }
     }
 
+    protected WebTarget getTarget(String path) {
+        return getClient().target(rootUrl + path);
+    }
+
     protected Client getClient() {
         if (client != null) {
             return client;
         }
         java.util.logging.Logger LOGJ = java.util.logging.Logger.getLogger(RootIT.class.getName());
-        client = ClientBuilder.newClient(new ClientConfig());
+        // add cookie handling support:
+        ClientConfig clientConfig = new ClientConfig().connectorProvider(new ApacheConnectorProvider());
+        client = JerseyClientBuilder.createClient(clientConfig);
         LOGJ.setLevel(java.util.logging.Level.FINEST);
         LOGJ.addHandler(new Handler() {
 
             @Override
             public void publish(LogRecord record) {
                 LOG.info(record.getSourceClassName() + System.lineSeparator() + record.getMessage());
-
             }
 
             @Override
             public void flush() {
-                // TODO Auto-generated method stub
-
             }
 
             @Override
             public void close() throws SecurityException {
-                // TODO Auto-generated method stub
-
             }
         });
         LOGJ.log(java.util.logging.Level.FINEST, "test");

@@ -18,7 +18,7 @@ if [[ -z "$acct" ]]; then
 fi
 host=${acct##*@}
 chktgt=http://$host:80/
-chktgt2=https://$host:443/
+chktgt2=https://$host:443/assets/style.css
 unpd=target/deploy.zip.unpack
 distname=$artifactId
 relexec=./$distname/autostart.sh
@@ -54,5 +54,5 @@ done
 
 uptest
 
-curl -k -s "$chktgt2" | grep sandbox.html >/dev/null
+curl -k -s "$chktgt2" | grep "height:" >/dev/null
 

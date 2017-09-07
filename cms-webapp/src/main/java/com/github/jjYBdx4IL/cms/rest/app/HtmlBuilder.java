@@ -131,10 +131,10 @@ public class HtmlBuilder {
         addCssUrl(baseUri + "assets/simplegrid.css");
         // spinning icons: https://www.w3schools.com/w3css/w3css_icons.asp
         // <!-- https://material.io/icons/ -->
-        addCssUrl("https://fonts.googleapis.com/icon?family=Material+Icons");
-        addCssUrl("https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css");
-        addScriptUrl("http://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js");
-        addScriptUrl("https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
+        addCssUrl("//fonts.googleapis.com/icon?family=Material+Icons");
+        addCssUrl("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css");
+        addScriptUrl("//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js");
+        addScriptUrl("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
         addScriptUrl(baseUri + "assets/header.js");
         addScriptUrl(baseUri + "assets/tag-autocomplete.js");
 

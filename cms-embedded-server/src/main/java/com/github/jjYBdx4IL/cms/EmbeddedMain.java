@@ -1,5 +1,6 @@
 package com.github.jjYBdx4IL.cms;
 
+import com.github.jjYBdx4IL.utils.env.Env;
 import com.github.jjYBdx4IL.utils.env.Maven;
 
 import org.eclipse.jetty.deploy.DeploymentManager;
@@ -25,8 +26,6 @@ import org.eclipse.jetty.server.session.DefaultSessionCache;
 import org.eclipse.jetty.server.session.DefaultSessionIdManager;
 import org.eclipse.jetty.server.session.FileSessionDataStore;
 import org.eclipse.jetty.server.session.SessionHandler;
-import org.eclipse.jetty.util.component.LifeCycle;
-import org.eclipse.jetty.util.component.LifeCycle.Listener;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
@@ -36,7 +35,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.file.Paths;
+import java.util.Properties;
 
 /**
  * http://www.eclipse.org/jetty/documentation/current/embedding-jetty.html
@@ -50,6 +52,8 @@ public class EmbeddedMain {
     private static final Logger LOG = LoggerFactory.getLogger(EmbeddedMain.class);
 
     public static final String JETTY_HTTP_PORT = "jetty.http.port";
+    public static volatile boolean isDevel = false;
+    public static final File configDir = Env.getConfigDir(EmbeddedMain.class);
     private static final String cwd = Paths.get(System.getProperty("appserver.base", "."))
         .toAbsolutePath().normalize().toString();
     // sys prop jetty.port.offset has priority over env var with same name
@@ -126,13 +130,29 @@ public class EmbeddedMain {
 
     // setup-code shared between live and development:
     public static void setup(Server server) throws Exception {
-        LOG.info("setup start " + server.isRunning());
-        //Env.dumpEnvInfo();
+        LOG.info("setup start");
 
         if (server.getHandler() != null) {
             throw new IllegalStateException();
         }
 
+        
+        
+        File cfgFile = new File(EmbeddedMain.configDir, "config.properties");
+        LOG.info("config file: " + cfgFile.getAbsolutePath());
+        if (!cfgFile.exists()) {
+            LOG.info("config file not found: " + cfgFile.getAbsolutePath());
+        } else {
+            Properties p = new Properties();
+            try (InputStream is = new FileInputStream(cfgFile)) {
+                p.load(is);
+            }
+            isDevel = Boolean.parseBoolean((String) p.get("devel"));
+        }
+        LOG.info("isDevel = " + isDevel);
+        
+        
+        
         server.setDumpAfterStart(true);
         server.setDumpBeforeStop(false);
         server.setStopAtShutdown(true);
@@ -182,7 +202,7 @@ public class EmbeddedMain {
             webAppProvider.setMonitoredDirName(cwd + "/apps");
             // webapp_provider.setDefaultsDescriptor(jetty_home +
             // "/etc/webdefault.xml");
-            webAppProvider.setScanInterval(1);
+            webAppProvider.setScanInterval(0);
             webAppProvider.setExtractWars(false);
             webAppProvider.setConfigurationManager(new PropertiesConfigurationManager());
 

@@ -89,7 +89,7 @@ if [[ $cmd == "start" ]]; then
     export PROCIDTAG
     (
         while true; do
-            java -Dh2.bindAddress=localhost -jar $startJar || :
+            $authbind java -Dh2.bindAddress=localhost -jar $startJar || :
             sleep 10
         done
     ) >& $LOGFILE &

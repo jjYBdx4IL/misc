@@ -119,6 +119,8 @@ public class WebsiteVerifier {
         spider.setPageProcessor(pageProcessor)
             .addStartRequests(rootUrl).setSpiderConfig(config);
 
+        registerLink(rootUrl, "start");
+        
         spider.addSpiderListeners(new SpiderListener() {
 
             @Override

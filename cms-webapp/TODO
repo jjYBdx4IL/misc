@@ -1,3 +1,9 @@
 add connection pool, see:
 
 https://stackoverflow.com/questions/12545129/setting-up-jndi-datasource-in-junit
+
+* backup/restore (dump/load to/from XML)
+* Markdown
+* add article path ids for permanent URL construction
+* twitter/fb integration?
+* task scheduler for db snapshot backups and fulltext reindex?
