@@ -8,20 +8,15 @@ import static org.junit.Assert.fail;
 import com.github.jjYBdx4IL.cms.jaxb.dto.ExportDump;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.jpa.dto.Tag;
+import com.github.jjYBdx4IL.utils.jersey.JerseyClientUtils;
 import com.github.jjYBdx4IL.utils.text.PasswordGenerator;
 import com.github.jjYBdx4IL.wsverifier.WebsiteVerifier;
 
-import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.JerseyClientBuilder;
-import org.glassfish.jersey.logging.LoggingFeature;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.client.Client;
@@ -142,28 +137,7 @@ public class RootIT {
         if (client != null) {
             return client;
         }
-        java.util.logging.Logger LOGJ = java.util.logging.Logger.getLogger(RootIT.class.getName());
-        // add cookie handling support:
-        ClientConfig clientConfig = new ClientConfig().connectorProvider(new ApacheConnectorProvider());
-        client = JerseyClientBuilder.createClient(clientConfig);
-        LOGJ.setLevel(java.util.logging.Level.FINEST);
-        LOGJ.addHandler(new Handler() {
-
-            @Override
-            public void publish(LogRecord record) {
-                LOG.info(record.getSourceClassName() + System.lineSeparator() + record.getMessage());
-            }
-
-            @Override
-            public void flush() {
-            }
-
-            @Override
-            public void close() throws SecurityException {
-            }
-        });
-        LOGJ.log(java.util.logging.Level.FINEST, "test");
-        client.register(new LoggingFeature(LOGJ, LoggingFeature.Verbosity.PAYLOAD_ANY));
-        return client;
+        client = JerseyClientUtils.createClient();
+        return client; 
     }
 }
