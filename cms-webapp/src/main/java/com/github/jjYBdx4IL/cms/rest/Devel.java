@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.security.DenyAll;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.ws.rs.GET;
@@ -23,6 +24,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 @Path("devel")
+@DenyAll
 public class Devel {
 
     private static final Logger LOG = LoggerFactory.getLogger(Devel.class);

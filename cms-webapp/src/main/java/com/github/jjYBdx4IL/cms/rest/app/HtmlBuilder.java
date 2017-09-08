@@ -153,12 +153,12 @@ public class HtmlBuilder {
 
         ContainerTag menu = null;
         if (session.isAuthenticated()) {
-            menu = Grid.container(
-                Grid.row(
+            menu = div(
+                div(
                     iconTextLink("col-6", "view_list", "Article Manager", ArticleManager.class),
-                    Grid.cell(6, "Menu item 2"),
-                    Grid.cell(12, "Menu item 3")
-                    )
+                    div("Menu item 2").withClass("col-6"),
+                    div("Menu item 3").withClass("col-12")
+                    ).withClass("row")
                 ).withClass("container menu");
         }
 
@@ -194,7 +194,7 @@ public class HtmlBuilder {
                                             .attr("title", signoutTooltipText)
                                     ).condWith(signInLink != null,
                                         a("vpn_key").withHref(signInLink).withClass("material-icons")
-                                        .attr("title", "Sign in")
+                                            .attr("title", "Sign in")
                                     ).withClass("col-4-sm right")
                                 ).withClass("row")
                             ).withClass("container titlebar")

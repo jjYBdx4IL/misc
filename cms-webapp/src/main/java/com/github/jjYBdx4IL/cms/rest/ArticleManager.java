@@ -8,19 +8,21 @@ import static j2html.TagCreator.form;
 import static j2html.TagCreator.input;
 import static j2html.TagCreator.textarea;
 
+import com.github.jjYBdx4IL.cms.jaxb.dto.ArticleDTO;
 import com.github.jjYBdx4IL.cms.jaxb.dto.ExportDump;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
+import com.github.jjYBdx4IL.cms.jpa.dto.ConfigValue;
 import com.github.jjYBdx4IL.cms.jpa.dto.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Tag;
 import com.github.jjYBdx4IL.cms.jpa.tx.Tx;
 import com.github.jjYBdx4IL.cms.jpa.tx.TxRo;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
+import com.github.jjYBdx4IL.cms.rest.app.Role;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -47,13 +50,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 import j2html.tags.ContainerTag;
 
 @Path("articleManager")
+@RolesAllowed(Role.ADMIN)
 public class ArticleManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(ArticleManager.class);
@@ -70,10 +72,10 @@ public class ArticleManager {
     @GET
     @Produces(MediaType.TEXT_HTML)
     @TxRo
-    public String get() {
+    public Response get() {
         LOG.trace("get()");
 
-        List<Article> articles = QueryFactory.getArticleDisplayList(em, null).getResultList();
+        List<Article> articles = QueryFactory.getArticleDisplayList(em, null, session.getUser()).getResultList();
 
         UriBuilder urlTpl = uriInfo.getAbsolutePathBuilder().path(ArticleManager.class, "edit");
 
@@ -92,14 +94,14 @@ public class ArticleManager {
                 div(articleListRow).withClass("container articleManager")
             );
 
-        return htmlBuilder.toString();
+        return Response.ok().entity(htmlBuilder.toString()).build();
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     @TxRo
     @Path("create")
-    public String create() {
+    public Response create() {
         LOG.trace("create()");
 
         ContainerTag formRow = articleEditForm(null);
@@ -109,7 +111,7 @@ public class ArticleManager {
                 uriInfo.getBaseUriBuilder().path(ArticleManager.class).path("tagSearch").build().toString()
             ).mainAdd(div(formRow).withClass("container articleManager"));
 
-        return htmlBuilder.toString();
+        return Response.ok().entity(htmlBuilder.toString()).build();
     }
 
     @POST
@@ -118,12 +120,16 @@ public class ArticleManager {
     @Path("create")
     public Response createSave(
         @FormParam("title") String title,
+        @FormParam("pathId") String pathId,
         @FormParam("content") String content,
         @FormParam("tags") String tagsValue) {
         LOG.trace("createSave()");
 
         if (title == null || title.isEmpty()) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("title required").build();
+        }
+        if (pathId == null || pathId.isEmpty()) {
+            return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("pathId required").build();
         }
         if (content == null || content.isEmpty()) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("content required").build();
@@ -136,6 +142,7 @@ public class ArticleManager {
 
         Article article = new Article();
         article.setTitle(title);
+        article.setPathId(pathId);
         article.setContent(content);
         article.setOwner(session.getUser());
         article.setCreatedAt(new Date());
@@ -184,12 +191,16 @@ public class ArticleManager {
     public Response editSave(
         @PathParam("articleId") long articleId,
         @FormParam("title") String title,
+        @FormParam("pathId") String pathId,
         @FormParam("content") String content,
         @FormParam("tags") String tagsValue) {
         LOG.trace("editSave()");
 
         if (title == null || title.isEmpty()) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("title required").build();
+        }
+        if (pathId == null || pathId.isEmpty()) {
+            return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("pathId required").build();
         }
         if (content == null || content.isEmpty()) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("content required").build();
@@ -207,6 +218,7 @@ public class ArticleManager {
         }
 
         article.setTitle(title);
+        article.setPathId(pathId);
         article.setContent(content);
         article.setLastModified(new Date());
         article.setTags(tags);
@@ -243,9 +255,10 @@ public class ArticleManager {
     public Response exportDump() throws JAXBException {
         LOG.trace("export()");
 
-        List<Article> articles = QueryFactory.getArticleDisplayList(em, null).getResultList();
+        List<Article> articles = QueryFactory.getArticleDisplayList(em, null, session.getUser()).getResultList();
+        List<ConfigValue> configValues = QueryFactory.getAllConfigValues(em).getResultList();
 
-        return Response.ok().entity(new ExportDump(articles)).build();
+        return Response.ok().entity(ExportDump.create(articles, configValues)).build();
     }
 
     @POST
@@ -254,7 +267,7 @@ public class ArticleManager {
     @Path("import")
     public Response importDump(ExportDump dump) throws JAXBException {
         LOG.trace("import()");
-
+        
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaDelete<Article> cd = cb.createCriteriaDelete(Article.class);
         cd.from(Article.class);
@@ -263,15 +276,23 @@ public class ArticleManager {
         Map<String, Tag> tagMap = new HashMap<>();
         QueryFactory.getTags(em, null).getResultList().forEach(tag -> tagMap.put(tag.getId(), tag));
 
-        for (Article article : dump.getArticles()) {
+        for (ArticleDTO dto : dump.getArticles()) {
+            Article article = new Article();
+            article.setTitle(dto.getTitle());
+            article.setPathId(dto.getPathId());
+            article.setContent(dto.getContent());
+            article.setCreatedAt(dto.getCreatedAt());
+            article.setLastModified(dto.getLastModified());
             article.setOwner(session.getUser());
             List<Tag> tags = new ArrayList<>();
-            for (Tag tag : article.getTags()) {
-                if (tagMap.containsKey(tag.getId())) {
-                    tags.add(tagMap.get(tag.getId()));
+            for (String tagName : dto.getTags()) {
+                String tagId = tagName.toLowerCase();
+                if (tagMap.containsKey(tagId)) {
+                    tags.add(tagMap.get(tagId));
                 } else {
-                    tags.add(tag);
-                    tagMap.put(tag.getId(), tag);
+                    Tag newTag = new Tag(tagName);
+                    tags.add(newTag);
+                    tagMap.put(tagId, newTag);
                 }
             }
             article.setTags(tags);
@@ -286,6 +307,9 @@ public class ArticleManager {
             form().withMethod("post").with(
                 input().withName("title").withPlaceholder("title").isRequired()
                     .withValue(article != null ? article.getTitle() : ""),
+                br(),
+                input().withName("pathId").withPlaceholder("path id").isRequired()
+                    .withValue(article != null ? article.getPathId() : ""),
                 br(),
                 textarea().withName("content").isRequired()
                     .withText(article != null ? article.getContent() : ""),
@@ -328,4 +352,5 @@ public class ArticleManager {
         article.getTags().forEach(tag -> sb.append(sb.length() != 0 ? ", " : "").append(tag.getName()));
         return sb.toString();
     }
+    
 }

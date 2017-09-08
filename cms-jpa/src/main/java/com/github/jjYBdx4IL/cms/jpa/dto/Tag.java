@@ -6,14 +6,10 @@ import java.util.regex.Pattern;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 
 /**
  * 
@@ -21,7 +17,6 @@ import javax.xml.bind.annotation.XmlElement;
  */
 @SuppressWarnings("serial")
 @Entity
-@XmlAccessorType(XmlAccessType.NONE)
 public class Tag implements Serializable {
 
     public static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9-]+$");
@@ -36,12 +31,10 @@ public class Tag implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(length = 32, unique = true)
-    @XmlElement
     private String id;
     
     @Basic(optional = false)
     @Column(length = 32)
-    @XmlElement
     private String name;
 
     @PrePersist
@@ -51,7 +44,7 @@ public class Tag implements Serializable {
     }
 
     @Version
-    private long version;
+    private int version;
     
     /**
      * @return the id

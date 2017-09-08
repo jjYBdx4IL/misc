@@ -5,9 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import com.github.jjYBdx4IL.cms.jaxb.dto.ArticleDTO;
 import com.github.jjYBdx4IL.cms.jaxb.dto.ExportDump;
-import com.github.jjYBdx4IL.cms.jpa.dto.Article;
-import com.github.jjYBdx4IL.cms.jpa.dto.Tag;
 import com.github.jjYBdx4IL.utils.jersey.JerseyClientUtils;
 import com.github.jjYBdx4IL.utils.text.PasswordGenerator;
 import com.github.jjYBdx4IL.wsverifier.WebsiteVerifier;
@@ -40,6 +39,15 @@ public class RootIT {
         Response response = (Response) getTarget("").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
 
+        // test access
+        response = (Response) getTarget("articleManager").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_FORBIDDEN, response.getStatus());
+        response.readEntity(String.class);
+
+        response = (Response) getTarget("articleManager/export").request(MediaType.TEXT_HTML, MediaType.TEXT_XML).get();
+        assertEquals(HttpServletResponse.SC_FORBIDDEN, response.getStatus());
+        response.readEntity(String.class);
+        
         // devel login
         response = (Response) getTarget("devel/login").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
@@ -53,12 +61,12 @@ public class RootIT {
         final String tagB = "a" + PasswordGenerator.generate55(11);
 
         response = (Response) getTarget("articleManager/create").request()
-            .post(Entity.entity(String.format("title=%s&content=%s&tags=%s", title, content, tag),
+            .post(Entity.entity(String.format("title=%s&content=%s&tags=%s&pathId=%s", title, content, tag, title),
                 MediaType.APPLICATION_FORM_URLENCODED));
         assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
 
         response = (Response) getTarget("articleManager/create").request()
-            .post(Entity.entity(String.format("title=%s&content=%s&tags=%s", titleB, contentB, tagB),
+            .post(Entity.entity(String.format("title=%s&content=%s&tags=%s&pathId=%s", titleB, contentB, tagB, titleB),
                 MediaType.APPLICATION_FORM_URLENCODED));
         assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
 
@@ -101,10 +109,11 @@ public class RootIT {
 
         // check export
         response = (Response) getTarget("articleManager/create").request()
-            .post(Entity.entity(String.format("title=%s123&content=%s123&tags=%s", title, content, tag),
+            .post(Entity.entity(
+                String.format("title=%s123&content=%s123&tags=%s&pathId=%s123", title, content, tag, title),
                 MediaType.APPLICATION_FORM_URLENCODED));
         assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
-        
+
         response = (Response) getTarget("articleManager/export").request(MediaType.TEXT_XML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
         responseContent = response.readEntity(String.class);
@@ -113,8 +122,8 @@ public class RootIT {
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         ExportDump dump = (ExportDump) jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(responseContent.getBytes()));
 
-        Article article = null;
-        for (Article _article : dump.getArticles()) {
+        ArticleDTO article = null;
+        for (ArticleDTO _article : dump.getArticles()) {
             if (title.equals(_article.getTitle())) {
                 article = _article;
                 break;
@@ -122,8 +131,7 @@ public class RootIT {
         }
         assertEquals(content, article.getContent());
         assertEquals(1, article.getTags().size());
-        assertTrue(article.getTags().contains(new Tag(tag)));
-        assertEquals("1", article.getOwner().getGoogleUniqueId());
+        assertTrue(article.getTags().contains(tag));
 
         // check import
         response = (Response) getTarget("articleManager/import").request()

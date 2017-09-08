@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletResponse;
@@ -35,6 +36,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 @Path("googleLogin")
+@PermitAll
 public class GoogleLogin {
 
     private static final Logger LOG = LoggerFactory.getLogger(GoogleLogin.class);

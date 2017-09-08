@@ -1,16 +1,17 @@
 package com.github.jjYBdx4IL.cms.rest;
 
 import static j2html.TagCreator.a;
+import static j2html.TagCreator.div;
 import static j2html.TagCreator.h3;
 import static j2html.TagCreator.img;
 
-import com.github.jjYBdx4IL.cms.rest.app.Grid;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -22,6 +23,7 @@ import javax.ws.rs.core.UriInfo;
 import j2html.tags.ContainerTag;
 
 @Path("loginSelect")
+@PermitAll
 public class LoginSelect {
 
     private static final Logger LOG = LoggerFactory.getLogger(LoginSelect.class);
@@ -46,9 +48,11 @@ public class LoginSelect {
             .withHref(uriInfo.getBaseUriBuilder().path(GoogleLogin.class).build().toString());
 
         htmlBuilder.mainAdd(
-            Grid.container(
-                Grid.row(h3("Choose a Login Service:").withClass("col-12 center")),
-                Grid.row(googleSignInButton.withClass("col-12 center"))));
+            div(
+                div(h3("Choose a Login Service:").withClass("col-12 center")).withClass("row"),
+                div(googleSignInButton.withClass("col-12 center")).withClass("row")
+            ).withClass("container")
+        );
 
         return htmlBuilder.toString();
     }

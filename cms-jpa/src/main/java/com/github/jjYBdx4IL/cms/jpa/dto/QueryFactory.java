@@ -43,13 +43,16 @@ public class QueryFactory {
         return em.createQuery(cq);
     }
 
-    public static TypedQuery<Article> getArticleDisplayList(EntityManager em, String tag) {
+    public static TypedQuery<Article> getArticleDisplayList(EntityManager em, String tag, User owner) {
         final CriteriaBuilder cb = em.getCriteriaBuilder();
         final CriteriaQuery<Article> cq = cb.createQuery(Article.class);
         final Root<Article> root = cq.from(Article.class);
         if (tag != null) {
             final Join<Article, Tag> tagRoot = root.join(Article_.tags, JoinType.INNER);
             cq.where(cb.equal(cb.lower(tagRoot.get(Tag_.name)), tag.toLowerCase()));
+        }
+        if (owner != null) {
+            cq.where(cb.equal(root.get(Article_.owner), owner.getId()));
         }
         cq.orderBy(cb.desc(root.get(Article_.createdAt)));
         return em.createQuery(cq);

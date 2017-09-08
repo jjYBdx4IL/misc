@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -22,9 +23,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 
 @SuppressWarnings("serial")
 @Entity
@@ -32,8 +30,9 @@ import javax.xml.bind.annotation.XmlElement;
     @Index(name = "CREATEDAT_INDEX", unique = false, columnList = "createdAt")
 })
 @Indexed
-@XmlAccessorType(XmlAccessType.NONE)
 public class Article implements Serializable {
+
+    public static final Pattern PATHID_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9-]+$");
 
     @Id
     @GeneratedValue
@@ -42,33 +41,32 @@ public class Article implements Serializable {
     @Basic(optional = false)
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "owner")
-    @XmlElement
     private User owner;
 
     @ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
-    @XmlElement
     private Collection<Tag> tags = new ArrayList<>();
 
     @Basic(optional = false)
     @Column(columnDefinition = "TEXT")
-    @Field(store=Store.NO)
-    @XmlElement
+    @Field(store = Store.NO)
     private String title;
 
     @Basic(optional = false)
     @Column(columnDefinition = "TEXT")
-    @Field(store=Store.NO)
-    @XmlElement
+    @Field(store = Store.NO)
     private String content;
 
     @Basic(optional = false)
     @Column(name = "createdAt")
-    @XmlElement
     private Date createdAt;
 
     @Basic(optional = false)
-    @XmlElement
     private Date lastModified;
+
+    // we want articles to have IDs that persevere across exports/imports
+    @Basic(optional = false)
+    @Column(length = 255, unique = true)
+    private String pathId;
 
     @Version
     private int version;
@@ -127,6 +125,14 @@ public class Article implements Serializable {
 
     public int getVersion() {
         return version;
+    }
+
+    public String getPathId() {
+        return pathId;
+    }
+
+    public void setPathId(String pathId) {
+        this.pathId = pathId;
     }
 
 }

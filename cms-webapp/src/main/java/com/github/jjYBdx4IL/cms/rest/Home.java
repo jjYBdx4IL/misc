@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.ws.rs.GET;
@@ -24,6 +25,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 @Path("")
+@PermitAll
 public class Home {
 
     private static final Logger LOG = LoggerFactory.getLogger(Home.class);
@@ -51,7 +53,7 @@ public class Home {
     public Response byTag(@PathParam("tag") String selectedTag) {
         LOG.trace("byTag()");
 
-        List<Article> articles = QueryFactory.getArticleDisplayList(em, selectedTag).getResultList();
+        List<Article> articles = QueryFactory.getArticleDisplayList(em, selectedTag, null).getResultList();
 
         htmlBuilder.mainAdd(
             div(
