@@ -4,9 +4,12 @@ import java.io.Serializable;
 import java.util.regex.Pattern;
 
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -22,29 +25,38 @@ import javax.xml.bind.annotation.XmlElement;
 public class Tag implements Serializable {
 
     public static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9-]+$");
-    
+
     public Tag() {
     }
-    
+
     public Tag(String name) {
         this.name = name;
     }
 
     @Id
-    @GeneratedValue
-    private Long id;
-    @Basic
+    @Basic(optional = false)
+    @Column(length = 32, unique = true)
+    @XmlElement
+    private String id;
+    
+    @Basic(optional = false)
+    @Column(length = 32)
     @XmlElement
     private String name;
-    @Basic
-    private String description;
-    @Version
-    private int version;
 
+    @PrePersist
+    @PreUpdate
+    private void prepare() {
+        this.id = name == null ? null : name.toLowerCase();
+    }
+
+    @Version
+    private long version;
+    
     /**
      * @return the id
      */
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
@@ -56,25 +68,11 @@ public class Tag implements Serializable {
     }
 
     /**
-     * @param value the value to set
+     * @param value
+     *            the value to set
      */
     public void setName(String name) {
         this.name = name;
-    }
-
-    /**
-     * @return the version
-     */
-    public int getVersion() {
-        return version;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     @Override
@@ -102,5 +100,4 @@ public class Tag implements Serializable {
         return true;
     }
 
-    
 }

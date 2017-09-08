@@ -28,7 +28,7 @@ public class QueryFactory {
         final CriteriaBuilder cb = em.getCriteriaBuilder();
         final CriteriaQuery<Tag> cq = cb.createQuery(Tag.class);
         final Root<Tag> root = cq.from(Tag.class);
-        cq.where(cb.equal(cb.lower(root.get(Tag_.name)), tagName.toLowerCase()));
+        cq.where(cb.equal(root.get(Tag_.id), tagName.toLowerCase()));
         return em.createQuery(cq);
     }
 
@@ -37,9 +37,9 @@ public class QueryFactory {
         final CriteriaQuery<Tag> cq = cb.createQuery(Tag.class);
         final Root<Tag> root = cq.from(Tag.class);
         if (tagPrefix != null) {
-            cq.where(cb.like(cb.lower(root.get(Tag_.name)), tagPrefix + "%"));
+            cq.where(cb.like(root.get(Tag_.id), tagPrefix.toLowerCase() + "%"));
         }
-        cq.orderBy(cb.asc(root.get(Tag_.name)));
+        cq.orderBy(cb.asc(root.get(Tag_.id)));
         return em.createQuery(cq);
     }
 

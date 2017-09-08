@@ -47,7 +47,7 @@ public class RootIT {
         final String title = "t" + PasswordGenerator.generate55(11);
         final String content = "c" + PasswordGenerator.generate55(11);
         final String tag = "a" + PasswordGenerator.generate55(11);
-        
+
         final String titleB = "t" + PasswordGenerator.generate55(11);
         final String contentB = "c" + PasswordGenerator.generate55(11);
         final String tagB = "a" + PasswordGenerator.generate55(11);
@@ -61,7 +61,7 @@ public class RootIT {
             .post(Entity.entity(String.format("title=%s&content=%s&tags=%s", titleB, contentB, tagB),
                 MediaType.APPLICATION_FORM_URLENCODED));
         assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
-        
+
         // check for updated main page
         response = (Response) getTarget("").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
@@ -70,7 +70,7 @@ public class RootIT {
         // check /byTag/...
         response = (Response) getTarget("byTag/" + tag).request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
-        String responseContent = response.readEntity(String.class); 
+        String responseContent = response.readEntity(String.class);
         assertTrue(responseContent.contains(title));
         assertFalse(responseContent.contains(titleB));
 
@@ -90,20 +90,25 @@ public class RootIT {
         response = (Response) getTarget("search?q=" + title).request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
         assertTrue(response.readEntity(String.class).contains(title));
-        
+
         response = (Response) getTarget("search?q=" + content).request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
         assertTrue(response.readEntity(String.class).contains(title));
-        
+
         response = (Response) getTarget("search?q=notexisting389jk4387d").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
         assertFalse(response.readEntity(String.class).contains(title));
-        
+
         // check export
+        response = (Response) getTarget("articleManager/create").request()
+            .post(Entity.entity(String.format("title=%s123&content=%s123&tags=%s", title, content, tag),
+                MediaType.APPLICATION_FORM_URLENCODED));
+        assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
+        
         response = (Response) getTarget("articleManager/export").request(MediaType.TEXT_XML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
-        responseContent = response.readEntity(String.class); 
-     
+        responseContent = response.readEntity(String.class);
+
         JAXBContext jaxbContext = JAXBContext.newInstance(ExportDump.class);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         ExportDump dump = (ExportDump) jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(responseContent.getBytes()));
@@ -119,6 +124,11 @@ public class RootIT {
         assertEquals(1, article.getTags().size());
         assertTrue(article.getTags().contains(new Tag(tag)));
         assertEquals("1", article.getOwner().getGoogleUniqueId());
+
+        // check import
+        response = (Response) getTarget("articleManager/import").request()
+            .post(Entity.entity(responseContent, MediaType.TEXT_XML));
+        assertEquals(HttpServletResponse.SC_NO_CONTENT, response.getStatus());
     }
 
     @Test
@@ -138,6 +148,6 @@ public class RootIT {
             return client;
         }
         client = JerseyClientUtils.createClient();
-        return client; 
+        return client;
     }
 }

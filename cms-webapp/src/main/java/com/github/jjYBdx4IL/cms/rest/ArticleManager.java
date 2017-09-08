@@ -23,12 +23,16 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
@@ -233,22 +237,48 @@ public class ArticleManager {
     }
 
     @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.TEXT_XML})
+    @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     @TxRo
     @Path("export")
-    public Response export() throws JAXBException {
+    public Response exportDump() throws JAXBException {
         LOG.trace("export()");
 
-        JAXBContext jaxbContext = JAXBContext.newInstance(ExportDump.class);
-        Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-        // output pretty printed
-        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         List<Article> articles = QueryFactory.getArticleDisplayList(em, null).getResultList();
-        jaxbMarshaller.marshal(new ExportDump(articles), baos);
 
-        return Response.ok().entity(baos.toString()).build();
+        return Response.ok().entity(new ExportDump(articles)).build();
+    }
+
+    @POST
+    @Consumes({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Tx
+    @Path("import")
+    public Response importDump(ExportDump dump) throws JAXBException {
+        LOG.trace("import()");
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaDelete<Article> cd = cb.createCriteriaDelete(Article.class);
+        cd.from(Article.class);
+        em.createQuery(cd).executeUpdate();
+
+        Map<String, Tag> tagMap = new HashMap<>();
+        QueryFactory.getTags(em, null).getResultList().forEach(tag -> tagMap.put(tag.getId(), tag));
+
+        for (Article article : dump.getArticles()) {
+            article.setOwner(session.getUser());
+            List<Tag> tags = new ArrayList<>();
+            for (Tag tag : article.getTags()) {
+                if (tagMap.containsKey(tag.getId())) {
+                    tags.add(tagMap.get(tag.getId()));
+                } else {
+                    tags.add(tag);
+                    tagMap.put(tag.getId(), tag);
+                }
+            }
+            article.setTags(tags);
+            em.persist(article);
+        }
+
+        return Response.noContent().build();
     }
 
     protected ContainerTag articleEditForm(Article article) {
@@ -284,7 +314,6 @@ public class ArticleManager {
             } else {
                 tag = new Tag();
                 tag.setName(tagName);
-                tag.setDescription("");
             }
             tags.add(tag);
         }
