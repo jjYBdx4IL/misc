@@ -3,6 +3,7 @@ package com.github.jjYBdx4IL.cms.rest.app;
 import com.github.jjYBdx4IL.cms.EmbeddedMain;
 import com.github.jjYBdx4IL.cms.rest.Home;
 
+import org.glassfish.hk2.api.InterceptionService;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
@@ -37,15 +38,16 @@ public class RestApp extends ResourceConfig {
             @Override
             public void configure() {
                 bindFactory(EmfFactory.class).to(EntityManagerFactory.class).in(Singleton.class);
-                bindFactory(EmFactory.class).to(EntityManager.class).in(RequestScoped.class);
+                bindFactory(EmFactory.class).to(EntityManager.class)
+                .in(RequestScoped.class);
                 bindFactory(SessionDataFactory.class).to(SessionData.class).in(RequestScoped.class);
                 bindFactory(HtmlBuilderFactory.class).to(HtmlBuilder.class).in(RequestScoped.class);
-                // bindFactory(PermissionsFactory.class).to(Permissions.class).in(RequestScoped.class);
-                bind(Permissions.class).to(Permissions.class).in(RequestScoped.class);
+//                bind(TxInterceptionService.class)
+//                    .to(InterceptionService.class)
+//                    .in(Singleton.class);
             }
         });
-        packages(true, getClass().getPackage().getName());
-        packages(true, Home.class.getPackage().getName());
+        packages(true, getClass().getPackage().getName(), Home.class.getPackage().getName());
     }
 
 }
