@@ -6,7 +6,6 @@ import static j2html.TagCreator.input;
 
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article_;
-import com.github.jjYBdx4IL.cms.jpa.tx.TxRo;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
 
 import org.hibernate.search.exception.EmptyQueryException;
@@ -22,7 +21,6 @@ import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -42,14 +40,14 @@ public class Search {
 
     @Context
     UriInfo uriInfo;
-    @Inject
-    public EntityManager em;
+    @Context
+    private EntityManager em;
     @Inject
     private HtmlBuilder htmlBuilder;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    @TxRo
+//    @TxRo
     public Response search(@QueryParam("q") String searchTerm) {
         LOG.trace("search()");
 

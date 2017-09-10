@@ -1,7 +1,5 @@
 package com.github.jjYBdx4IL.cms.rest.app;
 
-import com.github.jjYBdx4IL.cms.EmbeddedMain;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +22,7 @@ public class Permissions {
 
     public boolean isAllowed(Method method) {
         if (method.isAnnotationPresent(DenyAll.class)) {
-            return EmbeddedMain.isDevel;
+            return isDevel();
         }
         if (method.isAnnotationPresent(PermitAll.class)) {
             return true;
@@ -36,7 +34,7 @@ public class Permissions {
         Class<?> klazz = method.getDeclaringClass();
 
         if (klazz.isAnnotationPresent(DenyAll.class)) {
-            return EmbeddedMain.isDevel;
+            return isDevel();
         }
         if (klazz.isAnnotationPresent(PermitAll.class)) {
             return true;
@@ -70,12 +68,16 @@ public class Permissions {
         if (!session.isAuthenticated()) {
             return false;
         }
-        if (EmbeddedMain.isDevel && session.getUser().getGoogleUniqueId().equals("1")) {
+        if (isDevel() && session.getUser().getGoogleUniqueId().equals("1")) {
             return true;
         }
         if ("101939159763736852726".equals(session.getUser().getGoogleUniqueId())) {
             return true;
         }
+        return false;
+    }
+    
+    public static boolean isDevel() {
         return false;
     }
 

@@ -2,9 +2,8 @@ package com.github.jjYBdx4IL.cms.rest;
 
 import static j2html.TagCreator.div;
 
+import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
-import com.github.jjYBdx4IL.cms.jpa.dto.QueryFactory;
-import com.github.jjYBdx4IL.cms.jpa.tx.TxRo;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
 
 import org.slf4j.Logger;
@@ -15,6 +14,7 @@ import java.util.List;
 import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -32,14 +32,14 @@ public class Home {
 
     @Context
     UriInfo uriInfo;
-    @Inject
-    public EntityManager em;
+    @PersistenceContext
+    EntityManager em;
     @Inject
     private HtmlBuilder htmlBuilder;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    @TxRo
+//    @TxRo
     public Response get() {
         LOG.trace("get()");
 
@@ -48,13 +48,13 @@ public class Home {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    @TxRo
+//    @TxRo
     @Path("byTag/{tag}")
     public Response byTag(@PathParam("tag") String selectedTag) {
         LOG.trace("byTag()");
 
         List<Article> articles = QueryFactory.getArticleDisplayList(em, selectedTag, null).getResultList();
-
+LOG.info(""+htmlBuilder);
         htmlBuilder.mainAdd(
             div(
                 htmlBuilder.createArticleListRow(articles)

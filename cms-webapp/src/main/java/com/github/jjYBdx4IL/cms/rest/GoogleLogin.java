@@ -1,10 +1,8 @@
 package com.github.jjYBdx4IL.cms.rest;
 
+import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
-import com.github.jjYBdx4IL.cms.jpa.dto.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.User;
-import com.github.jjYBdx4IL.cms.jpa.tx.Tx;
-import com.github.jjYBdx4IL.cms.jpa.tx.TxRo;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 import com.github.jjYBdx4IL.utils.text.PasswordGenerator;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
@@ -43,13 +41,13 @@ public class GoogleLogin {
 
     @Context
     UriInfo uriInfo;
-    @Inject
-    public EntityManager em;
-    @Inject
+    @Context
+    private EntityManager em;
+    @Context
     private SessionData session;
 
     @GET
-    @TxRo
+//    @TxRo
     public Response login() throws URISyntaxException {
         LOG.trace("login()");
 
@@ -72,7 +70,7 @@ public class GoogleLogin {
 
     // https://console.developers.google.com/apis/credentials
     @GET
-    @Tx
+//    @Tx
     @Path("googleOauth2Callback")
     public Response callback(@QueryParam("code") String code, @QueryParam("state") String state) throws IOException {
         LOG.trace("callback()");

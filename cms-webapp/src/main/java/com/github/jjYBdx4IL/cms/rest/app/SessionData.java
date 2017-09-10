@@ -4,9 +4,11 @@ import com.github.jjYBdx4IL.cms.jpa.dto.User;
 
 import java.io.Serializable;
 
+import javax.enterprise.context.SessionScoped;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+@SessionScoped
 public class SessionData implements Serializable {
 
     /**

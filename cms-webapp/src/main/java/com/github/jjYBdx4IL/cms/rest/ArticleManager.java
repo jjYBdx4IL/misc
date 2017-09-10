@@ -10,12 +10,10 @@ import static j2html.TagCreator.textarea;
 
 import com.github.jjYBdx4IL.cms.jaxb.dto.ArticleDTO;
 import com.github.jjYBdx4IL.cms.jaxb.dto.ExportDump;
+import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigValue;
-import com.github.jjYBdx4IL.cms.jpa.dto.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Tag;
-import com.github.jjYBdx4IL.cms.jpa.tx.Tx;
-import com.github.jjYBdx4IL.cms.jpa.tx.TxRo;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
 import com.github.jjYBdx4IL.cms.rest.app.Role;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
@@ -62,16 +60,16 @@ public class ArticleManager {
 
     @Context
     UriInfo uriInfo;
-    @Inject
-    public EntityManager em;
-    @Inject
+    @Context
+    private EntityManager em;
+    @Context
     private SessionData session;
     @Inject
     private HtmlBuilder htmlBuilder;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    @TxRo
+    //@TxRo
     public Response get() {
         LOG.trace("get()");
 
@@ -99,7 +97,7 @@ public class ArticleManager {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    @TxRo
+//    @TxRo
     @Path("create")
     public Response create() {
         LOG.trace("create()");
@@ -116,7 +114,7 @@ public class ArticleManager {
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Tx
+//    @Tx
     @Path("create")
     public Response createSave(
         @FormParam("title") String title,
@@ -157,7 +155,7 @@ public class ArticleManager {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    @TxRo
+//    @TxRo
     @Path("edit/{articleId}")
     public Response edit(@PathParam("articleId") long articleId) {
         LOG.trace("edit()");
@@ -186,7 +184,7 @@ public class ArticleManager {
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Tx
+//    @Tx
     @Path("edit/{articleId}")
     public Response editSave(
         @PathParam("articleId") long articleId,
@@ -231,7 +229,7 @@ public class ArticleManager {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @TxRo
+//    @TxRo
     @Path("tagSearch")
     public Response tagSearch(@QueryParam("term") String term) {
         LOG.trace("tagSearch()");
@@ -250,7 +248,7 @@ public class ArticleManager {
 
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    @TxRo
+//    @TxRo
     @Path("export")
     public Response exportDump() throws JAXBException {
         LOG.trace("export()");
@@ -263,7 +261,7 @@ public class ArticleManager {
 
     @POST
     @Consumes({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    @Tx
+//    @Tx
     @Path("import")
     public Response importDump(ExportDump dump) throws JAXBException {
         LOG.trace("import()");

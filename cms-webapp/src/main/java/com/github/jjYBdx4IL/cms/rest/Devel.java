@@ -1,9 +1,8 @@
 package com.github.jjYBdx4IL.cms.rest;
 
-import com.github.jjYBdx4IL.cms.EmbeddedMain;
-import com.github.jjYBdx4IL.cms.jpa.dto.QueryFactory;
+import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.User;
-import com.github.jjYBdx4IL.cms.jpa.tx.TxRo;
+import com.github.jjYBdx4IL.cms.rest.app.Permissions;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 
 import org.slf4j.Logger;
@@ -31,20 +30,20 @@ public class Devel {
 
     @Context
     UriInfo uriInfo;
-    @Inject
-    public EntityManager em;
-    @Inject
+    @Context
+    private EntityManager em;
+    @Context
     private SessionData session;
 
     public Devel() {
-        if (!EmbeddedMain.isDevel) {
+        if (!Permissions.isDevel()) {
             throw new IllegalStateException();
         }
     }
     
     @GET
     @Produces(MediaType.TEXT_HTML)
-    @TxRo
+//    @TxRo
     @Path("login")
     public Response login() {
         LOG.trace("login()");

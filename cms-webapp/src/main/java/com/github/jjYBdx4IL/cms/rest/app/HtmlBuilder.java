@@ -33,16 +33,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.Provider;
 
 import j2html.tags.ContainerTag;
 import j2html.tags.DomContent;
 import j2html.tags.UnescapedText;
 
+@RequestScoped
+@Provider
 public class HtmlBuilder {
 
-    private UriInfo uriInfo = null;
+    @Context
+    UriInfo uriInfo;
+    @Inject
+    SessionData session;
+    
     private String title = null;
     private String pageTitle = "";
     private String lang = "en";
@@ -50,9 +60,7 @@ public class HtmlBuilder {
     private String author = null;
     private String signInLink = null;
     private String signOutLink = null;
-    private String homeLink = null;
     private boolean noIndex = false;
-    private SessionData session = null;
     private final List<String> cssUrls = new ArrayList<>();
     private final List<String> scriptUrls = new ArrayList<>();
     private final List<DomContent> mainContent = new ArrayList<>();
@@ -60,13 +68,7 @@ public class HtmlBuilder {
     private final List<ContainerTag> pageTitleRowSubItems = new ArrayList<>();
     private final Map<String, String> jsValues = new HashMap<>();
 
-    private HtmlBuilder() {
-    }
-
-    public static HtmlBuilder createDefault() {
-        HtmlBuilder htmlBuilder = new HtmlBuilder();
-
-        return htmlBuilder;
+    public HtmlBuilder() {
     }
 
     public void enableNoIndex() {
@@ -184,7 +186,7 @@ public class HtmlBuilder {
                     header(
                         div(
                             div(
-                                h3(a(title).withHref(homeLink)).withClass("col-8-sm"),
+                                h3(a(title).withHref(baseUri)).withClass("col-8-sm"),
                                 div().with(
                                     a("search").withHref(searchLink).withClass("material-icons")
                                     ).condWith(session.isAuthenticated(),
@@ -209,29 +211,6 @@ public class HtmlBuilder {
         for (DomContent _dc : dc) {
             mainContent.add(_dc);
         }
-        return this;
-    }
-
-    public String getHomeLink() {
-        return homeLink;
-    }
-
-    public void setHomeLink(String homeLink) {
-        this.homeLink = homeLink;
-    }
-
-    public SessionData getSession() {
-        return session;
-    }
-
-    public HtmlBuilder setSession(SessionData session) {
-        this.session = session;
-        return this;
-    }
-
-    public HtmlBuilder setUriInfo(UriInfo uriInfo) {
-        this.uriInfo = uriInfo;
-        setHomeLink(uriInfo.getBaseUriBuilder().path(Home.class).build().toString());
         return this;
     }
 
