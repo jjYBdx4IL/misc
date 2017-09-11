@@ -3,6 +3,7 @@ package com.github.jjYBdx4IL.cms.jpa.dto;
 import java.io.Serializable;
 
 import javax.persistence.Basic;
+import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -13,6 +14,7 @@ import javax.persistence.Id;
  * @author Github jjYBdx4IL Projects
  */
 @Entity
+@Cacheable
 public class ConfigValue implements Serializable {
 
     /**

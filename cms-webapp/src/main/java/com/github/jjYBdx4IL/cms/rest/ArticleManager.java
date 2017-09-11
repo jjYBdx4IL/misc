@@ -1,7 +1,6 @@
 package com.github.jjYBdx4IL.cms.rest;
 
 import static j2html.TagCreator.a;
-import static j2html.TagCreator.br;
 import static j2html.TagCreator.div;
 import static j2html.TagCreator.each;
 import static j2html.TagCreator.form;

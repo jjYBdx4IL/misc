@@ -21,6 +21,7 @@ import static j2html.TagCreator.title;
 
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
+import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
 import com.github.jjYBdx4IL.cms.rest.ArticleManager;
 import com.github.jjYBdx4IL.cms.rest.Home;
 import com.github.jjYBdx4IL.cms.rest.LoginSelect;
@@ -64,7 +65,6 @@ public class HtmlBuilder {
     @Inject
     QueryFactory qf;
 
-    private String title = null;
     private String pageTitle = "";
     private String lang = "en";
     private String description = null;
@@ -96,15 +96,6 @@ public class HtmlBuilder {
 
     public void addScriptUrl(String url) {
         scriptUrls.add(url);
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public HtmlBuilder setTitle(String title) {
-        this.title = title;
-        return this;
     }
 
     public String getLang() {
@@ -153,8 +144,6 @@ public class HtmlBuilder {
         addScriptUrl(baseUri + "assets/header.js");
         addScriptUrl(baseUri + "assets/tag-autocomplete.js");
 
-        setTitle("Page Title");
-
         if (session.isAuthenticated()) {
             setSignOutLink(uriInfo.getBaseUriBuilder().path(Logout.class).build().toString());
         } else {
@@ -180,10 +169,12 @@ public class HtmlBuilder {
 
         ContainerTag _main = constructMainSection();
 
+        String title = qf.getConfigValue(ConfigKey.WEBSITE_TITLE, "");
+        
         String doc = document(
             html(
                 head(
-                    title != null ? title(title) : null,
+                    title(title),
                     description != null ? meta().attr("description", description) : null,
                     author != null ? meta().attr("author", author) : null,
                     noIndex ? meta().attr("name", "robots").attr("content", "noindex") : null,

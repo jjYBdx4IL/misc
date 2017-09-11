@@ -121,7 +121,17 @@ public class QueryFactory {
         return users.isEmpty() ? null : users.get(0);
     }
 
+    /**
+     * Throws {@link NoResultException} if the config value is not set.
+     * 
+     * @param key the config key
+     * @return the config value
+     */
     public String getConfigValue(ConfigKey key) {
+        return getConfigValueQuery(key).getSingleResult().getValue();
+    }
+    
+    private TypedQuery<ConfigValue> getConfigValueQuery(ConfigKey key) {
         final CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         final CriteriaQuery<ConfigValue> criteriaQuery = criteriaBuilder.createQuery(ConfigValue.class);
         final Root<ConfigValue> userRoot = criteriaQuery.from(ConfigValue.class);
@@ -129,9 +139,14 @@ public class QueryFactory {
             userRoot.get(ConfigValue_.key),
             key);
         criteriaQuery.where(predicateKey);
-        return em.createQuery(criteriaQuery).getSingleResult().getValue();
+        return em.createQuery(criteriaQuery);
     }
 
+    public String getConfigValue(ConfigKey key, String defaultValue) {
+        List<ConfigValue> results = getConfigValueQuery(key).getResultList();
+        return results.isEmpty() ? defaultValue : results.get(0).getValue();
+    }
+    
     public TypedQuery<ConfigValue> getAllConfigValues() {
         final CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         final CriteriaQuery<ConfigValue> criteriaQuery = criteriaBuilder.createQuery(ConfigValue.class);
