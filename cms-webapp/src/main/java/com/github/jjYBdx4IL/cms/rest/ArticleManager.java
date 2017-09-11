@@ -16,8 +16,8 @@ import com.github.jjYBdx4IL.cms.jpa.dto.ConfigValue;
 import com.github.jjYBdx4IL.cms.jpa.dto.Tag;
 import com.github.jjYBdx4IL.cms.jpa.dto.User;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
-import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 import com.github.jjYBdx4IL.cms.rest.app.Role;
+import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,8 +129,8 @@ public class ArticleManager {
         if (title == null || title.isEmpty()) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("title required").build();
         }
-        if (pathId == null || pathId.isEmpty()) {
-            return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("pathId required").build();
+        if (pathId == null || pathId.isEmpty() || !Article.PATHID_PATTERN.matcher(pathId).find()) {
+            return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("pathId empty or invalid").build();
         }
         if (content == null || content.isEmpty()) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("content required").build();
@@ -177,6 +177,7 @@ public class ArticleManager {
         ContainerTag formRow = articleEditForm(article);
 
         htmlBuilder.setPageTitle("Edit Article")
+            .addPageTitleSubItem("help", "Syntax help", "https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax")
             .setJsValue("tagSearchApiEndpoint",
                 uriInfo.getBaseUriBuilder().path(ArticleManager.class).path("tagSearch").build().toString()
             ).mainAdd(div(formRow).withClass("container articleManager"));
@@ -196,12 +197,12 @@ public class ArticleManager {
         @FormParam("content") String content,
         @FormParam("tags") String tagsValue) {
         LOG.trace("editSave()");
-
+        
         if (title == null || title.isEmpty()) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("title required").build();
         }
-        if (pathId == null || pathId.isEmpty()) {
-            return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("pathId required").build();
+        if (pathId == null || pathId.isEmpty() || !Article.PATHID_PATTERN.matcher(pathId).find()) {
+            return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("pathId empty or invalid").build();
         }
         if (content == null || content.isEmpty()) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("content required").build();
@@ -307,19 +308,16 @@ public class ArticleManager {
         return div(
             form().withMethod("post").with(
                 input().withName("title").withPlaceholder("title").isRequired()
-                    .withValue(article != null ? article.getTitle() : ""),
-                br(),
+                    .withValue(article != null ? article.getTitle() : "").withClass("col-12"),
                 input().withName("pathId").withPlaceholder("path id").isRequired()
-                    .withValue(article != null ? article.getPathId() : ""),
-                br(),
+                    .withValue(article != null ? article.getPathId() : "").withClass("col-12"),
                 textarea().withName("content").isRequired()
-                    .withText(article != null ? article.getContent() : ""),
-                br(),
+                    .withText(article != null ? article.getContent() : "").withClass("col-6"),
+                div().withId("mdPreview").withClass("col-5 markdown"),
                 input().withName("tags").withId("tags").withPlaceholder("Tags")
-                    .withValue(createTagsString(article)),
-                br(),
-                input().withType("submit").withName("submitButton").withValue("save")
-            ).withClass("col-12 editForm")
+                    .withValue(createTagsString(article)).withClass("col-12"),
+                input().withType("submit").withName("submitButton").withValue("save").withClass("col-12")
+            ).withClass("editForm")
         ).withClass("row");
     }
 

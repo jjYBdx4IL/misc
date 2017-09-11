@@ -6,8 +6,8 @@ import static j2html.TagCreator.div;
 import static j2html.TagCreator.document;
 import static j2html.TagCreator.each;
 import static j2html.TagCreator.footer;
+import static j2html.TagCreator.h1;
 import static j2html.TagCreator.h3;
-import static j2html.TagCreator.h4;
 import static j2html.TagCreator.head;
 import static j2html.TagCreator.header;
 import static j2html.TagCreator.html;
@@ -28,6 +28,8 @@ import com.github.jjYBdx4IL.cms.rest.Logout;
 import com.github.jjYBdx4IL.cms.rest.Search;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +51,8 @@ import j2html.tags.UnescapedText;
 @Provider
 public class HtmlBuilder {
 
+    private static final Logger LOG = LoggerFactory.getLogger(HtmlBuilder.class);
+    
     @Context
     UriInfo uriInfo;
     @Inject
@@ -140,6 +144,8 @@ public class HtmlBuilder {
         addCssUrl("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css");
         addScriptUrl("//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js");
         addScriptUrl("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
+        addScriptUrl("//cdn.rawgit.com/showdownjs/showdown/1.7.4/dist/showdown.min.js");
+        addScriptUrl("//cdnjs.cloudflare.com/ajax/libs/dompurify/1.0.2/purify.min.js");
         addScriptUrl(baseUri + "assets/header.js");
         addScriptUrl(baseUri + "assets/tag-autocomplete.js");
 
@@ -169,7 +175,7 @@ public class HtmlBuilder {
 
         ContainerTag _main = constructMainSection();
 
-        return document(
+        String doc = document(
             html(
                 head(
                     title != null ? title(title) : null,
@@ -208,6 +214,10 @@ public class HtmlBuilder {
                     )
                 ).attr("lang", lang)
             );
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("doc: " + doc);
+        }
+        return doc;
     }
 
     public HtmlBuilder mainAdd(DomContent... dc) {
@@ -231,9 +241,14 @@ public class HtmlBuilder {
     }
 
     public ContainerTag iconTextLink(String cssClass, String materialIconId, String text, String href) {
-        return a(
+        ContainerTag result = a(
             i(materialIconId).withClass("material-icons"), span(text)
             ).withHref(href).withClass((cssClass != null ? cssClass + " " : "") + "iconTextLink");
+        String baseUri = uriInfo.getBaseUriBuilder().build().toString();
+        if (!href.toLowerCase().startsWith(baseUri.toLowerCase())) {
+            result.withTarget("_extern");
+        }
+        return result;
     }
 
     public String getPageTitle() {
@@ -305,8 +320,8 @@ public class HtmlBuilder {
         return div(
             each(articles,
                 article -> div(
-                    h4(article.getTitle()).withClass("articleTitle"),
-                    div(article.getContent()).withClass("articleContent"),
+                    h1(article.getTitle()).withClass("articleTitle"),
+                    div(article.getContent()).withClass("articleContent markdown"),
                     span("Tags: ").withClass("tagLineHeader"),
                     each(article.getTags(),
                         tag -> a(tag.getName()).withHref(uriBuilder.build(tag.getName()).toString()).withClass("tag")

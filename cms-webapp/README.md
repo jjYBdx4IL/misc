@@ -43,3 +43,9 @@ properties are not listed there.
 
 Setting system properties in WildFly 11 requires a server restart.
 
+HTTP session persistence requres <distributable/> tag in web.xml. There is another
+variant, but that's not reliable (too fast reloads tend to lose the session store).
+
+Wildfly 11 CR1 also garbles form submissions. One has to set the servlet container's
+default encoding to UTF-8 to prevent this. https://issues.jboss.org/browse/WFLY-9337
+

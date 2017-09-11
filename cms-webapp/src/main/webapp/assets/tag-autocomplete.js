@@ -58,7 +58,6 @@ $(document).ready(
 
 			function t(match, val) {
 				dict.forEach(function(value, key, map) {
-					console.log(key + ' => ' + value + " in: " + val);
 					val = val.replace(new RegExp(key, "g"), value);
 				});
 				return val;
@@ -75,3 +74,30 @@ $(document).ready(
 								toPathId($(this).val()));
 					});
 		});
+
+/* markdown preview */
+
+$(document).ready(
+		function() {
+			var converter = new showdown.Converter();
+			converter.setFlavor('ghost');
+			function updateMdPreview() {
+				$("#mdPreview").html(
+						converter
+								.makeHtml($(".editForm textarea[name=content]")
+										.val()));
+			}
+			$(".editForm textarea[name=content]").on("change paste keyup",
+					updateMdPreview);
+			
+			// intial preview
+			updateMdPreview();
+			
+			// conversion of static markdown content
+			$("div.articleContent").each(function( index ) {
+				  $( this ).html(DOMPurify.sanitize(converter.makeHtml($( this ).text())));
+			});
+		});
+
+
+

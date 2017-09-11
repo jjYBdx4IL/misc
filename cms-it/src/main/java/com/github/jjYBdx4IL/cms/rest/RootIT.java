@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
@@ -44,7 +45,7 @@ public class RootIT {
         response = (Response) getTarget("articleManager/export").request(MediaType.TEXT_HTML, MediaType.TEXT_XML).get();
         assertEquals(HttpServletResponse.SC_FORBIDDEN, response.getStatus());
         response.readEntity(String.class);
-        
+
         // devel login
         response = (Response) getTarget("devel/login").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
@@ -53,29 +54,36 @@ public class RootIT {
         final String content = "c" + PasswordGenerator.generate55(11);
         final String tag = "a" + PasswordGenerator.generate55(11);
 
-        final String titleB = "t" + PasswordGenerator.generate55(11);
-        final String contentB = "c" + PasswordGenerator.generate55(11);
+        final String titleB = "ö" + PasswordGenerator.generate55(11);
+        final String contentB = "ä" + PasswordGenerator.generate55(11);
         final String tagB = "a" + PasswordGenerator.generate55(11);
+        final String pathIdB = "c" + contentB.substring(1);
+
+        Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
+            title);
 
         response = (Response) getTarget("articleManager/create").request()
-            .post(Entity.entity(String.format("title=%s&content=%s&tags=%s&pathId=%s", title, content, tag, title),
-                MediaType.APPLICATION_FORM_URLENCODED));
+            .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
         assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
 
+        form = new Form().param("title", titleB).param("content", contentB).param("tags", tagB).param("pathId",
+            pathIdB);
+
         response = (Response) getTarget("articleManager/create").request()
-            .post(Entity.entity(String.format("title=%s&content=%s&tags=%s&pathId=%s", titleB, contentB, tagB, titleB),
-                MediaType.APPLICATION_FORM_URLENCODED));
+            .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
         assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
 
         // check for updated main page
         response = (Response) getTarget("").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
-        assertTrue(response.readEntity(String.class).contains(title));
+        String responseContent = response.readEntity(String.class);
+        assertTrue(responseContent.contains(title));
+        assertTrue(responseContent, responseContent.contains(titleB)); // <-- also checks encoding processing
 
         // check /byTag/...
         response = (Response) getTarget("byTag/" + tag).request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
-        String responseContent = response.readEntity(String.class);
+        responseContent = response.readEntity(String.class);
         assertTrue(responseContent.contains(title));
         assertFalse(responseContent.contains(titleB));
 
@@ -105,10 +113,11 @@ public class RootIT {
         assertFalse(response.readEntity(String.class).contains(title));
 
         // check export
+        form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
+            title + "2");
+
         response = (Response) getTarget("articleManager/create").request()
-            .post(Entity.entity(
-                String.format("title=%s123&content=%s123&tags=%s&pathId=%s123", title, content, tag, title),
-                MediaType.APPLICATION_FORM_URLENCODED));
+            .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
         assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
 
         response = (Response) getTarget("articleManager/export").request(MediaType.TEXT_XML_TYPE).get();
