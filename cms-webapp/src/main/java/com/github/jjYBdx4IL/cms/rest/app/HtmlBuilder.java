@@ -33,7 +33,9 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -245,8 +247,9 @@ public class HtmlBuilder {
 
     public ContainerTag iconTextLink(String cssClass, String materialIconId, String text, String href) {
         ContainerTag result = a(
-            i(materialIconId).withClass("material-icons"), span(text)
-            ).withHref(href).withClass((cssClass != null ? cssClass + " " : "") + "iconTextLink");
+            i(materialIconId).withClass("material-icons")
+            ).condWith(text != null, span(text)).withHref(href)
+                .withClass((cssClass != null ? cssClass + " " : "") + "iconTextLink");
         String baseUri = uriInfo.getBaseUriBuilder().build().toString();
         if (!href.toLowerCase().startsWith(baseUri.toLowerCase())) {
             result.withTarget("_extern");
@@ -318,12 +321,13 @@ public class HtmlBuilder {
             .with(new UnescapedText(StringEscapeUtils.escapeHtml4(sb.toString())));
     }
 
-    public ContainerTag createArticleListRow(List<Article> articles) {
+    public ContainerTag createArticleListRow(List<Article> articles, boolean showDates, boolean showEditLink) {
         UriBuilder uriBuilder = uriInfo.getBaseUriBuilder().path(Home.class, "byTag");
         return div(
             each(articles,
                 article -> div(
                     h1(a(article.getTitle()).withHref(constructArticleLink(article))).withClass("articleTitle"),
+                    div(createDateInfo(article), createEditLink(article)).withClass("articleMeta"),
                     div(article.getContent()).withClass("articleContent markdown"),
                     span("Tags: ").withClass("tagLineHeader"),
                     each(article.getTags(),
@@ -332,6 +336,34 @@ public class HtmlBuilder {
                     ).withClass("col-12 article")
             )
             ).withClass("row");
+    }
+
+    private ContainerTag createDateInfo(Article article) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Created: ");
+        sb.append(fmtDate(article.getCreatedAt()));
+        if (!article.getCreatedAt().equals(article.getLastModified())) {
+            sb.append(" / Updated: ");
+            sb.append(fmtDate(article.getLastModified()));
+        }
+        return span(sb.toString());
+    }
+
+    private String fmtDate(Date date) {
+        LocalDateTime ldt = LocalDateTime.ofEpochSecond(date.getTime() / 1000L, 0, ZoneOffset.UTC);
+        return ldt.format(DateTimeFormatter.ISO_DATE);
+    }
+
+    private ContainerTag createEditLink(Article article) {
+        if (!session.isAuthenticated()) {
+            return null;
+        }
+        if (!session.getUid().equals(article.getOwner().getUid())) {
+            return null;
+        }
+        String link = uriInfo.getBaseUriBuilder().path(ArticleManager.class).path(ArticleManager.class, "edit")
+            .build(article.getId()).toString();
+        return iconTextLink("articleTitleAffix", "edit_mode", null, link).attr("title", "Edit article");
     }
 
     public String constructArticleLink(Article article) {

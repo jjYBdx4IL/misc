@@ -171,6 +171,30 @@ form textarea {
     background: #f3f3f3;
 }
 
+.article .articleTitle {
+    display: inline;
+}
+
+.article .articleMeta .iconTextLink * {
+	padding-left: 1em;
+	font-size: 1em;
+}
+
+/* .article .articleTitleAffix { */
+/*     display: inline; */
+/*     float: right; */
+/* } */
+
+/* .article .articleTitleAffix * { */
+/*     display: inline; */
+/* } */
+
+.article .articleMeta {
+	font-family: monospace;
+	font-size: 1em;
+	color: #777;
+}
+
 .articleManager textarea, .articleManager input {
 	font-family: monospace;
 }

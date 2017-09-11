@@ -76,7 +76,7 @@ public class Search {
                     ).withClass("row")
                 );
             } else {
-                container.with(htmlBuilder.createArticleListRow(articles));
+                container.with(htmlBuilder.createArticleListRow(articles, false, false));
             }
         }
 

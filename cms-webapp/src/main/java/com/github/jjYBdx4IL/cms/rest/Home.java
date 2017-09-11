@@ -16,6 +16,7 @@ import java.util.List;
 import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -25,6 +26,7 @@ import javax.ws.rs.core.Response;
 
 @Path("")
 @PermitAll
+@Transactional
 public class Home {
 
     private static final Logger LOG = LoggerFactory.getLogger(Home.class);
@@ -43,7 +45,7 @@ public class Home {
 
         htmlBuilder.mainAdd(
             div(
-                htmlBuilder.createArticleListRow(articles)
+                htmlBuilder.createArticleListRow(articles, false, false)
             ).withClass("container")
         );
         return Response.ok(htmlBuilder.toString()).build();
@@ -61,7 +63,7 @@ public class Home {
 
         htmlBuilder.mainAdd(
             div(
-                htmlBuilder.createArticleListRow(articles)
+                htmlBuilder.createArticleListRow(articles, false, false)
             ).withClass("container")
         );
         return Response.ok(htmlBuilder.toString()).build();
@@ -88,7 +90,7 @@ public class Home {
         
         htmlBuilder.mainAdd(
             div(
-                htmlBuilder.createArticleListRow(articles)
+                htmlBuilder.createArticleListRow(articles, true, true)
             ).withClass("container")
         );
         return Response.ok(htmlBuilder.toString()).build();
