@@ -4,16 +4,12 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Basic;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 
 /**
  * 
@@ -22,9 +18,8 @@ import javax.xml.bind.annotation.XmlElement;
 @SuppressWarnings("serial")
 @Entity
 @Table(indexes={
-    @Index(name="USER_GOOGLE_UID_INDEX", unique=true, columnList="GOOGLE_UID")
+    @Index(name="USER_UID_INDEX", unique=true, columnList="uid")
 })
-@XmlAccessorType(XmlAccessType.NONE)
 public class User implements Serializable {
 
     public User() {
@@ -34,9 +29,7 @@ public class User implements Serializable {
     @GeneratedValue
     private Long id;
     @Basic
-    @Column(name="GOOGLE_UID")
-    @XmlElement
-    private String googleUniqueId;
+    private String uid;
     @Basic
     private String email;
     @Basic
@@ -53,14 +46,6 @@ public class User implements Serializable {
      */
     public Long getId() {
         return id;
-    }
-
-    public String getGoogleUniqueId() {
-        return googleUniqueId;
-    }
-
-    public void setGoogleUniqueId(String googleUniqueId) {
-        this.googleUniqueId = googleUniqueId;
     }
 
     public String getEmail() {
@@ -102,13 +87,11 @@ public class User implements Serializable {
         return version;
     }
 
-    public boolean hasWriteAccessTo(Article article) {
-        if (article == null || article.getOwner() == null || article.getOwner().getGoogleUniqueId() == null) {
-            return false;
-        }
-        if (getGoogleUniqueId() == null) {
-            return false;
-        }
-        return getGoogleUniqueId().equals(article.getOwner().getGoogleUniqueId());
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }

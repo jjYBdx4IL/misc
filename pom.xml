@@ -94,6 +94,7 @@
         <module>vmmgmt-utils</module>
         <module>vmmgmt-test-utils</module>
         <module>website-verifier</module>
+        <module>h2-frontend</module>
         <module>xml-dom4j-utils</module>
     </modules>
 

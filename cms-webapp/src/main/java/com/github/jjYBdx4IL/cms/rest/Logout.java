@@ -22,7 +22,7 @@ public class Logout {
     
     @Context
     UriInfo uriInfo;
-    @Context
+    @Inject
     private SessionData session;
     
     @GET

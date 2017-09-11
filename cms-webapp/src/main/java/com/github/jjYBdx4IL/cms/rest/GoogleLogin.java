@@ -19,13 +19,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -38,16 +39,18 @@ import javax.ws.rs.core.UriInfo;
 public class GoogleLogin {
 
     private static final Logger LOG = LoggerFactory.getLogger(GoogleLogin.class);
+    public static final String GOOGLE_UID_PREFIX = "google-";
 
     @Context
     UriInfo uriInfo;
-    @Context
-    private EntityManager em;
-    @Context
-    private SessionData session;
+    @Inject
+    SessionData session;
+    @PersistenceContext
+    EntityManager em;
+    @Inject
+    QueryFactory qf;
 
     @GET
-//    @TxRo
     public Response login() throws URISyntaxException {
         LOG.trace("login()");
 
@@ -70,7 +73,7 @@ public class GoogleLogin {
 
     // https://console.developers.google.com/apis/credentials
     @GET
-//    @Tx
+    @Transactional
     @Path("googleOauth2Callback")
     public Response callback(@QueryParam("code") String code, @QueryParam("state") String state) throws IOException {
         LOG.trace("callback()");
@@ -126,13 +129,12 @@ public class GoogleLogin {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("email not verified").build();
         }
 
-        List<User> users = QueryFactory.getUserByGoogleUid(em, payload.getSubject()).getResultList();
-        User user = null;
-        if (!users.isEmpty()) {
-            user = users.get(0);
-        } else {
+        String uid = GOOGLE_UID_PREFIX + payload.getSubject();
+        
+        User user = qf.getUserByUid(uid);
+        if (user == null) {
             user = new User();
-            user.setGoogleUniqueId(payload.getSubject());
+            user.setUid(uid);
             user.setCreatedAt(new Date());
         }
 
@@ -141,15 +143,15 @@ public class GoogleLogin {
         user.setEmail(payload.getEmail());
         em.persist(user);
 
-        session.setUser(user);
+        session.setUid(uid);
 
         return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path(Home.class).build())
             .status(HttpServletResponse.SC_FOUND).build();
     }
 
     private GoogleAuthorizationCodeFlow getGAuthCodeFlow() {
-        String clientId = QueryFactory.getConfigValue(em, ConfigKey.GOOGLE_OAUTH2_CLIENT_ID);
-        String clientSecret = QueryFactory.getConfigValue(em, ConfigKey.GOOGLE_OAUTH2_CLIENT_SECRET);
+        String clientId = qf.getConfigValue(ConfigKey.GOOGLE_OAUTH2_CLIENT_ID);
+        String clientSecret = qf.getConfigValue(ConfigKey.GOOGLE_OAUTH2_CLIENT_SECRET);
         return new GoogleAuthorizationCodeFlow(
             new NetHttpTransport(), new JacksonFactory(), clientId, clientSecret,
             Arrays.asList(new String[] { "openid", "email" }));

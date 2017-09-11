@@ -19,6 +19,7 @@ import static j2html.TagCreator.script;
 import static j2html.TagCreator.span;
 import static j2html.TagCreator.title;
 
+import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.rest.ArticleManager;
 import com.github.jjYBdx4IL.cms.rest.Home;
@@ -52,7 +53,9 @@ public class HtmlBuilder {
     UriInfo uriInfo;
     @Inject
     SessionData session;
-    
+    @Inject
+    QueryFactory qf;
+
     private String title = null;
     private String pageTitle = "";
     private String lang = "en";
@@ -151,7 +154,7 @@ public class HtmlBuilder {
         String searchLink = uriInfo.getBaseUriBuilder().path(Search.class).build().toString();
 
         String signoutTooltipText = "Sign out." +
-            (session.isAuthenticated() ? "\nCurrently signed in as:\n" + session.getUser().getEmail() : "");
+            (session.isAuthenticated() ? "\nCurrently signed in as:\n" + qf.getUserByUid(session.getUid()).getEmail() : "");
 
         ContainerTag menu = null;
         if (session.isAuthenticated()) {
@@ -218,12 +221,13 @@ public class HtmlBuilder {
         String method) {
         return iconTextLink(
             cssClass, materialIconId, text,
-            uriInfo.getBaseUriBuilder().path(resource).path(method).toString()
+            uriInfo.getBaseUriBuilder().path(resource).path(method).build().toString()
             );
     }
 
     public ContainerTag iconTextLink(String cssClass, String materialIconId, String text, Class<?> resource) {
-        return iconTextLink(cssClass, materialIconId, text, uriInfo.getBaseUriBuilder().path(resource).toString());
+        return iconTextLink(cssClass, materialIconId, text,
+            uriInfo.getBaseUriBuilder().path(resource).build().toString());
     }
 
     public ContainerTag iconTextLink(String cssClass, String materialIconId, String text, String href) {

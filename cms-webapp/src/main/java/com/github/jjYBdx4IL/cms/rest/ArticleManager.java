@@ -14,9 +14,10 @@ import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigValue;
 import com.github.jjYBdx4IL.cms.jpa.dto.Tag;
+import com.github.jjYBdx4IL.cms.jpa.dto.User;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
-import com.github.jjYBdx4IL.cms.rest.app.Role;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
+import com.github.jjYBdx4IL.cms.rest.app.Role;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,9 +33,11 @@ import java.util.Set;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -60,20 +63,21 @@ public class ArticleManager {
 
     @Context
     UriInfo uriInfo;
-    @Context
+    @PersistenceContext
     private EntityManager em;
-    @Context
+    @Inject
     private SessionData session;
     @Inject
     private HtmlBuilder htmlBuilder;
+    @Inject
+    QueryFactory qf;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    //@TxRo
     public Response get() {
         LOG.trace("get()");
 
-        List<Article> articles = QueryFactory.getArticleDisplayList(em, null, session.getUser()).getResultList();
+        List<Article> articles = qf.getArticleDisplayList(null, session.getUid()).getResultList();
 
         UriBuilder urlTpl = uriInfo.getAbsolutePathBuilder().path(ArticleManager.class, "edit");
 
@@ -97,7 +101,6 @@ public class ArticleManager {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-//    @TxRo
     @Path("create")
     public Response create() {
         LOG.trace("create()");
@@ -114,7 +117,7 @@ public class ArticleManager {
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-//    @Tx
+    @Transactional
     @Path("create")
     public Response createSave(
         @FormParam("title") String title,
@@ -142,7 +145,7 @@ public class ArticleManager {
         article.setTitle(title);
         article.setPathId(pathId);
         article.setContent(content);
-        article.setOwner(session.getUser());
+        article.setOwner(qf.getUserByUid(session.getUid()));
         article.setCreatedAt(new Date());
         article.setLastModified(article.getCreatedAt());
         article.setTags(tags);
@@ -155,7 +158,6 @@ public class ArticleManager {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-//    @TxRo
     @Path("edit/{articleId}")
     public Response edit(@PathParam("articleId") long articleId) {
         LOG.trace("edit()");
@@ -166,8 +168,8 @@ public class ArticleManager {
             return Response.status(HttpServletResponse.SC_NOT_FOUND).entity("not found").build();
         }
 
-        if (article.getOwner().getGoogleUniqueId() == null
-            || !article.getOwner().getGoogleUniqueId().equals(session.getUser().getGoogleUniqueId())) {
+        if (article.getOwner().getUid() == null
+            || !article.getOwner().getUid().equals(session.getUid())) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("access denied").build();
         }
 
@@ -184,7 +186,7 @@ public class ArticleManager {
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-//    @Tx
+    @Transactional
     @Path("edit/{articleId}")
     public Response editSave(
         @PathParam("articleId") long articleId,
@@ -211,7 +213,7 @@ public class ArticleManager {
 
         Article article = em.find(Article.class, articleId);
 
-        if (!session.getUser().hasWriteAccessTo(article)) {
+        if (!article.getOwner().getUid().equals(session.getUid())) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("access denied").build();
         }
 
@@ -229,7 +231,6 @@ public class ArticleManager {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-//    @TxRo
     @Path("tagSearch")
     public Response tagSearch(@QueryParam("term") String term) {
         LOG.trace("tagSearch()");
@@ -238,7 +239,7 @@ public class ArticleManager {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("term param required").build();
         }
 
-        List<Tag> tags = QueryFactory.getTags(em, term).getResultList();
+        List<Tag> tags = qf.getTags(term).getResultList();
 
         List<String> tagNames = new ArrayList<>();
         tags.forEach(tag -> tagNames.add(tag.getName()));
@@ -248,20 +249,19 @@ public class ArticleManager {
 
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-//    @TxRo
     @Path("export")
     public Response exportDump() throws JAXBException {
         LOG.trace("export()");
 
-        List<Article> articles = QueryFactory.getArticleDisplayList(em, null, session.getUser()).getResultList();
-        List<ConfigValue> configValues = QueryFactory.getAllConfigValues(em).getResultList();
+        List<Article> articles = qf.getArticleDisplayList(null, session.getUid()).getResultList();
+        List<ConfigValue> configValues = qf.getAllConfigValues().getResultList();
 
         return Response.ok().entity(ExportDump.create(articles, configValues)).build();
     }
 
     @POST
     @Consumes({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-//    @Tx
+    @Transactional
     @Path("import")
     public Response importDump(ExportDump dump) throws JAXBException {
         LOG.trace("import()");
@@ -272,8 +272,10 @@ public class ArticleManager {
         em.createQuery(cd).executeUpdate();
 
         Map<String, Tag> tagMap = new HashMap<>();
-        QueryFactory.getTags(em, null).getResultList().forEach(tag -> tagMap.put(tag.getId(), tag));
+        qf.getTags(null).getResultList().forEach(tag -> tagMap.put(tag.getId(), tag));
 
+        User user = qf.getUserByUid(session.getUid());
+        
         for (ArticleDTO dto : dump.getArticles()) {
             Article article = new Article();
             article.setTitle(dto.getTitle());
@@ -281,7 +283,7 @@ public class ArticleManager {
             article.setContent(dto.getContent());
             article.setCreatedAt(dto.getCreatedAt());
             article.setLastModified(dto.getLastModified());
-            article.setOwner(session.getUser());
+            article.setOwner(user);
             List<Tag> tags = new ArrayList<>();
             for (String tagName : dto.getTags()) {
                 String tagId = tagName.toLowerCase();
@@ -329,7 +331,7 @@ public class ArticleManager {
             if (!Tag.NAME_PATTERN.matcher(tagName).find()) {
                 return null;
             }
-            List<Tag> _tags = QueryFactory.getTag(em, tagName).getResultList();
+            List<Tag> _tags = qf.getTag(tagName).getResultList();
             Tag tag;
             if (!_tags.isEmpty()) {
                 tag = _tags.get(0);

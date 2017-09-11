@@ -12,8 +12,6 @@ import com.github.jjYBdx4IL.utils.text.PasswordGenerator;
 import com.github.jjYBdx4IL.wsverifier.WebsiteVerifier;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 
@@ -28,10 +26,9 @@ import javax.xml.bind.Unmarshaller;
 
 public class RootIT {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RootIT.class);
     private Client client = null;
 
-    private static final String rootUrl = "http://localhost:" + System.getProperty("jetty.http.port", "9999") + "/";
+    private static final String rootUrl = "http://localhost:" + System.getProperty("jetty.http.port", "8080") + "/";
 
     @Test
     public void testWorkflow() throws Exception {

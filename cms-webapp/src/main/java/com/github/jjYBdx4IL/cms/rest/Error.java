@@ -25,8 +25,8 @@ public class Error {
     private static final Logger LOG = LoggerFactory.getLogger(Error.class);
     
     @GET
-    @Produces(MediaType.TEXT_HTML)
-    public String errorPage() {
+    @Produces(MediaType.TEXT_HTML) 
+    public String errorPage() { 
         LOG.trace("errorPage()");
         return document(
             html(

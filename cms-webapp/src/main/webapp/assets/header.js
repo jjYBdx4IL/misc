@@ -39,7 +39,7 @@ function hasScrolled() {
 /* trivial drop-down menu: it's always below the header bar, but only when the user
  * click on the menu icon the header bar gets extended downwards and reveals the menu's
  * contents.
- */ 
+ */
 $(document).ready(function() {
 	var rememberedHeight = $("header").css("height");
 	var state = 0;

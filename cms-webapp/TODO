@@ -2,6 +2,7 @@ add connection pool, see:
 
 https://stackoverflow.com/questions/12545129/setting-up-jndi-datasource-in-junit
 
+* switch to hsqldb for better data consistency? (h2 mvcc only supports read committed)
 * backup/restore (dump/load to/from XML)
 * Markdown
 * add article path ids for permanent URL construction

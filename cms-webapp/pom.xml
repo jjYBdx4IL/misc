@@ -61,6 +61,29 @@
                 </dependencies>
             </plugin>
 
+            <!-- help eclipse identify the webapp folder as a resource folder: -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-resource</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>add-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/webapp</directory>
+                                    <targetPath>${project.build.directory}/${project.build.finalName}</targetPath>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
 
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
@@ -134,9 +157,8 @@
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <packagingExcludes>**/*.cache.ttf,**/hosted.html,WEB-INF/web.devel.xml,WEB-INF/jetty.devel.xml</packagingExcludes>
                     <!-- do NOT archive classes, or jetty:run's auto-reload does not work -->
-                    <archiveClasses>false</archiveClasses>
+                    <archiveClasses>true</archiveClasses>
                     <attachClasses>true</attachClasses>
                 </configuration>
             </plugin>
@@ -262,16 +284,16 @@
 <!--             <artifactId>jetty-servlet</artifactId> -->
 <!--             <version>9.2.13.v20150730</version> -->
 <!--         </dependency> -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
+<!--         <dependency> -->
+<!--             <groupId>com.h2database</groupId> -->
+<!--             <artifactId>h2</artifactId> -->
 <!--             <scope>provided</scope> -->
-        </dependency>
+<!--         </dependency> -->
 
         <dependency>
-            <groupId>org.tuckey</groupId>
-            <artifactId>urlrewritefilter</artifactId>
-            <version>4.0.3</version>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

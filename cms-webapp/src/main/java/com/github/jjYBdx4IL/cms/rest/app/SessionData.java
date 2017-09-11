@@ -1,55 +1,27 @@
 package com.github.jjYBdx4IL.cms.rest.app;
 
-import com.github.jjYBdx4IL.cms.jpa.dto.User;
+import java.lang.reflect.Method;
 
-import java.io.Serializable;
+public interface SessionData {
 
-import javax.enterprise.context.SessionScoped;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+    String SESSION_ATTRNAME = "session.data";
 
-@SessionScoped
-public class SessionData implements Serializable {
+    String getUid();
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
+    void setUid(String uid);
 
-    public static final String SESSION_ATTRNAME = "session.data";
+    String getGoogleOauth2StateSecret();
 
-    private User user = null;
-    private String googleOauth2StateSecret = null;
+    void setGoogleOauth2StateSecret(String googleOauth2StateSecret);
 
-    public User getUser() {
-        return user;
-    }
+    boolean isAuthenticated();
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+    void logout();
 
-    public String getGoogleOauth2StateSecret() {
-        return googleOauth2StateSecret;
-    }
+    boolean isAllowed(Method method);
 
-    public void setGoogleOauth2StateSecret(String googleOauth2StateSecret) {
-        this.googleOauth2StateSecret = googleOauth2StateSecret;
-    }
+    String toString();
 
-    public boolean isAuthenticated() {
-        return getUser() != null;
-    }
+    boolean isDevel();
 
-    public void logout() {
-        setUser(null);
-    }
-
-    public static SessionData getOrCreate(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        if (session.getAttribute(SESSION_ATTRNAME) == null) {
-            session.setAttribute(SESSION_ATTRNAME, new SessionData());
-        }
-        return (SessionData) session.getAttribute(SESSION_ATTRNAME);
-    }
 }

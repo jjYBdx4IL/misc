@@ -9,20 +9,17 @@ import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 
 @Path("")
 @PermitAll
@@ -30,17 +27,14 @@ public class Home {
 
     private static final Logger LOG = LoggerFactory.getLogger(Home.class);
 
-    @Context
-    UriInfo uriInfo;
-    @PersistenceContext
-    EntityManager em;
     @Inject
     private HtmlBuilder htmlBuilder;
+    @Inject
+    QueryFactory qf;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-//    @TxRo
-    public Response get() {
+    public Response get() throws SQLException {
         LOG.trace("get()");
 
         return byTag(null);
@@ -48,13 +42,12 @@ public class Home {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-//    @TxRo
     @Path("byTag/{tag}")
-    public Response byTag(@PathParam("tag") String selectedTag) {
+    public Response byTag(@PathParam("tag") String selectedTag) throws SQLException {
         LOG.trace("byTag()");
 
-        List<Article> articles = QueryFactory.getArticleDisplayList(em, selectedTag, null).getResultList();
-LOG.info(""+htmlBuilder);
+        List<Article> articles = qf.getArticleDisplayList(selectedTag, null).getResultList();
+
         htmlBuilder.mainAdd(
             div(
                 htmlBuilder.createArticleListRow(articles)

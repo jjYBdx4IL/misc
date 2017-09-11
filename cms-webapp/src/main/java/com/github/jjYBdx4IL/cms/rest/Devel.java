@@ -2,18 +2,18 @@ package com.github.jjYBdx4IL.cms.rest;
 
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.User;
-import com.github.jjYBdx4IL.cms.rest.app.Permissions;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.security.DenyAll;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -30,33 +30,27 @@ public class Devel {
 
     @Context
     UriInfo uriInfo;
-    @Context
-    private EntityManager em;
-    @Context
-    private SessionData session;
+    @PersistenceContext
+    EntityManager em;
+    @Inject
+    SessionData session;
+    @Inject
+    QueryFactory qf;
 
-    public Devel() {
-        if (!Permissions.isDevel()) {
-            throw new IllegalStateException();
-        }
-    }
-    
     @GET
     @Produces(MediaType.TEXT_HTML)
-//    @TxRo
+    @Transactional
     @Path("login")
     public Response login() {
         LOG.trace("login()");
 
-        String testUid = "1";
+        String testUid = "devel-1";
         
-        List<User> users = QueryFactory.getUserByGoogleUid(em, testUid).getResultList();
-        User user = null;
-        if (!users.isEmpty()) {
-            user = users.get(0);
-        } else {
+        User user = qf.getUserByUid(testUid);
+        
+        if (user == null) {
             user = new User();
-            user.setGoogleUniqueId(testUid);
+            user.setUid(testUid);
             user.setCreatedAt(new Date());
         }
 
@@ -65,7 +59,7 @@ public class Devel {
         user.setEmail("test@tester.com");
         em.persist(user);
 
-        session.setUser(user);
+        session.setUid(testUid);
         
         return Response.ok().build();
     }

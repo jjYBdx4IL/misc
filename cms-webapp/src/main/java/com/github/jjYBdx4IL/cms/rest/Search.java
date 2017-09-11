@@ -20,6 +20,7 @@ import java.util.List;
 import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -40,7 +41,7 @@ public class Search {
 
     @Context
     UriInfo uriInfo;
-    @Context
+    @PersistenceContext
     private EntityManager em;
     @Inject
     private HtmlBuilder htmlBuilder;

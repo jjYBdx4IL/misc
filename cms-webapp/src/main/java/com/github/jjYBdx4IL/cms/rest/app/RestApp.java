@@ -3,7 +3,7 @@ package com.github.jjYBdx4IL.cms.rest.app;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-@ApplicationPath("/asd")
+@ApplicationPath("/")
 public class RestApp extends Application {
 
     public RestApp() {
