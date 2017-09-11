@@ -48,7 +48,6 @@ public class Search {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-//    @TxRo
     public Response search(@QueryParam("q") String searchTerm) {
         LOG.trace("search()");
 
@@ -57,7 +56,7 @@ public class Search {
         ContainerTag container = div().withClass("container");
 
         container.with(
-            form().withMethod("GET").with(
+            form().withMethod("GET").attr("accept-charset", "utf-8").with(
                 input().withName("q").withPlaceholder("Enter search term").isRequired()
                     .withCondValue(searchTerm != null, searchTerm)
                     .attr("autofocus")

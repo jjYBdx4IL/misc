@@ -305,7 +305,7 @@ public class ArticleManager {
 
     protected ContainerTag articleEditForm(Article article) {
         return div(
-            form().withMethod("post").with(
+            form().withMethod("post").attr("accept-charset", "utf-8").with(
                 input().withName("title").withPlaceholder("title").isRequired()
                     .withValue(article != null ? article.getTitle() : "").withClass("col-12"),
                 input().withName("pathId").withPlaceholder("path id").isRequired()

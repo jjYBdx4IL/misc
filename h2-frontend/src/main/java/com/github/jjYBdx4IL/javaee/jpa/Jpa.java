@@ -6,13 +6,10 @@ import static j2html.TagCreator.form;
 import static j2html.TagCreator.html;
 import static j2html.TagCreator.input;
 
-import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -28,47 +25,48 @@ import javax.ws.rs.core.UriInfo;
 public class Jpa {
 
     private static final Logger LOG = LoggerFactory.getLogger(Jpa.class);
-    
+
     @Context
     UriInfo uriInfo;
-    @PersistenceContext(unitName = "db-default")
-    private EntityManager em;
-    
+//    @PersistenceContext(unitName = "db-default")
+//    private EntityManager em;
+    @Context
+    HttpServletRequest req;
+
     @Produces(MediaType.TEXT_HTML)
     @GET
     public Response get() {
+        LOG.info(req.getCharacterEncoding());
         return Response.ok(document(html(body(
-            form().withMethod("post").with(
-//                input().withName("title").withPlaceholder("title").isRequired()
-//                    .withValue(article != null ? article.getTitle() : ""),
-//                br(),
-//                input().withName("pathId").withPlaceholder("path id").isRequired()
-//                    .withValue(article != null ? article.getPathId() : ""),
-//                br(),
-//                textarea().withName("content").isRequired()
-//                    .withText(article != null ? article.getContent() : ""),
-//                br(),
-//                input().withName("tags").withId("tags").withPlaceholder("Tags")
-//                    .withValue(createTagsString(article)),
-//                br(),
-                input().withType("submit").withName("submitButton").withValue("update"),
-                input().withType("submit").withName("submitButton").withValue("create"),
-                input().withType("submit").withName("submitButton").withValue("create-drop"),
-                input().withType("submit").withName("submitButton").withValue("dump model")
-            )
-            
+            form().withAction("/db/jpa/").withMethod("post").attr("enctype", "multipart/form-data")
+                .attr("accept-encoding", "utf-8").with(
+                    input().withType("text").withName("text2"),
+                    input().withType("submit").withName("submitButton").withValue("update")
+                ),
+            form().withAction("/db/jpa/").withMethod("post").attr("enctype", MediaType.APPLICATION_FORM_URLENCODED+";charset=utf-8")
+                .attr("accept-charset", "iso-8859-1")
+                .attr("accept-charset", "utf-8")
+                .with(
+                    input().withType("text").withName("text2"),
+                    input().withType("submit").withName("submitButton").withValue("update")
+                )
+
         )
         )).toString()).build();
     }
-    
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @POST
-    @Transactional
-    public Response post(@FormParam("submitButton") String button) {
-        LOG.info(""+em);
 
-        SchemaExport.main(new String[] {"--help"});
-        
+    @POST
+    @Consumes("multipart/form-data")
+    public Response post(@FormParam("submitButton") String button,
+        @FormParam("text2") String text) {
+        LOG.info("post(): text: " + text);
+        return Response.ok("").build();
+    }
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response post2(@FormParam("submitButton") String button,
+        @FormParam("text2") String text) {
+        LOG.info("post2(): text: " + text);
         return Response.ok("").build();
     }
 }

@@ -61,6 +61,13 @@ Setting system properties in WildFly 11 requires a server restart.
 HTTP session persistence requres &lt;distributable/> tag in web.xml. There is another
 variant, but that's not reliable (too fast reloads tend to lose the session store).
 
-Wildfly 11 CR1 also garbles form submissions. One has to set the servlet container's
-default encoding to UTF-8 to prevent this. https://issues.jboss.org/browse/WFLY-9337
+HTTP servers generally have a problem of not knowing the form data encoding submitted
+to them because browser usually don't care to attach the charset encoding information.
+See https://stackoverflow.com/questions/3278900/httpservletrequest-setcharacterencoding-seems-to-do-nothing/46162810#46162810
+on how to change the servlet container's default charset encoding. I have added
+descriptor files for glassfish and wildfly to fix this issue (ie. set the default
+encoding to UTF-8, accept-charset params in html forms must have the same value!).
+Only WildFly 11 CR1 is tested.
+
+
 

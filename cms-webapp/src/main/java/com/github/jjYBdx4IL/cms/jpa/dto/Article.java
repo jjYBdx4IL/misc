@@ -21,6 +21,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -50,12 +51,12 @@ public class Article implements Serializable {
     private Collection<Tag> tags = new ArrayList<>();
 
     @Basic(optional = false)
-    @Column(columnDefinition = "TEXT")
+    @Lob
     @Field(store = Store.NO)
     private String title;
 
     @Basic(optional = false)
-    @Column(columnDefinition = "TEXT")
+    @Lob
     @Field(store = Store.NO)
     private String content;
 

@@ -6,10 +6,8 @@
         <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
         <properties>
             <property name="hibernate.search.default.directory_provider" value="filesystem" />
-            <property name="hibernate.search.default.indexBase" value="${user.home}/.cms-webapp/ftsearchindex" />
+            <property name="hibernate.search.default.indexBase" value="${user.home}/lucene/cms-webapp" />
             <property name="hibernate.search.lucene_version" value="LUCENE_55" />
-            <property name="hibernate.connection.useUnicode" value="true" />
-            <property name="hibernate.connection.characterEncoding" value="UTF-8" />
         </properties>
     </persistence-unit>
 </persistence>
