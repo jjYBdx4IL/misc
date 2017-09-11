@@ -22,8 +22,10 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 /**
  *
@@ -64,14 +66,22 @@ public class QueryFactory {
         final CriteriaBuilder cb = em.getCriteriaBuilder();
         final CriteriaQuery<Article> cq = cb.createQuery(Article.class);
         final Root<Article> root = cq.from(Article.class);
+        
         if (tag != null) {
-            final Join<Article, Tag> tagRoot = root.join(Article_.tags, JoinType.INNER);
-            cq.where(cb.equal(cb.lower(tagRoot.get(Tag_.name)), tag.toLowerCase()));
+            final Subquery<Long> sq = cq.subquery(Long.class);
+            final Root<Article> fromArticle = sq.from(Article.class);
+            final Join<Article, Tag> articleTag = fromArticle.join(Article_.tags);
+            sq.select(fromArticle.get(Article_.id))
+                .where(cb.equal(articleTag.get(Tag_.id), tag.toLowerCase()));
+
+            cq.where(cb.in(root.get(Article_.id)).value(sq));
         }
+        
         if (uid != null) {
             final Join<Article, User> userRoot = root.join(Article_.owner, JoinType.LEFT);
             cq.where(cb.equal(userRoot.get(User_.uid), uid));
         }
+        
         cq.orderBy(cb.desc(root.get(Article_.createdAt)));
         return em.createQuery(cq);
     }
@@ -113,7 +123,7 @@ public class QueryFactory {
     }
 
     public Map<ConfigKey, String> getAllConfigValuesAsMap() {
-        Map<ConfigKey, String> result = new HashMap<>();
+        final Map<ConfigKey, String> result = new HashMap<>();
         for (ConfigValue cv : getAllConfigValues().getResultList()) {
             result.put(cv.getKey(), cv.getValue());
         }

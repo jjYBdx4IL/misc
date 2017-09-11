@@ -1,27 +1,117 @@
 package com.github.jjYBdx4IL.cms.rest.app;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
 import java.lang.reflect.Method;
 
-public interface SessionData {
+import javax.annotation.security.DenyAll;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
+import javax.enterprise.context.SessionScoped;
 
-    String SESSION_ATTRNAME = "session.data";
+@SuppressWarnings("serial")
+@SessionScoped
+public class SessionData implements Serializable {
 
-    String getUid();
+    private static final Logger LOG = LoggerFactory.getLogger(SessionData.class);
+    
+    public static final String SESSION_ATTRNAME = "session.data";
+    
+    private String uid = null;
+    private String googleOauth2StateSecret = null;
 
-    void setUid(String uid);
+    public synchronized String getUid() {
+        return uid;
+    }
 
-    String getGoogleOauth2StateSecret();
+    public synchronized void setUid(String uid) {
+        this.uid = uid;
+    }
+    
+    public synchronized String getGoogleOauth2StateSecret() {
+        return googleOauth2StateSecret;
+    }
 
-    void setGoogleOauth2StateSecret(String googleOauth2StateSecret);
+    public synchronized void setGoogleOauth2StateSecret(String googleOauth2StateSecret) {
+        this.googleOauth2StateSecret = googleOauth2StateSecret;
+    }
 
-    boolean isAuthenticated();
+    public synchronized boolean isAuthenticated() {
+        return getUid() != null;
+    }
 
-    void logout();
+    public synchronized void logout() {
+        setUid(null);
+    }
 
-    boolean isAllowed(Method method);
+    public synchronized boolean isAllowed(Method method) {
+        if (method.isAnnotationPresent(DenyAll.class)) {
+            return isDevel();
+        }
+        if (method.isAnnotationPresent(PermitAll.class)) {
+            return true;
+        }
+        if (checkRoles(method.getAnnotation(RolesAllowed.class))) {
+            return true;
+        }
 
-    String toString();
+        Class<?> klazz = method.getDeclaringClass();
 
-    boolean isDevel();
+        if (klazz.isAnnotationPresent(DenyAll.class)) {
+            return isDevel();
+        }
+        if (klazz.isAnnotationPresent(PermitAll.class)) {
+            return true;
+        }
+        if (checkRoles(klazz.getAnnotation(RolesAllowed.class))) {
+            return true;
+        }
+        
+        return false;
+    }
+
+    protected synchronized boolean checkRoles(RolesAllowed rolesAllowed) {
+        if (rolesAllowed == null) {
+            return false;
+        }
+        for (String role : rolesAllowed.value()) {
+            if (Role.USER.equals(role)) {
+                if (isAuthenticated()) {
+                    return true;
+                }
+            } else if (Role.ADMIN.equals(role)) {
+                if (isAdmin()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    protected synchronized boolean isAdmin() {
+        LOG.info("isAdmin " + this);
+        if (!isAuthenticated()) {
+            return false;
+        }
+        if (isDevel() && getUid().equals("devel-1")) {
+            return true;
+        }
+        if (System.getProperty("cms.webapp.admin.uid", "none").equals(getUid())) {
+            return true;
+        }
+        return false;
+    }
+    
+    public synchronized boolean isDevel() {
+        return Boolean.parseBoolean(System.getProperty("env.devel", "false"));
+    }
+
+    @Override
+    public synchronized String toString() {
+        return "SessionDataImpl [uid=" + uid + ", googleOauth2StateSecret=" + googleOauth2StateSecret + "]";
+    }
+
 
 }

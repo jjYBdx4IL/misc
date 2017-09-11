@@ -1,5 +1,7 @@
 package com.github.jjYBdx4IL.cms.jpa.dto;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
@@ -39,11 +41,12 @@ public class Article implements Serializable {
     private Long id;
 
     @Basic(optional = false)
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "owner")
     private User owner;
 
     @ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
     private Collection<Tag> tags = new ArrayList<>();
 
     @Basic(optional = false)

@@ -19,7 +19,6 @@
 
     <properties>
         <webappAssetsDirectory>${project.build.directory}/${project.build.finalName}/assets</webappAssetsDirectory>
-        <failOnMissingWebXml>false</failOnMissingWebXml>
     </properties>
 
     <build>
@@ -61,107 +60,13 @@
                 </dependencies>
             </plugin>
 
-            <!-- help eclipse identify the webapp folder as a resource folder: -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-resource</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>add-resource</goal>
-                        </goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/webapp</directory>
-                                    <targetPath>${project.build.directory}/${project.build.finalName}</targetPath>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-
-            <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>${jetty.version}</version>
-<!--                 <executions> -->
-<!--                     <execution> -->
-<!--                         <id>jetty-it-start</id> -->
-<!--                         <goals> -->
-<!--                             <goal>start</goal> -->
-<!--                         </goals> -->
-<!--                         <phase>pre-integration-test</phase> -->
-<!--                         <configuration> -->
-<!--                             <skip>${skipITs}</skip> -->
-<!--                         </configuration> -->
-<!--                     </execution> -->
-<!--                     <execution> -->
-<!--                         <id>jetty-it-stop</id> -->
-<!--                         <goals> -->
-<!--                             <goal>stop</goal> -->
-<!--                         </goals> -->
-<!--                         <phase>post-integration-test</phase> -->
-<!--                         <configuration> -->
-<!--                             <skip>${skipITs}</skip> -->
-<!--                         </configuration> -->
-<!--                     </execution> -->
-<!--                 </executions> -->
-                <configuration>
-                    <!-- we cannot use provided scope for additional server classes because if the webapp needs it too, it 
-                        may get declared twice, once explicitly with provided scope, and once through the plugin's dependencies, which leads to class 
-                        loading errors like "class not found" -->
-                    <useProvidedScope>false</useProvidedScope>
-                    <!-- an even faster way to reload code changes is to use the eclipse debugger -->
-                    <scanIntervalSeconds>0</scanIntervalSeconds>
-                    <webApp>
-                        <overrideDescriptor>${project.basedir}/src/main/webapp/WEB-INF/web.devel.xml</overrideDescriptor>
-                        <resourceBases>
-                            <resourceBase>${project.basedir}/src/main/webapp</resourceBase>
-                            <resourceBase>${project.build.directory}/${project.build.finalName}</resourceBase>
-                        </resourceBases>
-                    </webApp>
-                    <jettyEnvXml>${project.basedir}/src/main/webapp/WEB-INF/jetty-env.xml</jettyEnvXml>
-                    <jettyXml>${project.basedir}/src/main/webapp/WEB-INF/jetty.devel.xml</jettyXml>
-                    <systemProperties>
-                        <systemProperty>
-                            <name>jetty.http.port</name>
-                            <value>${jetty.http.port}</value>
-                        </systemProperty>
-                        <systemProperty>
-                            <!-- h2 frontend: -->
-                            <name>h2.bindAddress</name>
-                            <value>localhost</value>
-                        </systemProperty>
-                        <systemProperty>
-                            <name>basedir</name>
-                            <value>${basedir}</value>
-                        </systemProperty>
-                    </systemProperties>
-                    <stopKey>123</stopKey>
-                    <stopPort>8085</stopPort>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.github.jjYBdx4IL.cms</groupId>
-                        <artifactId>cms-embedded-server</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <!-- do NOT archive classes, or jetty:run's auto-reload does not work -->
-                    <archiveClasses>true</archiveClasses>
-                    <attachClasses>true</attachClasses>
-                </configuration>
-            </plugin>
+<!--             <plugin> -->
+<!--                 <artifactId>maven-war-plugin</artifactId> -->
+<!--                 <configuration> -->
+<!--                     <archiveClasses>true</archiveClasses> -->
+<!--                     <attachClasses>true</attachClasses> -->
+<!--                 </configuration> -->
+<!--             </plugin> -->
 
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -236,6 +141,7 @@
                     <outputDirectory>${webappAssetsDirectory}</outputDirectory>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -252,6 +158,22 @@
                             </sources>
                         </configuration>
                     </execution>
+                <!-- help eclipse identify the webapp folder as a resource folder: -->
+                    <execution>
+                        <id>add-resource</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>add-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/webapp</directory>
+                                    <targetPath>${project.build.directory}/${project.build.finalName}</targetPath>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -259,13 +181,6 @@
     </build>
 
     <dependencies>
-<!--         <dependency> -->
-<!--             <groupId>com.github.jjYBdx4IL.cms</groupId> -->
-<!--             <artifactId>cms-embedded-server</artifactId> -->
-<!--             <version>${project.version}</version> -->
-<!--             <scope>provided</scope> -->
-<!--         </dependency> -->
-
 <!--         <dependency> -->
 <!--             <groupId>com.github.jjYBdx4IL.cms</groupId> -->
 <!--             <artifactId>cms-it</artifactId> -->
@@ -278,17 +193,6 @@
             <scope>provided</scope>
 <!--             <version>5.7.2.Final</version> -->
         </dependency>
-
-<!--         <dependency> -->
-<!--             <groupId>org.eclipse.jetty</groupId> -->
-<!--             <artifactId>jetty-servlet</artifactId> -->
-<!--             <version>9.2.13.v20150730</version> -->
-<!--         </dependency> -->
-<!--         <dependency> -->
-<!--             <groupId>com.h2database</groupId> -->
-<!--             <artifactId>h2</artifactId> -->
-<!--             <scope>provided</scope> -->
-<!--         </dependency> -->
 
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -326,19 +230,6 @@
             <groupId>com.j2html</groupId>
             <artifactId>j2html</artifactId>
         </dependency>
-<!--         <dependency> -->
-<!--             <groupId>org.glassfish.jersey.core</groupId> -->
-<!--             <artifactId>jersey-server</artifactId> -->
-<!--         </dependency> -->
-<!--         <dependency> -->
-<!--             <groupId>org.glassfish.jersey.containers</groupId> -->
-<!--             <artifactId>jersey-container-jetty-http</artifactId> -->
-<!--         </dependency> -->
-<!--         <dependency> -->
-<!--             <groupId>org.glassfish.jersey.containers</groupId> -->
-<!--             <artifactId>jersey-container-servlet-core</artifactId> -->
-<!--         </dependency> -->
-
 
         <dependency>
             <groupId>javax</groupId>

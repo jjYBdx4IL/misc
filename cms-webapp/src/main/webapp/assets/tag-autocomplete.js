@@ -47,3 +47,31 @@ $(function() {
 		}
 	});
 });
+
+/* article pathId generation */
+
+$(document).ready(
+		function() {
+			var dict = new Map([ [ '\u00dc', 'Ue' ], [ '\u00fc', 'ue' ],
+					[ '\u00c4', 'Ae' ], [ '\u00e4', 'ae' ], [ '\u00d6', 'Oe' ],
+					[ '\u00f6', 'oe' ], [ '\u00df', 'ss' ] ]);
+
+			function t(match, val) {
+				dict.forEach(function(value, key, map) {
+					console.log(key + ' => ' + value + " in: " + val);
+					val = val.replace(new RegExp(key, "g"), value);
+				});
+				return val;
+			}
+			function toPathId(a) {
+				a = a.replace(/([^a-z0-9]+)/gi, t);
+				return a.replace(/([^a-z0-9]+)/gi, '-').toLowerCase();
+			}
+
+			$(".editForm input[name=title]").on(
+					"change paste keyup",
+					function() {
+						$(".editForm input[name=pathId]").val(
+								toPathId($(this).val()));
+					});
+		});

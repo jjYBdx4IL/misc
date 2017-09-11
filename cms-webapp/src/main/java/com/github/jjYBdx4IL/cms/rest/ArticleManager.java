@@ -64,11 +64,11 @@ public class ArticleManager {
     @Context
     UriInfo uriInfo;
     @PersistenceContext
-    private EntityManager em;
+    EntityManager em;
     @Inject
-    private SessionData session;
+    SessionData session;
     @Inject
-    private HtmlBuilder htmlBuilder;
+    HtmlBuilder htmlBuilder;
     @Inject
     QueryFactory qf;
 
@@ -159,6 +159,7 @@ public class ArticleManager {
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("edit/{articleId}")
+    @Transactional
     public Response edit(@PathParam("articleId") long articleId) {
         LOG.trace("edit()");
 

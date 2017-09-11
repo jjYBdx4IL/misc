@@ -32,6 +32,8 @@ See the follow up call in GoogleLogin.callback() to a successful oauth2 request.
 
     hibernate.hbm2ddl.auto = update
     hibernate.show_sql = true (stdout, or use your logger)
+    hibernate.format_sql = true
+    hibernate.use_sql_comments = true
     env.devel = true
 
 ## remarks
