@@ -31,6 +31,8 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +54,7 @@ import j2html.tags.UnescapedText;
 public class HtmlBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(HtmlBuilder.class);
-    
+
     @Context
     UriInfo uriInfo;
     @Inject
@@ -160,7 +162,8 @@ public class HtmlBuilder {
         String searchLink = uriInfo.getBaseUriBuilder().path(Search.class).build().toString();
 
         String signoutTooltipText = "Sign out." +
-            (session.isAuthenticated() ? "\nCurrently signed in as:\n" + qf.getUserByUid(session.getUid()).getEmail() : "");
+            (session.isAuthenticated() ? "\nCurrently signed in as:\n" + qf.getUserByUid(session.getUid()).getEmail()
+                : "");
 
         ContainerTag menu = null;
         if (session.isAuthenticated()) {
@@ -320,7 +323,7 @@ public class HtmlBuilder {
         return div(
             each(articles,
                 article -> div(
-                    h1(article.getTitle()).withClass("articleTitle"),
+                    h1(a(article.getTitle()).withHref(constructArticleLink(article))).withClass("articleTitle"),
                     div(article.getContent()).withClass("articleContent markdown"),
                     span("Tags: ").withClass("tagLineHeader"),
                     each(article.getTags(),
@@ -329,6 +332,14 @@ public class HtmlBuilder {
                     ).withClass("col-12 article")
             )
             ).withClass("row");
+    }
+
+    public String constructArticleLink(Article article) {
+        LocalDateTime ldt = LocalDateTime.ofEpochSecond(article.getCreatedAt().getTime() / 1000L, 0, ZoneOffset.UTC);
+        return uriInfo.getBaseUriBuilder().path(Home.class, "byPathId")
+            .build(ldt.getYear(), String.format("%02d", ldt.getMonthValue()),
+                String.format("%02d", ldt.getDayOfMonth()), article.getPathId())
+            .toString();
     }
 
 }

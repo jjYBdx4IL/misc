@@ -61,6 +61,23 @@ public class QueryFactory {
         cq.orderBy(cb.asc(root.get(Tag_.id)));
         return em.createQuery(cq);
     }
+    
+    public Article getArticleByPathId(String pathId) {
+        if (pathId == null) {
+            return null;
+        }
+        
+        final CriteriaBuilder cb = em.getCriteriaBuilder();
+        final CriteriaQuery<Article> cq = cb.createQuery(Article.class);
+        final Root<Article> root = cq.from(Article.class);
+        cq.where(cb.equal(root.get(Article_.pathId), pathId));
+        
+        List<Article> articles = em.createQuery(cq).getResultList();
+        if (articles.isEmpty()) {
+            return null;
+        }
+        return articles.get(0);
+    }
 
     public TypedQuery<Article> getArticleDisplayList(String tag, String uid) {
         final CriteriaBuilder cb = em.getCriteriaBuilder();
