@@ -104,10 +104,33 @@ $(document).ready(
 			});
 			
 			// replace simple youtube links with iframes
+			var myRegex = /(\d+)([hms])/gi;
+			function toSecs(val) {
+				var secs = 0;
+				while (res = myRegex.exec(val)) {
+				    if (res[2] === 's') {
+				    	secs += 1 * res[1];
+				    }
+				    else if (res[2] === 'm') {
+		                secs += 60 * res[1];
+		            }
+		            else if (res[2] === 'h') {
+		                secs += 3600 * res[1];
+		            }
+				}
+				return secs;
+			}
+			function toYoutubeIframe(val, vidId, startPos) {
+				var url = 'https://www.youtube.com/embed/' + vidId;
+				if (startPos) {
+					url += '?start=' + toSecs(startPos);
+				}
+				return '<iframe width="560" height="315" src="'+url+'" frameborder="0" allowfullscreen></iframe>';
+			}
 			$(".articleContent").each(function( index ) {
-				if ($(this).text().match(/\bembed:\/\/youtube\/[a-z0-9]{8,}\b/i)) {
-					$(this).html($(this).html().replace(/\bembed:\/\/youtube\/([a-z0-9]{8,})\b/gi,
-							'<iframe width="560" height="315" src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe>'));
+				console.log(index);
+				if ($(this).text().match(/\bembed:\/\/youtube\/([a-z0-9-]{8,})(\/([0-9hms]+))?\b/gi)) {
+					$(this).html($(this).html().replace(/\bembed:\/\/youtube\/([a-z0-9-]{8,})(\/([0-9hms]+))?\b/gi, toYoutubeIframe));
 				}
 			});
 		});

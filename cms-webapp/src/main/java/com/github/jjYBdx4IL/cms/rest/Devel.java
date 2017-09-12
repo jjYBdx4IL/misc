@@ -16,9 +16,9 @@
 package com.github.jjYBdx4IL.cms.rest;
 
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
+import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.jpa.dto.User;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +42,8 @@ import javax.ws.rs.core.UriInfo;
 @DenyAll
 public class Devel {
 
+    public static final String TEST_UID = "devel-1";
+
     private static final Logger LOG = LoggerFactory.getLogger(Devel.class);
 
     @Context
@@ -60,13 +62,11 @@ public class Devel {
     public Response login() {
         LOG.trace("login()");
 
-        String testUid = "devel-1";
-        
-        User user = qf.getUserByUid(testUid);
-        
+        User user = qf.getUserByUid(TEST_UID);
+
         if (user == null) {
             user = new User();
-            user.setUid(testUid);
+            user.setUid(TEST_UID);
             user.setCreatedAt(new Date());
         }
 
@@ -75,8 +75,25 @@ public class Devel {
         user.setEmail("test@tester.com");
         em.persist(user);
 
-        session.setUid(testUid);
-        
+        session.setUid(TEST_UID);
+
+        return Response.ok().build();
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Transactional
+    @Path("clean")
+    public Response clean() {
+        LOG.trace("clean()");
+
+        for (Article article : qf.getArticleDisplayList(null, TEST_UID).getResultList()) {
+            if (TEST_UID.equals(article.getOwner().getUid())) {
+                LOG.warn("DELETE: " + article);
+                em.remove(article);
+            }
+        }
+
         return Response.ok().build();
     }
 

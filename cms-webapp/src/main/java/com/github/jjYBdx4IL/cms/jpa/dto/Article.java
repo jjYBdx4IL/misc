@@ -155,4 +155,29 @@ public class Article implements Serializable {
         this.pathId = pathId;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Article [id=");
+        builder.append(id);
+        builder.append(", owner=");
+        builder.append(owner);
+        builder.append(", tags=");
+        builder.append(tags);
+        builder.append(", title=");
+        builder.append(title);
+        builder.append(", content=");
+        builder.append(content);
+        builder.append(", createdAt=");
+        builder.append(createdAt);
+        builder.append(", lastModified=");
+        builder.append(lastModified);
+        builder.append(", pathId=");
+        builder.append(pathId);
+        builder.append(", version=");
+        builder.append(version);
+        builder.append("]");
+        return builder.toString();
+    }
+
 }

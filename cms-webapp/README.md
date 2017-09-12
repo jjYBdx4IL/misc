@@ -80,5 +80,8 @@ Javascript performs the following steps in the listed order:
 Currently only youtube is supported via:
 
     embed://youtube/$videoId
+    embed://youtube/$videoId/1h3m  (<- start position)
+
+
 
 The editor's live preview only includes step 1 atm.

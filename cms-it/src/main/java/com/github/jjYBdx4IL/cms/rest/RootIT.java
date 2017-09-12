@@ -27,10 +27,28 @@ import javax.xml.bind.Unmarshaller;
 
 public class RootIT {
 
+    private static final String rootUrl = "http://localhost:" + System.getProperty("jetty.http.port", "8080") + "/";
+    
     private Client client = null;
 
-    private static final String rootUrl = "http://localhost:" + System.getProperty("jetty.http.port", "8080") + "/";
+    @Test
+    public void createSomeArticles() throws Exception {
+        Response response = (Response) getTarget("devel/login").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        
+        final String title = "test title <script>window.alert('ups');</script>";
+        final String content = "embed://youtube/d4e03F3lLco/19m29s";
+        final String tag = "aTag";
+        final String pathId = "p" + PasswordGenerator.generate55(11);
 
+        Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
+            pathId);
+        
+        response = (Response) getTarget("articleManager/create").request()
+            .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
+        assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
+    }
+    
     @Test
     public void testWorkflow() throws Exception {
         // GET empty main page
@@ -143,6 +161,10 @@ public class RootIT {
         response = (Response) getTarget("articleManager/import").request()
             .post(Entity.entity(responseContent, MediaType.TEXT_XML));
         assertEquals(HttpServletResponse.SC_NO_CONTENT, response.getStatus());
+        
+        // clean up
+        response = (Response) getTarget("devel/clean").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
     }
 
     @Test
