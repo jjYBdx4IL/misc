@@ -121,7 +121,7 @@ public class SessionData implements Serializable {
     }
     
     public synchronized boolean isDevel() {
-        return Boolean.parseBoolean(System.getProperty("env.devel", "false"));
+        return Boolean.parseBoolean(System.getProperty("cms.devel", "false"));
     }
 
     @Override

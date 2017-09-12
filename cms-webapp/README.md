@@ -69,5 +69,16 @@ descriptor files for glassfish and wildfly to fix this issue (ie. set the defaul
 encoding to UTF-8, accept-charset params in html forms must have the same value!).
 Only WildFly 11 CR1 is tested.
 
+## embedding, sanitization, markdown processing
 
+Javascript performs the following steps in the listed order:
 
+1. Markdown conversion.
+2. XSS protection is done using DOMPurify
+3. replacing embed://service/id tags.
+
+Currently only youtube is supported via:
+
+    embed://youtube/$videoId
+
+The editor's live preview only includes step 1 atm.

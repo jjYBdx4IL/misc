@@ -75,7 +75,7 @@ $(document).ready(
 					});
 		});
 
-/* markdown preview */
+/* markdown preview, sanitize and youtube iframe injection */
 
 $(document).ready(
 		function() {
@@ -93,9 +93,22 @@ $(document).ready(
 			// intial preview
 			updateMdPreview();
 			
-			// conversion of static markdown content
-			$("div.articleContent").each(function( index ) {
+			// conversion of static markdown content, plus sanitization
+			$(".articleContent").each(function( index ) {
 				  $( this ).html(DOMPurify.sanitize(converter.makeHtml($( this ).text())));
+			});
+			
+			// sanitize article titles
+			$(".articleTitle").each(function( index ) {
+				  $( this ).html(DOMPurify.sanitize($( this ).html()));
+			});
+			
+			// replace simple youtube links with iframes
+			$(".articleContent").each(function( index ) {
+				if ($(this).text().match(/\bembed:\/\/youtube\/[a-z0-9]{8,}\b/i)) {
+					$(this).html($(this).html().replace(/\bembed:\/\/youtube\/([a-z0-9]{8,})\b/gi,
+							'<iframe width="560" height="315" src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe>'));
+				}
 			});
 		});
 
