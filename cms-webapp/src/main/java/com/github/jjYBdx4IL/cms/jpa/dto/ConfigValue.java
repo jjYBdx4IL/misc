@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2017 jjYBdx4IL (https://github.com/jjYBdx4IL)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.jjYBdx4IL.cms.jpa.dto;
 
 import java.io.Serializable;
@@ -9,18 +24,10 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 
-/**
- *
- * @author Github jjYBdx4IL Projects
- */
+@SuppressWarnings("serial")
 @Entity
 @Cacheable
 public class ConfigValue implements Serializable {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
 
     @Id
     @Basic
@@ -38,32 +45,18 @@ public class ConfigValue implements Serializable {
         this.value = value;
     }
 
-    /**
-     * @return the data1
-     */
     public ConfigKey getKey() {
         return key;
     }
 
-    /**
-     * @param data1
-     *            the data1 to set
-     */
     public void setKey(ConfigKey key) {
         this.key = key;
     }
 
-    /**
-     * @return the data2
-     */
     public String getValue() {
         return value;
     }
 
-    /**
-     * @param data2
-     *            the data2 to set
-     */
     public void setValue(String value) {
         this.value = value;
     }

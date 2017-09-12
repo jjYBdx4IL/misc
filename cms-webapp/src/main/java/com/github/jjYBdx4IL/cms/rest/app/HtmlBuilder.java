@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2017 jjYBdx4IL (https://github.com/jjYBdx4IL)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.jjYBdx4IL.cms.rest.app;
 
 import static j2html.TagCreator.a;
@@ -26,8 +41,11 @@ import com.github.jjYBdx4IL.cms.rest.ArticleManager;
 import com.github.jjYBdx4IL.cms.rest.Home;
 import com.github.jjYBdx4IL.cms.rest.LoginSelect;
 import com.github.jjYBdx4IL.cms.rest.Logout;
+import com.github.jjYBdx4IL.cms.rest.RssFeed;
 import com.github.jjYBdx4IL.cms.rest.Search;
-
+import j2html.tags.ContainerTag;
+import j2html.tags.DomContent;
+import j2html.tags.UnescapedText;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,10 +66,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
 
-import j2html.tags.ContainerTag;
-import j2html.tags.DomContent;
-import j2html.tags.UnescapedText;
-
+//CHECKSTYLE:OFF
 @RequestScoped
 @Provider
 public class HtmlBuilder {
@@ -170,7 +185,7 @@ public class HtmlBuilder {
         ContainerTag _main = constructMainSection();
 
         String title = qf.getConfigValue(ConfigKey.WEBSITE_TITLE, "");
-        
+
         String doc = document(
             html(
                 head(
@@ -187,6 +202,9 @@ public class HtmlBuilder {
                     each(
                         scriptUrls, script -> script().withType("text/javascript").withSrc(script))
                     ),
+                link().withRel("alternate").withType("application/rss+xml").withTitle("Blog")
+                    .withHref(uriInfo.getBaseUriBuilder().path(RssFeed.class).path(RssFeed.class, "feed").build()
+                        .toString()),
                 body(
                     header(
                         div(

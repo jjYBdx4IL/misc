@@ -5,19 +5,26 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.github.jjYBdx4IL.cms</groupId>
-        <artifactId>cms-parent</artifactId>
-        <version>1.0-SNAPSHOT</version>
-        <relativePath>../cms-parent</relativePath>
+        <groupId>com.github.jjYBdx4IL</groupId>
+        <artifactId>release-parent</artifactId>
+        <version>1.3-SNAPSHOT</version>
+        <relativePath>../release-parent</relativePath>
     </parent>
 
+    <groupId>com.github.jjYBdx4IL.cms</groupId>
     <artifactId>cms-webapp</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <name>CMS WebApp</name>
     <inceptionYear>2017</inceptionYear>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <hibernate.version>5.2.10.Final</hibernate.version>
         <webappAssetsDirectory>${project.build.directory}/${project.build.finalName}/assets</webappAssetsDirectory>
     </properties>
 
@@ -60,69 +67,24 @@
                 </dependencies>
             </plugin>
 
-<!--             <plugin> -->
-<!--                 <artifactId>maven-war-plugin</artifactId> -->
-<!--                 <configuration> -->
-<!--                     <archiveClasses>true</archiveClasses> -->
-<!--                     <attachClasses>true</attachClasses> -->
-<!--                 </configuration> -->
-<!--             </plugin> -->
-
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>make-a-test-jar</id>
+                        <id>make-a-jar</id>
                         <goals>
-                            <goal>test-jar</goal>
+                            <goal>jar</goal>
                         </goals>
+                        <configuration>
+                            <classifier>classes</classifier>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <excludes>
-                        <exclude>**/jetty.xml</exclude>
-                        <exclude>**/log4j.xml</exclude>
-                        <exclude>**/application-context.xml</exclude>
-                        <exclude>**/application-properties.xml</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
-
-<!--             <plugin> -->
-<!--                 <artifactId>maven-failsafe-plugin</artifactId> -->
-<!--                 <executions> -->
-<!--                     <execution> -->
-<!--                         <id>default</id> -->
-<!--                         <goals> -->
-<!--                             <goal>integration-test</goal> -->
-<!--                         </goals> -->
-<!--                         <phase>integration-test</phase> -->
-<!--                         <configuration> -->
-<!--                             <failIfNoTests>true</failIfNoTests> -->
-<!--                         </configuration> -->
-<!--                     </execution> -->
-<!--                     <execution> -->
-<!--                         <id>verify</id> -->
-<!--                         <phase>verify</phase> -->
-<!--                         <goals> -->
-<!--                             <goal>verify</goal> -->
-<!--                         </goals> -->
-<!--                     </execution> -->
-<!--                 </executions> -->
-<!--                 <configuration> -->
-<!--                     <systemPropertyVariables> -->
-<!--                         <jetty.http.port>${jetty.http.port}</jetty.http.port> -->
-<!--                     </systemPropertyVariables> -->
-<!--                     <dependenciesToScan> -->
-<!--                         <dependency>${project.groupId}:cms-it</dependency> -->
-<!--                     </dependenciesToScan> -->
-<!--                 </configuration> -->
-<!--             </plugin> -->
 
             <plugin>
                 <groupId>com.googlecode.maven-download-plugin</groupId>
                 <artifactId>download-maven-plugin</artifactId>
-                <version>1.3.0</version>
                 <executions>
                     <execution>
                         <phase>process-classes</phase>
@@ -178,69 +140,92 @@
             </plugin>
 
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>com.googlecode.maven-download-plugin</groupId>
+                                        <artifactId>download-maven-plugin</artifactId>
+                                        <versionRange>[1.3.0,)</versionRange>
+                                        <goals>
+                                            <goal>wget</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
     <dependencies>
-<!--         <dependency> -->
-<!--             <groupId>com.github.jjYBdx4IL.cms</groupId> -->
-<!--             <artifactId>cms-it</artifactId> -->
-<!--             <version>${project.version}</version> -->
-<!--             <scope>test</scope> -->
-<!--         </dependency> -->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-orm</artifactId>
-            <scope>provided</scope>
-<!--             <version>5.7.2.Final</version> -->
-        </dependency>
-
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
         <dependency>
             <groupId>com.github.jjYBdx4IL.utils</groupId>
             <artifactId>text-utils</artifactId>
             <version>1.1-SNAPSHOT</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
+            <version>1.22.0</version>
         </dependency>
-<!--         <dependency> -->
-<!--             <groupId>org.hibernate</groupId> -->
-<!--             <artifactId>hibernate-entitymanager</artifactId> -->
-<!--         </dependency> -->
-<!--         <dependency> -->
-<!--             <groupId>org.hibernate.javax.persistence</groupId> -->
-<!--             <artifactId>hibernate-jpa-2.1-api</artifactId> -->
-<!--         </dependency> -->
         <dependency>
             <groupId>com.j2html</groupId>
             <artifactId>j2html</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rometools</groupId>
+            <artifactId>rome</artifactId>
+            <version>1.7.4</version>
         </dependency>
 
         <dependency>
             <groupId>javax</groupId>
-            <artifactId>javaee-web-api</artifactId>
+            <artifactId>javaee-api</artifactId>
             <version>7.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-orm</artifactId>
+            <version>5.5.8.Final</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
+            <version>1.7.25</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.25</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>

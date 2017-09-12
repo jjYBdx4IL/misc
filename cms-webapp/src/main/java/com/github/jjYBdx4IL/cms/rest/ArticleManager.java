@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2017 jjYBdx4IL (https://github.com/jjYBdx4IL)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.jjYBdx4IL.cms.rest;
 
 import static j2html.TagCreator.a;
@@ -17,7 +32,7 @@ import com.github.jjYBdx4IL.cms.jpa.dto.User;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
 import com.github.jjYBdx4IL.cms.rest.app.Role;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
-
+import j2html.tags.ContainerTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,11 +67,12 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBException;
 
-import j2html.tags.ContainerTag;
-
+//CHECKSTYLE:OFF
 @Path("articleManager")
 @RolesAllowed(Role.ADMIN)
 public class ArticleManager {
+
+    public static final String MARKDOWN_HELP_LINK = "https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax";
 
     private static final Logger LOG = LoggerFactory.getLogger(ArticleManager.class);
 
@@ -107,6 +123,7 @@ public class ArticleManager {
         ContainerTag formRow = articleEditForm(null);
 
         htmlBuilder.setPageTitle("Create New Article")
+            .addPageTitleSubItem("help", "Syntax help", MARKDOWN_HELP_LINK)
             .setJsValue("tagSearchApiEndpoint",
                 uriInfo.getBaseUriBuilder().path(ArticleManager.class).path("tagSearch").build().toString()
             ).mainAdd(div(formRow).withClass("container articleManager"));
@@ -176,7 +193,7 @@ public class ArticleManager {
         ContainerTag formRow = articleEditForm(article);
 
         htmlBuilder.setPageTitle("Edit Article")
-            .addPageTitleSubItem("help", "Syntax help", "https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax")
+            .addPageTitleSubItem("help", "Syntax help", MARKDOWN_HELP_LINK)
             .setJsValue("tagSearchApiEndpoint",
                 uriInfo.getBaseUriBuilder().path(ArticleManager.class).path("tagSearch").build().toString()
             ).mainAdd(div(formRow).withClass("container articleManager"));
@@ -196,7 +213,7 @@ public class ArticleManager {
         @FormParam("content") String content,
         @FormParam("tags") String tagsValue) {
         LOG.trace("editSave()");
-        
+
         if (title == null || title.isEmpty()) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("title required").build();
         }
@@ -266,7 +283,7 @@ public class ArticleManager {
     @Path("import")
     public Response importDump(ExportDump dump) throws JAXBException {
         LOG.trace("import()");
-        
+
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaDelete<Article> cd = cb.createCriteriaDelete(Article.class);
         cd.from(Article.class);
@@ -276,7 +293,7 @@ public class ArticleManager {
         qf.getTags(null).getResultList().forEach(tag -> tagMap.put(tag.getId(), tag));
 
         User user = qf.getUserByUid(session.getUid());
-        
+
         for (ArticleDTO dto : dump.getArticles()) {
             Article article = new Article();
             article.setTitle(dto.getTitle());
@@ -350,5 +367,5 @@ public class ArticleManager {
         article.getTags().forEach(tag -> sb.append(sb.length() != 0 ? ", " : "").append(tag.getName()));
         return sb.toString();
     }
-    
+
 }
