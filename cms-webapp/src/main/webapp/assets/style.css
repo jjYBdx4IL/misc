@@ -195,4 +195,12 @@ input[readonly]
     background-color: #ddd;
 }
 
+.settings .editForm {
+    border-top: dashed #ddd;
+}
+
+.settings .editForm textarea {
+    font-family: monospace;
+}
+
 /* radial-gradient(ellipse at center, #604060 0%, #1d1d2b 100%) */
