@@ -275,7 +275,8 @@ public class ArticleManager {
         List<Article> articles = qf.getArticleDisplayList(null, session.getUid()).getResultList();
         List<ConfigValue> configValues = qf.getAllConfigValues().getResultList();
 
-        return Response.ok().entity(ExportDump.create(articles, configValues)).build();
+        return Response.ok().header("Content-Disposition",
+            "attachment; filename=\"export.xml\"").entity(ExportDump.create(articles, configValues)).build();
     }
 
     @POST
