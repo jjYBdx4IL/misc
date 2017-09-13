@@ -51,7 +51,7 @@ import javax.ws.rs.core.UriInfo;
 public class RssFeed {
 
     public static final int MAX_ENTRIES = 10;
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(RssFeed.class);
 
     @Context
@@ -63,7 +63,7 @@ public class RssFeed {
 
     @Path("rss.xml")
     @GET
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_ATOM_XML })
     public Response feed() {
         LOG.trace("feed()");
 

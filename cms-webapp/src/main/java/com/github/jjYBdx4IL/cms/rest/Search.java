@@ -60,6 +60,8 @@ public class Search {
     @Inject
     private HtmlBuilder htmlBuilder;
 
+    private boolean revertedToFuzzyMatching = false;
+
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response search(@QueryParam("q") String searchTerm) {
@@ -74,21 +76,28 @@ public class Search {
                 input().withName("q").withPlaceholder("Enter search term").isRequired()
                     .withCondValue(searchTerm != null, searchTerm)
                     .attr("autofocus")
-                    .withClass("col-12")
                     .attr("title", "Wildcards like * and ? are supported. "
                         + "If nothing is found, a fuzzy search is performed.")
+                    .withClass("col-12")
             ).withClass("row searchForm")
         );
 
         if (searchTerm != null) {
             List<Article> articles = doFullTextSearch(searchTerm);
-            if (articles.isEmpty()) {
-                container.with(
-                    div(
-                        div("nothing found").withClass("col-12 searchWithoutResults")
-                    ).withClass("row")
-                );
-            } else {
+            container.with(
+                div(
+                    div(String.format("%d match(es) found.", articles.size())).withClass("col-12 searchResultComment")
+                ).withClass("row")
+            );
+            if (!articles.isEmpty()) {
+                if (revertedToFuzzyMatching) {
+                    container.with(
+                        div(
+                            div("No exact match found. Reverted to fuzzy matching.")
+                                .withClass("col-12 searchResultComment")
+                        ).withClass("row")
+                    );
+                }
                 container.with(htmlBuilder.createArticleListRow(articles, false, false));
             }
         }
@@ -118,13 +127,13 @@ public class Search {
 
             // revert to fuzzy search if nothing has been found
             if (articles.isEmpty()) {
+                revertedToFuzzyMatching = true;
                 luceneQuery = b.keyword().fuzzy()
                     .onField(Article_.content.getName())
                     .andField(Article_.title.getName()).boostedTo(3)
                     .matching(term)
                     .createQuery();
                 fullTextQuery = fullTextEntityManager.createFullTextQuery(luceneQuery, Article.class);
-
                 articles = fullTextQuery.getResultList();
             }
         } catch (EmptyQueryException ex) {

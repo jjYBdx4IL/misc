@@ -236,7 +236,7 @@ public class ArticleManager {
         }
 
         article.setTitle(title);
-        article.setPathId(pathId);
+        //article.setPathId(pathId); // the pathId should be constant and never modified
         article.setContent(content);
         article.setLastModified(new Date());
         article.setTags(tags);
@@ -326,6 +326,7 @@ public class ArticleManager {
                 input().withName("title").withPlaceholder("title").isRequired()
                     .withValue(article != null ? article.getTitle() : "").withClass("col-12"),
                 input().withName("pathId").withPlaceholder("path id").isRequired()
+                    .condAttr(article != null, "readonly", "")
                     .withValue(article != null ? article.getPathId() : "").withClass("col-12"),
                 textarea().withName("content").isRequired()
                     .withText(article != null ? article.getContent() : "").withClass("col-6"),

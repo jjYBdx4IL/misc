@@ -23,6 +23,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 @SuppressWarnings("serial")
 @Entity
@@ -35,6 +36,7 @@ public class ConfigValue implements Serializable {
     private ConfigKey key;
 
     @Basic
+    @Lob
     private String value;
 
     public ConfigValue() {

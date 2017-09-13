@@ -198,3 +198,9 @@ form textarea {
 .articleManager textarea, .articleManager input {
 	font-family: monospace;
 }
+
+input[readonly]
+{
+    background-color: #ddd;
+}
+

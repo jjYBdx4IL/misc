@@ -70,7 +70,7 @@ $(document).ready(
 			$(".editForm input[name=title]").on(
 					"change paste keyup",
 					function() {
-						$(".editForm input[name=pathId]").val(
+						$(".editForm input[name=pathId]:not([readonly])").val(
 								toPathId($(this).val()));
 					});
 		});

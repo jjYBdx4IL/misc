@@ -14,7 +14,8 @@ Add your personal Google Oauth2 API credentials as follows:
     INSERT INTO CONFIGVALUE (KEY, VALUE)
     VALUES
         ('GOOGLE_OAUTH2_CLIENT_ID', '...'),
-        ('GOOGLE_OAUTH2_CLIENT_SECRET', '...')
+        ('GOOGLE_OAUTH2_CLIENT_SECRET', '...'),
+        ('HTML_HEAD_FRAGMENT', '<script>...</script>')
 
 ## Other DB config values
 

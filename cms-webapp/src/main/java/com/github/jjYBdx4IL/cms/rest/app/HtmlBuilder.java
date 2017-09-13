@@ -37,6 +37,7 @@ import static j2html.TagCreator.title;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
+import com.github.jjYBdx4IL.cms.jpa.dto.Tag;
 import com.github.jjYBdx4IL.cms.rest.ArticleManager;
 import com.github.jjYBdx4IL.cms.rest.Home;
 import com.github.jjYBdx4IL.cms.rest.LoginSelect;
@@ -73,6 +74,8 @@ public class HtmlBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(HtmlBuilder.class);
 
+    public static final int META_KEYWORDS_MAX_LEN = 255;
+    
     @Context
     UriInfo uriInfo;
     @Inject
@@ -93,8 +96,29 @@ public class HtmlBuilder {
     private final ContainerTag _footer = footer();
     private final List<ContainerTag> pageTitleRowSubItems = new ArrayList<>();
     private final Map<String, String> jsValues = new HashMap<>();
+    private StringBuilder metaKeywords = null;
 
     public HtmlBuilder() {
+    }
+
+    public HtmlBuilder addMetaKeywords(Article article) {
+        for (Tag tag : article.getTags()) {
+            addMetaKeyword(tag.getName());
+        }
+        return this;
+    }
+    
+    public HtmlBuilder addMetaKeyword(String keyword) {
+        if (metaKeywords == null) {
+            metaKeywords = new StringBuilder();
+        } else if (metaKeywords.length() >= META_KEYWORDS_MAX_LEN) {
+            return this;
+        }
+        if (metaKeywords.length() > 0) {
+            metaKeywords.append(",");
+        }
+        metaKeywords.append(keyword);
+        return this;
     }
 
     public void enableNoIndex() {
@@ -185,6 +209,7 @@ public class HtmlBuilder {
         ContainerTag _main = constructMainSection();
 
         String title = qf.getConfigValue(ConfigKey.WEBSITE_TITLE, "");
+        String headFragment = qf.getConfigValue(ConfigKey.HTML_HEAD_FRAGMENT, "");
 
         String doc = document(
             html(
@@ -195,7 +220,10 @@ public class HtmlBuilder {
                     noIndex ? meta().attr("name", "robots").attr("content", "noindex") : null,
                     meta().attr("http-equiv", "Content-Type").attr("content", "text/html;charset=UTF-8"),
                     meta().attr("name", "viewport").attr("content", "width=device-width, initial-scale=1"),
+                    meta().attr("name", "keywords")
+                        .attr("content", metaKeywords != null ? metaKeywords.toString() : ""),
                     createJsValuesScript(),
+                    new UnescapedText(headFragment),
                     each(
                         cssUrls,
                         stylesheet -> link().withRel("stylesheet").withType("text/css").withHref(stylesheet)),
@@ -331,6 +359,7 @@ public class HtmlBuilder {
     }
 
     public ContainerTag createArticleListRow(List<Article> articles, boolean showDates, boolean showEditLink) {
+        articles.forEach(article -> addMetaKeywords(article));
         UriBuilder uriBuilder = uriInfo.getBaseUriBuilder().path(Home.class, "byTag");
         return div(
             each(articles,

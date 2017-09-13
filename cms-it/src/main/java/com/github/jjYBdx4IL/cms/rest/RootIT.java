@@ -28,14 +28,41 @@ import javax.xml.bind.Unmarshaller;
 public class RootIT {
 
     private static final String rootUrl = "http://localhost:" + System.getProperty("jetty.http.port", "8080") + "/";
-    
+
     private Client client = null;
+
+    @Test
+    public void testRssFeed() throws Exception {
+        Response response = (Response) getTarget("devel/login").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+
+        final String title = "test title mit ö" + PasswordGenerator.generate55(11);
+        final String content = "content" + PasswordGenerator.generate55(11);
+        final String tag = "aTag" + PasswordGenerator.generate55(11);
+        final String pathId = "p" + PasswordGenerator.generate55(11);
+
+        Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
+            pathId);
+
+        response = (Response) getTarget("articleManager/create").request()
+            .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
+        assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
+
+        response = (Response) getTarget("logout").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+
+        response = (Response) getTarget("feed/rss.xml").request(MediaType.APPLICATION_ATOM_XML).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        String rss = response.readEntity(String.class);
+
+        assertTrue(rss, rss.contains(">" + title + "<"));
+    }
 
     @Test
     public void createSomeArticles() throws Exception {
         Response response = (Response) getTarget("devel/login").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
-        
+
         final String title = "test title <script>window.alert('ups');</script>";
         final String content = "embed://youtube/d4e03F3lLco/19m29s";
         final String tag = "aTag";
@@ -43,12 +70,12 @@ public class RootIT {
 
         Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
             pathId);
-        
+
         response = (Response) getTarget("articleManager/create").request()
             .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
         assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
     }
-    
+
     @Test
     public void testWorkflow() throws Exception {
         // GET empty main page
@@ -96,7 +123,11 @@ public class RootIT {
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
         String responseContent = response.readEntity(String.class);
         assertTrue(responseContent.contains(title));
-        assertTrue(responseContent, responseContent.contains(titleB)); // <-- also checks encoding processing
+        assertTrue(responseContent, responseContent.contains(titleB)); // <--
+                                                                       // also
+                                                                       // checks
+                                                                       // encoding
+                                                                       // processing
 
         // check /byTag/...
         response = (Response) getTarget("byTag/" + tag).request(MediaType.TEXT_HTML_TYPE).get();
@@ -161,7 +192,7 @@ public class RootIT {
         response = (Response) getTarget("articleManager/import").request()
             .post(Entity.entity(responseContent, MediaType.TEXT_XML));
         assertEquals(HttpServletResponse.SC_NO_CONTENT, response.getStatus());
-        
+
         // clean up
         response = (Response) getTarget("devel/clean").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
