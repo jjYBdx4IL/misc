@@ -28,6 +28,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 //CHECKSTYLE:OFF
@@ -44,13 +45,27 @@ public class Assets {
     @Path("{filename: .*}")
     public Response get(@PathParam("filename") String filename) {
         LOG.trace("get()");
-        
+
         MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
 
         File file = new File(ctx.getRealPath("/assets/" + filename));
-        String mimeType = mimeTypesMap.getContentType(file.getAbsolutePath());
+        if (!file.exists() || !file.isFile() || !file.canRead()) {
+            LOG.warn("asset file not found: " + file.getAbsolutePath());
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        String fileName = file.getName();
+        String mimeType = mimeTypesMap.getContentType(fileName);
+        if (fileName.contains(".")) {
+            String suffix = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+            if ("js".equals(suffix)) {
+                mimeType = "application/javascript;charset=utf-8";
+            }
+            else if ("css".equals(suffix)) {
+                mimeType = "text/css;charset=utf-8";
+            }
+        }
         LOG.info(mimeType + " " + file);
-        return Response.ok(file).lastModified(new Date(file.lastModified())).build();
+        return Response.ok(file, mimeType).lastModified(new Date(file.lastModified())).build();
     }
 
 }

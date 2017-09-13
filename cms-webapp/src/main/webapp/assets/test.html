@@ -12,14 +12,13 @@
 <link rel="stylesheet" href="simplegrid.css">
 <!-- spinning icons: https://www.w3schools.com/w3css/w3css_icons.asp -->
 <!-- https://material.io/icons/ -->
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+<link href="//fonts.googleapis.com/icon?family=Material+Icons"
 	rel="stylesheet">
 <script
-	src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script src="header.js"></script>
+	src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.4/cookieconsent.min.css"/>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.4/cookieconsent.min.js"></script>
 <script type="application/javascript">
-	
-	
 $(function() {
 	var myRegex = /(\d+)([hms])/gi;
 	function toSecs(val) {
@@ -41,9 +40,24 @@ $(function() {
     console.log(toSecs('1m1s1h'));
 });
     
+$(function() {
+window.cookieconsent.initialise({
+  "palette": {
+    "popup": {
+      "background": "#000"
+    },
+    "button": {
+      "background": "#f1d600"
+    }
+  },
+  "content": {
+    "message": "We use cookies to personalise content and ads, to provide social media features and to analyse our traffic. We also share information about your use of our site with our social media, advertising and analytics partners who may combine it with other information you’ve provided to them or they’ve collected from your use of their services.",
+    "href": "http://www.google.de"
+  }
+})});
 
 </script>
-<script async charset="utf-8" src="//cdn.iframe.ly/embed.js?api_key=..."></script>
+<script src="scripts.js"></script>
 </head>
 <body>
 	<header>

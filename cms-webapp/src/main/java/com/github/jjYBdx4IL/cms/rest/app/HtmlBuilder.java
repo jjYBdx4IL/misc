@@ -75,7 +75,7 @@ public class HtmlBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(HtmlBuilder.class);
 
     public static final int META_KEYWORDS_MAX_LEN = 255;
-    
+
     @Context
     UriInfo uriInfo;
     @Inject
@@ -107,7 +107,7 @@ public class HtmlBuilder {
         }
         return this;
     }
-    
+
     public HtmlBuilder addMetaKeyword(String keyword) {
         if (metaKeywords == null) {
             metaKeywords = new StringBuilder();
@@ -170,6 +170,8 @@ public class HtmlBuilder {
         String baseUri = uriInfo.getBaseUriBuilder().build().toString();
 
         setJsValue("assetsUri", baseUri + "assets/");
+        setJsValue("privacyPolicyUri", uriInfo.getBaseUriBuilder().path(Home.class).path(Home.class, "byTag")
+            .build("site-privacy-policy").toString());
         if (session.isDevel()) {
             addCssUrl(baseUri + "assets/simplegrid.css");
             addCssUrl(baseUri + "assets/style.css");

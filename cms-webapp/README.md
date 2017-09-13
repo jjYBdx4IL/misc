@@ -86,3 +86,51 @@ Currently only youtube is supported via:
 
 
 The editor's live preview only includes step 1 atm.
+
+## cookieconsent2
+
+It's assumed that Google Analytics and stuff is inserted into the HTML HEAD.
+So by default we have cookieconsent enabled (opt-out mode). It links
+to a privacy page tagged with "site-privacy-policy".
+
+Example content:
+
+```
+We use cookies to personalise content and ads, to provide social media features and to analyse our traffic. We also share information about your use of our site with our social media, advertising and analytics partners who may combine it with other information you’ve provided to them or they’ve collected from your use of their services.
+
+[How Google uses data when you use our partners' sites or apps](https://www.google.com/intl/en/policies/privacy/partners/)
+
+On top of that, we need cookies to keep track of authorization/login status.
+```
+
+Adjust to your own needs. We don't take any responsibility. This is just an example.
+
+```
+INSERT INTO CONFIGVALUE (KEY, VALUE)
+VALUES
+        ('HTML_HEAD_FRAGMENT',
+'
+<!-- Cookie consent banner --> 
+<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.4/cookieconsent.min.css" /> 
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.4/cookieconsent.min.js"></script> 
+<script> 
+window.addEventListener("load", function(){ 
+window.cookieconsent.initialise({ 
+  "palette": { 
+    "popup": { 
+      "background": "#000000", 
+      "text": "#cccccc" 
+    }, 
+    "button": { 
+      "background": "#cfcfcf" 
+    } 
+  }, 
+  "theme": "edgeless",
+  "content": {
+    "message": "We use cookies to personalise content and ads, to provide social media features and to analyse our traffic. We also share information about your use of our site with our social media, advertising and analytics partners who may combine it with other information you’ve provided to them or they’ve collected from your use of their services.",
+    "href": privacyPolicyUri
+  }  
+})}); 
+</script> 
+')
+```
