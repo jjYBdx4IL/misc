@@ -139,6 +139,34 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <groupId>com.samaxes.maven</groupId>
+                <artifactId>minify-maven-plugin</artifactId>
+                <version>1.7.6</version>
+                <executions>
+                    <execution>
+                        <id>default-minify</id>
+                        <configuration>
+                            <charset>UTF-8</charset>
+                            <cssSourceDir>assets</cssSourceDir>
+                            <cssSourceFiles>
+                                <cssSourceFile>simplegrid.css</cssSourceFile>
+                                <cssSourceFile>style.css</cssSourceFile>
+                            </cssSourceFiles>
+                            <cssFinalFile>site.css</cssFinalFile>
+                            <jsSourceDir>assets</jsSourceDir>
+                            <jsSourceFiles>
+                                <jsSourceFile>scripts.js</jsSourceFile>
+                            </jsSourceFiles>
+                            <jsFinalFile>site.js</jsFinalFile>
+                            <jsEngine>CLOSURE</jsEngine>
+                        </configuration>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>

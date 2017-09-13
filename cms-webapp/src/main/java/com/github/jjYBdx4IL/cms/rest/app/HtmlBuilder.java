@@ -170,17 +170,25 @@ public class HtmlBuilder {
         String baseUri = uriInfo.getBaseUriBuilder().build().toString();
 
         setJsValue("assetsUri", baseUri + "assets/");
-        addCssUrl(baseUri + "assets/style.css");
-        addCssUrl(baseUri + "assets/simplegrid.css");
+        if (session.isDevel()) {
+            addCssUrl(baseUri + "assets/simplegrid.css");
+            addCssUrl(baseUri + "assets/style.css");
+        } else {
+            addCssUrl(baseUri + "assets/site.min.css");
+        }
         // spinning icons: https://www.w3schools.com/w3css/w3css_icons.asp
         // <!-- https://material.io/icons/ -->
         addCssUrl("//fonts.googleapis.com/icon?family=Material+Icons");
-        addCssUrl("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css");
+        addCssUrl("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.min.css");
         addScriptUrl("//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js");
         addScriptUrl("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
         addScriptUrl("//cdn.rawgit.com/showdownjs/showdown/1.7.4/dist/showdown.min.js");
         addScriptUrl("//cdnjs.cloudflare.com/ajax/libs/dompurify/1.0.2/purify.min.js");
-        addScriptUrl(baseUri + "assets/site.js");
+        if (session.isDevel()) {
+            addScriptUrl(baseUri + "assets/scripts.js");
+        } else {
+            addScriptUrl(baseUri + "assets/site.min.js");
+        }
 
         if (session.isAuthenticated()) {
             setSignOutLink(uriInfo.getBaseUriBuilder().path(Logout.class).build().toString());

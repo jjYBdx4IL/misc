@@ -236,7 +236,8 @@ public class ArticleManager {
         }
 
         article.setTitle(title);
-        //article.setPathId(pathId); // the pathId should be constant and never modified
+        // article.setPathId(pathId); // the pathId should be constant and never
+        // modified
         article.setContent(content);
         article.setLastModified(new Date());
         article.setTags(tags);
@@ -334,8 +335,8 @@ public class ArticleManager {
                 input().withName("tags").withId("tags").withPlaceholder("Tags")
                     .withValue(createTagsString(article)).withClass("col-12"),
                 input().withType("submit").withName("submitButton").withValue("save").withClass("col-12")
-            ).withClass("editForm")
-        ).withClass("row");
+                ).withClass("editForm")
+            ).withClass("row");
     }
 
     protected Set<Tag> parseTags(String tagsValue) {

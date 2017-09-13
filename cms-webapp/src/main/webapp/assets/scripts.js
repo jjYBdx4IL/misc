@@ -144,14 +144,17 @@ $(document).ready(
 		function() {
 			var converter = new showdown.Converter();
 			converter.setFlavor('ghost');
+			var textarea = $(".editForm textarea[name=content]");
 			function updateMdPreview() {
 				$("#mdPreview").html(
 						converter
-								.makeHtml($(".editForm textarea[name=content]")
-										.val()));
+								.makeHtml(textarea.val()));
+				/* increase text area height to match preview area height */
+				if ($("#mdPreview").height() > textarea.height()) {
+					textarea.height($("#mdPreview").height());
+				}
 			}
-			$(".editForm textarea[name=content]").on("change paste keyup",
-					updateMdPreview);
+			textarea.on("change paste keyup", updateMdPreview);
 			
 			// intial preview
 			updateMdPreview();
@@ -191,13 +194,10 @@ $(document).ready(
 				return '<iframe width="560" height="315" src="'+url+'" frameborder="0" allowfullscreen></iframe>';
 			}
 			$(".articleContent").each(function( index ) {
-				console.log(index);
 				if ($(this).text().match(/\bembed:\/\/youtube\/([a-z0-9-]{8,})(\/([0-9hms]+))?\b/gi)) {
 					$(this).html($(this).html().replace(/\bembed:\/\/youtube\/([a-z0-9-]{8,})(\/([0-9hms]+))?\b/gi, toYoutubeIframe));
 				}
 			});
 		});
-
-
 
 
