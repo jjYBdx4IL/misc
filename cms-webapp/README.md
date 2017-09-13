@@ -134,3 +134,32 @@ window.cookieconsent.initialise({
 </script> 
 ')
 ```
+
+## Ad-blocker detection
+
+Put this into the footer fragment:
+
+```
+<script  src="//cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script>
+
+<script  src="//cdnjs.cloudflare.com/ajax/libs/blockadblock/3.2.1/blockadblock.min.js">
+</script>
+
+<script>
+function adBlockDetected() {
+/* http://malsup.com/jquery/block/#options */
+    $.blockUI({message:  '<h1>Ad-blocker detected. Deactivate, then reload the page.</h1>',
+     overlayCSS:  { 
+        backgroundColor: '#000', 
+        opacity:         1.0
+    } });
+}
+
+if(typeof blockAdBlock === 'undefined') {
+    adBlockDetected();
+} else {
+    blockAdBlock.onDetected(adBlockDetected);
+}
+</script>
+```
+

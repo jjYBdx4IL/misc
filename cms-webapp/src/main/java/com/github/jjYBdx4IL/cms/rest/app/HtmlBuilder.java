@@ -390,12 +390,14 @@ public class HtmlBuilder {
     }
 
     private ContainerTag createDateInfo(Article article) {
+        String createdAt = fmtDate(article.getCreatedAt());
+        String lastModified = fmtDate(article.getLastModified());
         StringBuilder sb = new StringBuilder();
         sb.append("Created: ");
-        sb.append(fmtDate(article.getCreatedAt()));
-        if (!article.getCreatedAt().equals(article.getLastModified())) {
+        sb.append(createdAt);
+        if (!createdAt.equals(lastModified)) {
             sb.append(" / Updated: ");
-            sb.append(fmtDate(article.getLastModified()));
+            sb.append(lastModified);
         }
         return span(sb.toString());
     }

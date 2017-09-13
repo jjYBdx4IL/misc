@@ -124,6 +124,8 @@ public class Settings {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("null value").build();
         }
         
+        value = value.replace("\r\n", "\n");
+        
         ConfigValue configValue = em.find(ConfigValue.class, configKey);
         if (configValue == null) {
             configValue = new ConfigValue(configKey, value);

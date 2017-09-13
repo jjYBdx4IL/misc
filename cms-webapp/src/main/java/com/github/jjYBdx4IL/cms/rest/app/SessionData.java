@@ -33,8 +33,6 @@ public class SessionData implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(SessionData.class);
     
-    public static final String SESSION_ATTRNAME = "session.data";
-    
     private String uid = null;
     private String googleOauth2StateSecret = null;
 
