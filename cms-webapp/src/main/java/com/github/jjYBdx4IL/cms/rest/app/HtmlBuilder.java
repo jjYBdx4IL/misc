@@ -219,6 +219,10 @@ public class HtmlBuilder {
 
         String title = qf.getConfigValue(ConfigKey.WEBSITE_TITLE, "");
         String headFragment = qf.getConfigValue(ConfigKey.HTML_HEAD_FRAGMENT, "");
+        String footFragment = qf.getConfigValue(ConfigKey.HTML_FOOT_FRAGMENT, "");
+        
+        _footer.condWith(footFragment != null && !footFragment.isEmpty(),
+            new UnescapedText(footFragment));
 
         String doc = document(
             html(

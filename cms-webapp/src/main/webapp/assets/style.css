@@ -203,4 +203,9 @@ input[readonly]
     font-family: monospace;
 }
 
+footer {
+	padding-top: 3em;
+	text-align: center;
+}
+
 /* radial-gradient(ellipse at center, #604060 0%, #1d1d2b 100%) */
