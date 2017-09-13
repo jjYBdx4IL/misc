@@ -180,8 +180,7 @@ public class HtmlBuilder {
         addScriptUrl("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
         addScriptUrl("//cdn.rawgit.com/showdownjs/showdown/1.7.4/dist/showdown.min.js");
         addScriptUrl("//cdnjs.cloudflare.com/ajax/libs/dompurify/1.0.2/purify.min.js");
-        addScriptUrl(baseUri + "assets/header.js");
-        addScriptUrl(baseUri + "assets/tag-autocomplete.js");
+        addScriptUrl(baseUri + "assets/site.js");
 
         if (session.isAuthenticated()) {
             setSignOutLink(uriInfo.getBaseUriBuilder().path(Logout.class).build().toString());
