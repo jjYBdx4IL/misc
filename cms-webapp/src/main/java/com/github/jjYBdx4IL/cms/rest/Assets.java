@@ -71,6 +71,9 @@ public class Assets {
             else if ("css".equals(suffix)) {
                 mimeType = "text/css;charset=utf-8";
             }
+            else if ("tpl".equals(suffix)) {
+                mimeType = "text/template";
+            }
         }
         LOG.info(mimeType + " " + file);
         CacheControl cacheControl = new CacheControl();

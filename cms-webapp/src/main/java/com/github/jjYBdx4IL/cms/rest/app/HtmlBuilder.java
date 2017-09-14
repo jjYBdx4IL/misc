@@ -96,12 +96,26 @@ public class HtmlBuilder {
     private final List<String> cssUrls = new ArrayList<>();
     private final List<String> scriptUrls = new ArrayList<>();
     private final List<DomContent> mainContent = new ArrayList<>();
+    private final List<DomContent> headContent = new ArrayList<>();
     private final ContainerTag _footer = footer();
     private final List<ContainerTag> pageTitleRowSubItems = new ArrayList<>();
     private final Map<String, String> jsValues = new HashMap<>();
     private StringBuilder metaKeywords = null;
+    private final List<String> headFragments = new ArrayList<>();
 
     public HtmlBuilder() {
+    }
+
+    public HtmlBuilder addHeadContent(DomContent dom) {
+        headContent.add(dom);
+        return this;
+    }
+    
+    public HtmlBuilder addHeadFragment(String fragment) {
+        if (!fragment.isEmpty()) {
+            headFragments.add(fragment);
+        }
+        return this;
     }
 
     public HtmlBuilder addMetaKeywords(Article article) {
@@ -229,7 +243,7 @@ public class HtmlBuilder {
         ContainerTag _main = constructMainSection();
 
         String title = appCache.get(ConfigKey.WEBSITE_TITLE);
-        String headFragment = appCache.get(ConfigKey.HTML_HEAD_FRAGMENT);
+        addHeadFragment(appCache.get(ConfigKey.HTML_HEAD_FRAGMENT));
         String footFragment = appCache.get(ConfigKey.HTML_FOOT_FRAGMENT);
 
         _footer.condWith(footFragment != null && !footFragment.isEmpty(),
@@ -251,13 +265,14 @@ public class HtmlBuilder {
                     script().withSrc("//cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js")
                         .attr("async").attr("defer").attr("data-main", baseUri + "assets/app")
                         .withType("text/javascript"),
-                    new UnescapedText(headFragment),
-                    each(
-                        cssUrls,
+                    each(headFragments,
+                        headFragment -> new UnescapedText(headFragment)
+                        ),
+                    each(headContent, dom -> dom),
+                    each(cssUrls,
                         stylesheet -> link().withRel("stylesheet").withType("text/css").withHref(stylesheet)),
-                    each(
-                        scriptUrls, script -> script().withType("text/javascript").withSrc(script).attr("async")
-                            .attr("defer"))
+                    each(scriptUrls, script -> script().withType("text/javascript").withSrc(script).attr("async")
+                        .attr("defer"))
                     ),
                 link().withRel("alternate").withType("application/rss+xml").withTitle("Blog")
                     .withHref(uriInfo.getBaseUriBuilder().path(RssFeed.class).path(RssFeed.class, "feed").build()
@@ -274,17 +289,19 @@ public class HtmlBuilder {
                                     ).condWith(signOutLink != null,
                                         a("exit_to_app").withHref(signOutLink).withClass("signout material-icons")
                                             .attr("title", signoutTooltipText)
-                                    ).condWith(signInLink != null,
+                                        )
+                                    .condWith(signInLink != null,
                                         a("vpn_key").withHref(signInLink).withClass("material-icons")
                                             .attr("title", "Sign in")
-                                    ).withClass("col-4-sm right")
+                                        )
+                                    .withClass("col-4-sm right")
                                 ).withClass("row")
                                 ).withClass("container titlebar")
-                            ).condWith(menu != null, menu),
+                                ).condWith(menu != null, menu),
                     _main, _footer
-                        )
+                            )
                     ).attr("lang", lang)
-                );
+                    );
         if (LOG.isTraceEnabled()) {
             LOG.trace("doc: " + doc);
         }
@@ -402,7 +419,7 @@ public class HtmlBuilder {
                     )
                     ).withClass("col-12 article")
                 )
-            ).withClass("row");
+                ).withClass("row");
     }
 
     private ContainerTag createDateInfo(Article article) {
