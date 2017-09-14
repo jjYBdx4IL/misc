@@ -15,6 +15,8 @@
  */
 package com.github.jjYBdx4IL.cms.rest;
 
+import com.github.jjYBdx4IL.cms.jpa.AppCache;
+import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +25,7 @@ import java.util.Date;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.annotation.security.PermitAll;
+import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -41,6 +44,10 @@ public class Assets {
 
     @Context
     ServletContext ctx;
+    @Inject
+    SessionData session;
+    @Inject
+    private AppCache appCache;
 
     @GET
     @Path("{filename: .*}")
@@ -67,7 +74,11 @@ public class Assets {
         }
         LOG.info(mimeType + " " + file);
         CacheControl cacheControl = new CacheControl();
-        cacheControl.setMaxAge(7200); // seconds
+        if (appCache.isDevel()) {
+            cacheControl.setNoCache(true);
+        } else {
+            cacheControl.setMaxAge(7200); // seconds
+        }
         return Response.ok(file, mimeType).cacheControl(cacheControl).build();
     }
 

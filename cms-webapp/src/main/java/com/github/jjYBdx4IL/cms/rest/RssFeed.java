@@ -15,6 +15,7 @@
  */
 package com.github.jjYBdx4IL.cms.rest;
 
+import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
@@ -60,6 +61,8 @@ public class RssFeed {
     HtmlBuilder htmlBuilder;
     @Inject
     QueryFactory qf;
+    @Inject
+    private AppCache appCache;
 
     @Path("rss.xml")
     @GET
@@ -77,7 +80,7 @@ public class RssFeed {
         feed.setFeedType("rss_2.0");
         feed.setEncoding("UTF-8");
 
-        feed.setTitle(qf.getConfigValue(ConfigKey.WEBSITE_TITLE, ""));
+        feed.setTitle(appCache.get(ConfigKey.WEBSITE_TITLE));
         feed.setLink(uriInfo.getAbsolutePathBuilder().build().toString());
         feed.setStyleSheet("http://www.w3.org/2005/Atom");
         feed.setDescription(feed.getTitle());

@@ -15,12 +15,39 @@
  */
 package com.github.jjYBdx4IL.cms.jpa.dto;
 
+import com.github.jjYBdx4IL.cms.Description;
+
+import java.lang.reflect.Field;
+
+//CHECKSTYLE:OFF
 public enum ConfigKey {
 
+    //@formatter:off
     GOOGLE_OAUTH2_CLIENT_ID,
     GOOGLE_OAUTH2_CLIENT_SECRET,
     WEBSITE_TITLE,
     HTML_HEAD_FRAGMENT,
-    HTML_FOOT_FRAGMENT;
+    HTML_FOOT_FRAGMENT,
+    @Description("leave empty to disable, set to 'true' to enable")
+    ENABLE_ADBLOCK_BLOCKER,
+    @Description("leave empty to disable cookie consent banner, enter consent message to activate. The consent banner"+
+        " features a link that points to the article tag "+ Tag.SITE_PRIVACY_POLICY)
+    COOKIE_CONSENT_MESSAGE,
+    @Description("enter comma-separated list of admin users, ie 'google-$subject,...' "+
+        "where $subject is Google's unique used identifier")
+    ADMINS;
+    //@formatter:on
 
+    public String getDesc() {
+        try {
+            Field f = ConfigKey.class.getField(name());
+            if (f.isAnnotationPresent(Description.class)) {
+                Description desc = f.getAnnotation(Description.class);
+                return desc.value();
+            }
+        } catch (NoSuchFieldException | SecurityException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
 }

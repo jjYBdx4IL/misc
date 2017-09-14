@@ -15,11 +15,16 @@
  */
 package com.github.jjYBdx4IL.cms.rest.app;
 
+import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
+
+import javax.annotation.security.DenyAll;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
@@ -36,6 +41,8 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     private ResourceInfo resourceInfo;
     @Inject
     private SessionData session;
+    @Inject
+    private AppCache appCache;
 
     private static final Response ACCESS_FORBIDDEN = Response.status(Response.Status.FORBIDDEN).build();
 
@@ -48,10 +55,66 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         if (LOG.isTraceEnabled()) {
             LOG.trace("filter " + requestContext);
         }
-        if (!session.isAllowed(resourceInfo.getResourceMethod())) {
+        if (!isAllowed(resourceInfo.getResourceMethod())) {
             requestContext.abortWith(ACCESS_FORBIDDEN);
             return;
         }            
-    } 
+    }
+    
+    private boolean isAllowed(Method method) {
+        if (method.isAnnotationPresent(DenyAll.class)) {
+            return appCache.isDevel();
+        }
+        if (method.isAnnotationPresent(PermitAll.class)) {
+            return true;
+        }
+        if (checkRoles(method.getAnnotation(RolesAllowed.class))) {
+            return true;
+        }
+
+        Class<?> klazz = method.getDeclaringClass();
+
+        if (klazz.isAnnotationPresent(DenyAll.class)) {
+            return appCache.isDevel();
+        }
+        if (klazz.isAnnotationPresent(PermitAll.class)) {
+            return true;
+        }
+        if (checkRoles(klazz.getAnnotation(RolesAllowed.class))) {
+            return true;
+        }
+        
+        return false;
+    }
+
+    private boolean checkRoles(RolesAllowed rolesAllowed) {
+        if (rolesAllowed == null) {
+            return false;
+        }
+        for (String role : rolesAllowed.value()) {
+            if (Role.USER.equals(role)) {
+                if (session.isAuthenticated()) {
+                    return true;
+                }
+            } else if (Role.ADMIN.equals(role)) {
+                if (isAdmin()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isAdmin() {
+        if (!session.isAuthenticated()) {
+            return false;
+        }
+        if (appCache.isAdmin(session.getUid())) {
+            return true;
+        }
+        return false;
+    }
+    
+    
 }
 

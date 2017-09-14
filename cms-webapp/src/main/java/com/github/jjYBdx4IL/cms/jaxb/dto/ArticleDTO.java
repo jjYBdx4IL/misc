@@ -33,6 +33,7 @@ public class ArticleDTO implements Serializable {
     private String title;
     private String pathId; 
     private String content;
+    private String processed;
     private Date createdAt;
     private Date lastModified;
     private List<String> tag = new ArrayList<>();
@@ -85,6 +86,14 @@ public class ArticleDTO implements Serializable {
         this.tag = tags;
     }
     
+    public String getProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(String processed) {
+        this.processed = processed;
+    }
+    
     /**
      * Create instance from the corresponding jpa instance.
      * 
@@ -96,10 +105,11 @@ public class ArticleDTO implements Serializable {
         dto.setTitle(article.getTitle());
         dto.setPathId(article.getPathId());
         dto.setContent(article.getContent());
+        dto.setProcessed(article.getProcessed());
         dto.setCreatedAt(article.getCreatedAt());
         dto.setLastModified(article.getLastModified());
         article.getTags().forEach(tag -> dto.getTags().add(tag.getName()));
         return dto;
     }
-    
+
 }

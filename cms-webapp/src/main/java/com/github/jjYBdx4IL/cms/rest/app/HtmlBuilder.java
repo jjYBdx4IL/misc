@@ -34,6 +34,7 @@ import static j2html.TagCreator.script;
 import static j2html.TagCreator.span;
 import static j2html.TagCreator.title;
 
+import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
@@ -82,6 +83,8 @@ public class HtmlBuilder {
     SessionData session;
     @Inject
     QueryFactory qf;
+    @Inject
+    private AppCache appCache;
 
     private String pageTitle = "";
     private String lang = "en";
@@ -172,25 +175,33 @@ public class HtmlBuilder {
         setJsValue("assetsUri", baseUri + "assets/");
         setJsValue("privacyPolicyUri", uriInfo.getBaseUriBuilder().path(Home.class).path(Home.class, "byTag")
             .build("site-privacy-policy").toString());
-        if (session.isDevel()) {
+        if (Boolean.parseBoolean(appCache.get(ConfigKey.ENABLE_ADBLOCK_BLOCKER))) {
+            setJsValue("enableAdblockBlocker", "true");
+        }
+        if (appCache.isDevel()) {
+            setJsValue("isDevel", "true");
+        }
+        String cookieConsentMessage = appCache.get(ConfigKey.COOKIE_CONSENT_MESSAGE);
+        if (!cookieConsentMessage.isEmpty()) {
+            setJsValue("cookieConsentMessage", cookieConsentMessage);
+            addCssUrl("//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.4/cookieconsent.min.css");
+        }
+
+        if (appCache.isDevel()) {
             addCssUrl(baseUri + "assets/simplegrid.css");
             addCssUrl(baseUri + "assets/style.css");
         } else {
             addCssUrl(baseUri + "assets/site.min.css");
         }
-        // spinning icons: https://www.w3schools.com/w3css/w3css_icons.asp
-        // <!-- https://material.io/icons/ -->
         addCssUrl("//fonts.googleapis.com/icon?family=Material+Icons");
         addCssUrl("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.min.css");
-        addScriptUrl("//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js");
-        addScriptUrl("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
-        addScriptUrl("//cdn.rawgit.com/showdownjs/showdown/1.7.4/dist/showdown.min.js");
-        addScriptUrl("//cdnjs.cloudflare.com/ajax/libs/dompurify/1.0.2/purify.min.js");
-        if (session.isDevel()) {
-            addScriptUrl(baseUri + "assets/scripts.js");
-        } else {
-            addScriptUrl(baseUri + "assets/site.min.js");
-        }
+
+        // spinning icons: https://www.w3schools.com/w3css/w3css_icons.asp
+        // if (session.isDevel()) {
+        // addScriptUrl(baseUri + "assets/scripts.js");
+        // } else {
+        // addScriptUrl(baseUri + "assets/site.min.js");
+        // }
 
         if (session.isAuthenticated()) {
             setSignOutLink(uriInfo.getBaseUriBuilder().path(Logout.class).build().toString());
@@ -212,15 +223,15 @@ public class HtmlBuilder {
                     div("Menu item 2").withClass("col-6"),
                     div("Menu item 3").withClass("col-12")
                     ).withClass("row")
-                ).withClass("container menu");
+                    ).withClass("container menu");
         }
 
         ContainerTag _main = constructMainSection();
 
-        String title = qf.getConfigValue(ConfigKey.WEBSITE_TITLE, "");
-        String headFragment = qf.getConfigValue(ConfigKey.HTML_HEAD_FRAGMENT, "");
-        String footFragment = qf.getConfigValue(ConfigKey.HTML_FOOT_FRAGMENT, "");
-        
+        String title = appCache.get(ConfigKey.WEBSITE_TITLE);
+        String headFragment = appCache.get(ConfigKey.HTML_HEAD_FRAGMENT);
+        String footFragment = appCache.get(ConfigKey.HTML_FOOT_FRAGMENT);
+
         _footer.condWith(footFragment != null && !footFragment.isEmpty(),
             new UnescapedText(footFragment));
 
@@ -235,13 +246,18 @@ public class HtmlBuilder {
                     meta().attr("name", "viewport").attr("content", "width=device-width, initial-scale=1"),
                     meta().attr("name", "keywords")
                         .attr("content", metaKeywords != null ? metaKeywords.toString() : ""),
+                    meta().attr("name", "robots").attr("content", "noarchive"),
                     createJsValuesScript(),
+                    script().withSrc("//cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js")
+                        .attr("async").attr("defer").attr("data-main", baseUri + "assets/app")
+                        .withType("text/javascript"),
                     new UnescapedText(headFragment),
                     each(
                         cssUrls,
                         stylesheet -> link().withRel("stylesheet").withType("text/css").withHref(stylesheet)),
                     each(
-                        scriptUrls, script -> script().withType("text/javascript").withSrc(script))
+                        scriptUrls, script -> script().withType("text/javascript").withSrc(script).attr("async")
+                            .attr("defer"))
                     ),
                 link().withRel("alternate").withType("application/rss+xml").withTitle("Blog")
                     .withHref(uriInfo.getBaseUriBuilder().path(RssFeed.class).path(RssFeed.class, "feed").build()
@@ -263,12 +279,12 @@ public class HtmlBuilder {
                                             .attr("title", "Sign in")
                                     ).withClass("col-4-sm right")
                                 ).withClass("row")
-                            ).withClass("container titlebar")
-                        ).condWith(menu != null, menu),
+                                ).withClass("container titlebar")
+                            ).condWith(menu != null, menu),
                     _main, _footer
-                    )
-                ).attr("lang", lang)
-            );
+                        )
+                    ).attr("lang", lang)
+                );
         if (LOG.isTraceEnabled()) {
             LOG.trace("doc: " + doc);
         }
@@ -379,13 +395,13 @@ public class HtmlBuilder {
                 article -> div(
                     h1(a(article.getTitle()).withHref(constructArticleLink(article))).withClass("articleTitle"),
                     div(createDateInfo(article), createEditLink(article)).withClass("articleMeta"),
-                    div(article.getContent()).withClass("articleContent markdown"),
+                    div(new UnescapedText(article.getProcessed())).withClass("articleContent"),
                     span("Tags: ").withClass("tagLineHeader"),
                     each(article.getTags(),
                         tag -> a(tag.getName()).withHref(uriBuilder.build(tag.getName()).toString()).withClass("tag")
                     )
                     ).withClass("col-12 article")
-            )
+                )
             ).withClass("row");
     }
 
@@ -425,6 +441,11 @@ public class HtmlBuilder {
             .build(ldt.getYear(), String.format("%02d", ldt.getMonthValue()),
                 String.format("%02d", ldt.getDayOfMonth()), article.getPathId())
             .toString();
+    }
+
+    public HtmlBuilder enableJsEditorSupport() {
+        setJsValue("enableJsEditorSupport", "true");
+        return this;
     }
 
 }

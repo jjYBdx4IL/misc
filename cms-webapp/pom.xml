@@ -156,7 +156,7 @@
                             <cssFinalFile>site.css</cssFinalFile>
                             <jsSourceDir>assets</jsSourceDir>
                             <jsSourceFiles>
-                                <jsSourceFile>scripts.js</jsSourceFile>
+                                <jsSourceFile>main.js</jsSourceFile>
                             </jsSourceFiles>
                             <jsFinalFile>site.js</jsFinalFile>
                             <jsEngine>CLOSURE</jsEngine>
@@ -214,11 +214,22 @@
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
             <version>1.22.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava-jdk5</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.j2html</groupId>
             <artifactId>j2html</artifactId>
             <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+            <artifactId>owasp-java-html-sanitizer</artifactId>
+            <version>20170515.1</version>
         </dependency>
         <dependency>
             <groupId>com.rometools</groupId>

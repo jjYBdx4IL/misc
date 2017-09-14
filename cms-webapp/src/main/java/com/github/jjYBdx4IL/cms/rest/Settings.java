@@ -91,6 +91,7 @@ public class Settings {
                 each(keys, key -> div(
                     form().withMethod("post").attr("accept-charset", "utf-8").with(
                         span(key.name() + ": ").withClass("col-12"),
+                        key.getDesc() != null ? span(key.getDesc()).withClass("col-12") : null,
                         input().withType("hidden").withName("key").withValue(key.name()),
                         textarea().withName("value").isRequired()
                             .withText(values.get(key) != null ? values.get(key) : "").withClass("col-9"),

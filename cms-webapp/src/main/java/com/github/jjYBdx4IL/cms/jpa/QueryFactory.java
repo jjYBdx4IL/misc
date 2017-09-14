@@ -48,7 +48,7 @@ public class QueryFactory {
 
     @PersistenceContext
     EntityManager em;
-    
+
     public QueryFactory() {
     }
 
@@ -73,17 +73,17 @@ public class QueryFactory {
         cq.orderBy(cb.asc(root.get(Tag_.id)));
         return em.createQuery(cq);
     }
-    
+
     public Article getArticleByPathId(String pathId) {
         if (pathId == null) {
             return null;
         }
-        
+
         final CriteriaBuilder cb = em.getCriteriaBuilder();
         final CriteriaQuery<Article> cq = cb.createQuery(Article.class);
         final Root<Article> root = cq.from(Article.class);
         cq.where(cb.equal(root.get(Article_.pathId), pathId));
-        
+
         List<Article> articles = em.createQuery(cq).getResultList();
         if (articles.isEmpty()) {
             return null;
@@ -95,7 +95,7 @@ public class QueryFactory {
         final CriteriaBuilder cb = em.getCriteriaBuilder();
         final CriteriaQuery<Article> cq = cb.createQuery(Article.class);
         final Root<Article> root = cq.from(Article.class);
-        
+
         if (tag != null) {
             final Subquery<Long> sq = cq.subquery(Long.class);
             final Root<Article> fromArticle = sq.from(Article.class);
@@ -105,12 +105,12 @@ public class QueryFactory {
 
             cq.where(cb.in(root.get(Article_.id)).value(sq));
         }
-        
+
         if (uid != null) {
             final Join<Article, User> userRoot = root.join(Article_.owner, JoinType.LEFT);
             cq.where(cb.equal(userRoot.get(User_.uid), uid));
         }
-        
+
         cq.orderBy(cb.desc(root.get(Article_.createdAt)));
         return em.createQuery(cq);
     }
@@ -136,13 +136,14 @@ public class QueryFactory {
     /**
      * Throws {@link NoResultException} if the config value is not set.
      * 
-     * @param key the config key
+     * @param key
+     *            the config key
      * @return the config value
      */
     public String getConfigValue(ConfigKey key) {
         return getConfigValueQuery(key).getSingleResult().getValue();
     }
-    
+
     private TypedQuery<ConfigValue> getConfigValueQuery(ConfigKey key) {
         final CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         final CriteriaQuery<ConfigValue> criteriaQuery = criteriaBuilder.createQuery(ConfigValue.class);
@@ -156,9 +157,13 @@ public class QueryFactory {
 
     public String getConfigValue(ConfigKey key, String defaultValue) {
         List<ConfigValue> results = getConfigValueQuery(key).getResultList();
-        return results.isEmpty() ? defaultValue : results.get(0).getValue();
+        String res = defaultValue;
+        if (!results.isEmpty() && results.get(0).getValue() != null) {
+            res = results.get(0).getValue();
+        }
+        return res;
     }
-    
+
     public TypedQuery<ConfigValue> getAllConfigValues() {
         final CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         final CriteriaQuery<ConfigValue> criteriaQuery = criteriaBuilder.createQuery(ConfigValue.class);

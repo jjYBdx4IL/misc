@@ -77,6 +77,10 @@ public class Article implements Serializable {
     private String content;
 
     @Basic(optional = false)
+    @Lob
+    private String processed;
+
+    @Basic(optional = false)
     @Column(name = "createdAt")
     private Date createdAt;
 
@@ -155,6 +159,14 @@ public class Article implements Serializable {
         this.pathId = pathId;
     }
 
+    public String getProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(String processed) {
+        this.processed = processed;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -168,6 +180,8 @@ public class Article implements Serializable {
         builder.append(title);
         builder.append(", content=");
         builder.append(content);
+        builder.append(", processed=");
+        builder.append(processed);
         builder.append(", createdAt=");
         builder.append(createdAt);
         builder.append(", lastModified=");

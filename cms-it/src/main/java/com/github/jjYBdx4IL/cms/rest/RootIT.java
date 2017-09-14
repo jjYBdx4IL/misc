@@ -42,7 +42,7 @@ public class RootIT {
         final String pathId = "p" + PasswordGenerator.generate55(11);
 
         Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
-            pathId);
+            pathId).param("processed", "processed bla");;
 
         response = (Response) getTarget("articleManager/create").request()
             .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
@@ -69,11 +69,19 @@ public class RootIT {
         final String pathId = "p" + PasswordGenerator.generate55(11);
 
         Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
-            pathId);
+            pathId).param("processed", "processed bla");
 
+        // rejected because title has stuff in it that needs sanitizing
         response = (Response) getTarget("articleManager/create").request()
             .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
-        assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
+        assertEquals(HttpServletResponse.SC_BAD_REQUEST, response.getStatus());
+        
+        // fix title and try again
+        form = new Form().param("title", "asd").param("content", content).param("tags", tag).param("pathId",
+            pathId).param("processed", "processed bla");
+        response = (Response) getTarget("articleManager/create").request()
+            .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
+        assertEquals(response.readEntity(String.class), HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
     }
 
     @Test
@@ -105,14 +113,14 @@ public class RootIT {
         final String pathIdB = "c" + contentB.substring(1);
 
         Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
-            title);
+            title).param("processed", content);
 
         response = (Response) getTarget("articleManager/create").request()
             .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
         assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
 
         form = new Form().param("title", titleB).param("content", contentB).param("tags", tagB).param("pathId",
-            pathIdB);
+            pathIdB).param("processed", contentB);
 
         response = (Response) getTarget("articleManager/create").request()
             .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
@@ -163,7 +171,7 @@ public class RootIT {
 
         // check export
         form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
-            title + "2");
+            title + "2").param("processed", content);
 
         response = (Response) getTarget("articleManager/create").request()
             .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));

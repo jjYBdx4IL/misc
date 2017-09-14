@@ -15,6 +15,7 @@
  */
 package com.github.jjYBdx4IL.cms.rest;
 
+import com.github.jjYBdx4IL.cms.jpa.AppCache;
 //CHECKSTYLE:OFF
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
@@ -64,6 +65,8 @@ public class GoogleLogin {
     EntityManager em;
     @Inject
     QueryFactory qf;
+    @Inject
+    private AppCache appCache;
 
     @GET
     public Response login() throws URISyntaxException {
@@ -165,8 +168,8 @@ public class GoogleLogin {
     }
 
     private GoogleAuthorizationCodeFlow getGAuthCodeFlow() {
-        String clientId = qf.getConfigValue(ConfigKey.GOOGLE_OAUTH2_CLIENT_ID);
-        String clientSecret = qf.getConfigValue(ConfigKey.GOOGLE_OAUTH2_CLIENT_SECRET);
+        String clientId = appCache.getNonEmpty(ConfigKey.GOOGLE_OAUTH2_CLIENT_ID);
+        String clientSecret = appCache.getNonEmpty(ConfigKey.GOOGLE_OAUTH2_CLIENT_SECRET);
         return new GoogleAuthorizationCodeFlow(
             new NetHttpTransport(), new JacksonFactory(), clientId, clientSecret,
             Arrays.asList(new String[] { "openid", "email" }));
