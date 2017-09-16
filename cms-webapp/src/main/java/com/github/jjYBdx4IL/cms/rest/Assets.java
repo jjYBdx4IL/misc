@@ -72,6 +72,12 @@ public class Assets {
             else if ("tpl".equals(suffix)) {
                 mimeType = "text/template";
             }
+            else if ("svg".equals(suffix)) {
+                mimeType = "image/svg+xml";
+            }
+            else if ("svgz".equals(suffix)) {
+                mimeType = "image/svg+xml";
+            }
         }
         LOG.info(mimeType + " " + file);
         CacheControl cacheControl = new CacheControl();

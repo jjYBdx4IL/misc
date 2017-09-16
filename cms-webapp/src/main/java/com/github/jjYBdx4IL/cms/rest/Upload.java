@@ -34,18 +34,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.security.PermitAll;
 import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -68,8 +65,8 @@ public class Upload {
 
     private static final Logger LOG = LoggerFactory.getLogger(Upload.class);
 
-    public static final int MAX_THUMBNAIL_WIDTH = 400;
-    public static final int MAX_THUMBNAIL_HEIGHT = 300;
+    public static final int MAX_THUMBNAIL_WIDTH = 120;
+    public static final int MAX_THUMBNAIL_HEIGHT = 75;
     
     @Context
     UriInfo uriInfo;
@@ -144,7 +141,7 @@ public class Upload {
             BufferedImage thumbnail = Scalr.resize(image,
                 Method.ULTRA_QUALITY, MAX_THUMBNAIL_WIDTH, MAX_THUMBNAIL_HEIGHT);
             image.flush();
-            File tempFile = File.createTempFile("tmp", ".jpg");
+            tempFile = File.createTempFile("tmp", ".jpg");
             try {
                 ImageIO.write(thumbnail, "jpeg", tempFile);
                 thumbnail.flush();

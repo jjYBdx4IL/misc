@@ -102,17 +102,17 @@ form textarea {
 }
 
 .tagLineHeader {
-    font-size: 0.82em;
+	font-size: 0.82em;
 }
 
 .tag {
 	background: #ccf;
-/* 	border: 2px solid blue; */
-/*     border-radius: 1em; */
-    display: inline;
-    font-size: 0.82em;
-    padding: 0 0.2em;
-    margin: 0 0.2em;
+	/* 	border: 2px solid blue; */
+	/*     border-radius: 1em; */
+	display: inline;
+	font-size: 0.82em;
+	padding: 0 0.2em;
+	margin: 0 0.2em;
 }
 
 /* jquery */
@@ -122,57 +122,71 @@ form textarea {
 }
 
 /* article display */
-
 .articleContent h1, .article h1 {
-  font-size: 1.6rem;
+	font-size: 1.6rem;
 }
 
 .articleContent h2 {
-  font-size: 1.375rem;
+	font-size: 1.375rem;
 }
 
 .articleContent h3 {
-  font-size: 1.125rem;
+	font-size: 1.125rem;
 }
 
 .articleContent h4 {
-  font-size: 1rem;
+	font-size: 1rem;
 }
 
 .articleContent h5 {
-  font-size: 0.875rem;
+	font-size: 0.875rem;
 }
 
 .articleContent h6 {
-  font-size: 0.8rem;
+	font-size: 0.8rem;
 }
 
-.articleContent blockquote, .articleContent table {
-    background: #eee;
-    padding: 0 0.3em;
-    border: solid #ddd;
+.articleContent table {
+	background: #eee;
+	padding: 0 0.3em;
+	border: solid #ddd;
+}
+
+.articleContent blockquote {
+	padding: 0 0.3em;
+/* 	border: solid #ddd; */
+	font-style: normal;
+	margin-left: 32px;
+	font-family: "Segoe Print", "Times New Roman", Verdana;
+/* 	padding-left: 48px; */
+	background: url('material-icons/ic_format_quote_black_24px.svg');
+	background-repeat: no-repeat;
+	background-size: 55px;
+	background-position: 0 -1em;
+	min-height: 40px;
+	text-indent: 55px;
 }
 
 .articleContent code {
-    background: #eee;
-    font-family: monospace;
+	background: #eee;
+	font-family: monospace;
 }
 
 .articleContent pre {
 	background: #eee;
-    font-family: monospace;
-    display: inline-block;
-    padding: 0.3em;
+	font-family: monospace;
+	display: inline-block;
+	padding: 0.3em;
 }
 
 .article {
-    border-left: thick solid #ddd;
-    padding-left: 0.5em;
-    background: #f3f3f3;
+	border-left: thick solid #ddd;
+	padding-left: 0.5em;
+	background: #f3f3f3;
 }
 
 .article .articleTitle {
-    display: inline;
+	display: inline;
 }
 
 .article .articleMeta .iconTextLink * {
@@ -190,17 +204,16 @@ form textarea {
 	font-family: monospace;
 }
 
-input[readonly]
-{
-    background-color: #ddd;
+input[readonly] {
+	background-color: #ddd;
 }
 
 .settings .editForm {
-    border-top: dashed #ddd;
+	border-top: dashed #ddd;
 }
 
 .settings .editForm textarea {
-    font-family: monospace;
+	font-family: monospace;
 }
 
 footer {
