@@ -126,5 +126,13 @@ public class MediaFile implements Serializable {
         this.contentType = contentType;
     }
 
+    public Blob getPreview() {
+        return preview;
+    }
+
+    public void setPreview(Blob preview) {
+        this.preview = preview;
+    }
+
 
 }

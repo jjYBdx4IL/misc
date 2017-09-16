@@ -87,16 +87,30 @@
                 <artifactId>download-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>google-signin-assets</id>
                         <phase>process-classes</phase>
                         <goals>
                             <goal>wget</goal>
                         </goals>
+                        <configuration>
+                            <url>https://developers.google.com/identity/images/signin-assets.zip</url>
+                            <sha512>32d97fe02b6a4bd6f7703934ae2bf06fbbadc33d9ad23a209a7d3ce81d217ad40b312f3f80c0e27dbf43bc59f573bb85d961392eeeac3f994359d57952318fa7</sha512>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>fine-uploader-assets</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://github.com/FineUploader/fine-uploader/releases/download/5.15.0/fine-uploader.zip</url>
+                            <sha512>17807e8570db71693a17e62bde13c07c7220e75d042ed56e50cf7811413e23fd99372506631638a8a777bd995701e2af4825c9ba7c1161b45f661b58635ef4f1</sha512>
+                            <outputDirectory>${webappAssetsDirectory}/fineuploader</outputDirectory>
+                        </configuration>
                     </execution>
                 </executions>
                 <configuration>
-                    <url>https://developers.google.com/identity/images/signin-assets.zip</url>
-                    <outputDirectory>${project.build.directory}/google-signin-assets</outputDirectory>
-                    <targetDirectory>${project.build.directory}/google-signin-assets</targetDirectory>
                     <skipCache>false</skipCache>
                     <retries>2</retries>
                     <unpack>true</unpack>
@@ -220,6 +234,11 @@
                     <artifactId>guava-jdk5</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.imgscalr</groupId>
+            <artifactId>imgscalr-lib</artifactId>
+            <version>4.2</version>
         </dependency>
         <dependency>
             <groupId>com.j2html</groupId>

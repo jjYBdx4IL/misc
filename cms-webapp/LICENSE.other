@@ -1,7 +1,13 @@
-simplegrid css (https://github.com/zachacole/Simple-Grid) is licensed under the MIT license.
+Included with source code in this repository:
 
-We are also referencing external resources:
+* simplegrid.css: http://simplegrid.io/ (MIT license)
+
+Included in final build, not part of source code:
+
+* Google sign-in assets (Apache v2)
+* https://fineuploader.com (MIT License)
+
+Runtime linking (to external assets, CDNJS etc.):
 
 * jquery 1.x (and -ui)
 * Google font: Material Icons (Apache v2)
-

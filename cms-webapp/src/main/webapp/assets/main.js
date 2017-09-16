@@ -264,8 +264,8 @@ if ((typeof fineUploaderEndpoint !== typeof undefined) && fineUploaderEndpoint) 
             },
             thumbnails : {
                 placeholders : {
-                    waitingPath : '/source/placeholders/waiting-generic.png',
-                    notAvailablePath : '/source/placeholders/not_available-generic.png'
+                    waitingPath : appFineUploaderRoot + 'placeholders/waiting-generic.png',
+                    notAvailablePath : appFineUploaderRoot + 'placeholders/not_available-generic.png'
                 }
             },
             validation : {

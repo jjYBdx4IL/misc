@@ -48,10 +48,14 @@ import com.github.jjYBdx4IL.cms.rest.Search;
 import j2html.tags.ContainerTag;
 import j2html.tags.DomContent;
 import j2html.tags.UnescapedText;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -116,6 +120,14 @@ public class HtmlBuilder {
             headFragments.add(fragment);
         }
         return this;
+    }
+
+    public HtmlBuilder addHeadFragment(URL resource) {
+        try (InputStream is = resource.openStream()) {
+            return addHeadFragment(IOUtils.toString(resource, "UTF-8")); 
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public HtmlBuilder addMetaKeywords(Article article) {

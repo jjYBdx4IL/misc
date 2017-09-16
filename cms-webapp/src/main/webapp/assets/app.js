@@ -1,3 +1,5 @@
+var appFineUploaderRoot = assetsUri + 'fineuploader/';
+
 requirejs.config({
 	"baseUrl": assetsUri,
     "paths": {
@@ -9,7 +11,7 @@ requirejs.config({
       "showdown" : "//cdn.rawgit.com/showdownjs/showdown/1.7.4/dist/showdown.min",
       "purify" : "//cdnjs.cloudflare.com/ajax/libs/dompurify/1.0.2/purify.min",
       "cookieconsent" : "//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.4/cookieconsent.min",
-      "fineuploader" : "//cdnjs.cloudflare.com/ajax/libs/file-uploader/5.15.0/jquery.fine-uploader/jquery.fine-uploader.min",
+      "fineuploader" : appFineUploaderRoot + "jquery.fine-uploader.min",
     },
     "shim": {
         "blockUI": ["jquery"],
