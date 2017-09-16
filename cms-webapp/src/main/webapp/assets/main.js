@@ -161,6 +161,7 @@ if ((typeof enableJsEditorSupport !== typeof undefined) && enableJsEditorSupport
 
         var converter = new showdown.Converter();
         converter.setFlavor('ghost');
+        converter.setOption('excludeTrailingPunctuationFromURLs', 'true');
         var textarea = $(".editForm textarea[name=content]");
         var preview = $("#mdPreview");
         function updateMdPreview() {

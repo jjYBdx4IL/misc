@@ -30,7 +30,7 @@ import javax.persistence.Version;
 @Entity
 public class Tag implements Serializable {
 
-    public static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$");
+    public static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$");
 
     public static final String SITE_PRIVACY_POLICY = "site-privacy-policy";
     

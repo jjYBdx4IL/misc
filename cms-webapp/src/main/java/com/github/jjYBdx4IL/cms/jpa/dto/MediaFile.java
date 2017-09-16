@@ -51,6 +51,9 @@ public class MediaFile implements Serializable {
     @Basic(optional = false)
     private Blob data;
 
+    @Basic(optional = true)
+    private Blob preview;
+    
     @Basic(optional = false)
     private Date createdAt;
 

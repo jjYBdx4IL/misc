@@ -2,6 +2,8 @@ add connection pool, see:
 
 https://stackoverflow.com/questions/12545129/setting-up-jndi-datasource-in-junit
 
+* image upload/gallery
+* rss feed by tag
 * manual db backup and download
 * admin page for import/export
 * switch to hsqldb for better data consistency? (h2 mvcc only supports read committed)
