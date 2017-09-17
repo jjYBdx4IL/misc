@@ -53,8 +53,6 @@ public class Assets {
     public Response get(@PathParam("filename") String filename) {
         LOG.trace("get()");
 
-        MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
-
         File file = new File(ctx.getRealPath("/assets/" + filename));
         if (!file.exists() || !file.isFile() || !file.canRead()) {
             LOG.warn("asset file not found: " + file.getAbsolutePath());

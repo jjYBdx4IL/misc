@@ -12,12 +12,14 @@ requirejs.config({
       "purify" : "//cdnjs.cloudflare.com/ajax/libs/dompurify/1.0.2/purify.min",
       "cookieconsent" : "//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.4/cookieconsent.min",
       "fineuploader" : appFineUploaderRoot + "jquery.fine-uploader.min",
+      "imagesLoaded" : "//cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min",
     },
     "shim": {
         "blockUI": ["jquery"],
         "blockadblock": ["jquery"],
         "jquery-ui": ["jquery"],
         "fineuploader": ["jquery"],
+        "imagesLoaded": ["jquery"],
     }
 });
 

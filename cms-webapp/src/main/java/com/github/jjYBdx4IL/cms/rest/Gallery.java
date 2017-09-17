@@ -31,6 +31,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -38,8 +39,10 @@ import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -82,7 +85,7 @@ public class Gallery {
     @GET
     @Path("imageList")
     public Response imageList(@QueryParam("maxId") Long maxId) throws SQLException {
-        LOG.info("imageList()" + maxId);
+        LOG.trace("imageList()");
 
         List<MediaFile> results = qf.getImagesMeta(maxId).setMaxResults(PREVIEWS_PER_REQUEST).getResultList();
         List<MediaFileDTO> dtos = new ArrayList<>();
@@ -90,5 +93,35 @@ public class Gallery {
             dtos.add(MediaFileDTO.createFrom(mf));
         }
         return Response.ok(dtos).build();
+    }
+    
+    @Transactional
+    @PermitAll
+    @GET
+    @Path("get/{mediaId}/{filename}")
+    public Response getFile(@PathParam("mediaId") Long mediaId,
+        @PathParam("filename") String filename) {
+        LOG.info("get()");
+
+        MediaFile mediaFile = em.find(MediaFile.class, mediaId);
+        
+        if (mediaFile == null || !mediaFile.getFilename().equals(filename)) {
+            LOG.warn("media file not found: " + mediaId + "/" + filename);
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        
+        CacheControl cacheControl = new CacheControl();
+        if (appCache.isDevel()) {
+            cacheControl.setNoCache(true);
+        } else {
+            cacheControl.setMaxAge(86400); // seconds
+        }
+        try {
+            return Response.ok(mediaFile.getData().getBinaryStream(), mediaFile.getContentType())
+                .cacheControl(cacheControl).lastModified(mediaFile.getLastModified())
+                .header("Content-Length", mediaFile.getFilesize()).build();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

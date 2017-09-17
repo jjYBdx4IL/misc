@@ -482,6 +482,8 @@ public class HtmlBuilder {
         setJsValue("enableGallerySupport", "true");
         setJsValue("imageListEndpoint",
             uriInfo.getBaseUriBuilder().path(Gallery.class).path(Gallery.class, "imageList").build().toString());
+        setJsValue("fileGetEndpoint",
+            uriInfo.getBaseUriBuilder().path(Gallery.class).path(Gallery.class, "getFile").toTemplate());
         return this;
     }
 
