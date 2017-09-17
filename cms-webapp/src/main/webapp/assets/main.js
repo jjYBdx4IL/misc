@@ -208,11 +208,18 @@ requirejs([ "jquery", "waypoints" ],
             }
             return '<iframe width="560" height="315" src="' + url + '" frameborder="0" allowfullscreen></iframe>';
         }
+        function toImage(val, mediaId, fileName) {
+            var url = fileGetEndpoint.replace('{mediaId}', mediaId).replace('{filename}', fileName);
+            return '<img src="' + url + '">';
+        }
+        
         function embedStuff(target) {
-            if ($(target).text().match(/\bembed:\/\/youtube\/([a-z0-9_-]{8,})(\/([0-9hms]+))?\b/gi)) {
+            if ($(target).text().match(/\bembed:\/\//i)) {
                 $(target).html(
-                    $(target).html().replace(/\bembed:\/\/youtube\/([a-z0-9_-]{8,})(\/([0-9hms]+))?\b/gi,
-                        toYoutubeIframe));
+                    $(target).html()
+                        .replace(/\bembed:\/\/youtube\/([a-z0-9_-]{8,})(\/([0-9hms]+))?\b/gi, toYoutubeIframe)
+                        .replace(/\bembed:\/\/image\/([0-9]{1,})\/(\S*?\.(?:png|jpg|jpeg|gif|svgz?))\b/gi, toImage)
+                );
             }
         }
         function embedStuffDelayed(target) {
@@ -390,7 +397,8 @@ if ((typeof enableGallerySupport !== typeof undefined) && enableGallerySupport) 
             $(backpane).imagesLoaded( function() {
                 $(backpane).find('.rotationAnimation').hide(); 
                 $(img).show();
-                $('#imageViewerDesc').text(m.filename + ', ' + m.filesize + ' bytes');
+                $('#imageViewerDesc').text('embed://image/' + m.id + '/' +
+                     m.filename + ', ' + m.filesize + ' bytes');
                 centerImage();
             });
             $(img).attr('src', src);

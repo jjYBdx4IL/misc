@@ -274,6 +274,12 @@ footer {
 @-webkit-keyframes spin { 100% { -webkit-transform: rotate(-360deg); } }
 @keyframes spin { 100% { -webkit-transform: rotate(-360deg); transform:rotate(-360deg); } }
 
+footer .impressum a {
+    text-decoration: none;
+    color: gray;
+    font-size: 0.7em;
+}
+
 
 
 /* radial-gradient(ellipse at center, #604060 0%, #1d1d2b 100%) */

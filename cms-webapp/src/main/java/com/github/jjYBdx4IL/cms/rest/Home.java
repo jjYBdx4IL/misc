@@ -76,6 +76,10 @@ public class Home {
 
         htmlBuilder.setPageTitle("Tag: " + selectedTag);
         
+        if ("impressum".equalsIgnoreCase(selectedTag)) {
+            htmlBuilder.enableNoIndex();
+        }
+        
         List<Article> articles = qf.getArticleDisplayList(selectedTag, null).getResultList();
 
         htmlBuilder.mainAdd(

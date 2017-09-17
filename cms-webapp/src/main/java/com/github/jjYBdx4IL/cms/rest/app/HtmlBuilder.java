@@ -46,6 +46,8 @@ import com.github.jjYBdx4IL.cms.rest.LoginSelect;
 import com.github.jjYBdx4IL.cms.rest.Logout;
 import com.github.jjYBdx4IL.cms.rest.RssFeed;
 import com.github.jjYBdx4IL.cms.rest.Search;
+import com.github.jjYBdx4IL.cms.rest.Settings;
+import com.github.jjYBdx4IL.cms.rest.Upload;
 import j2html.tags.ContainerTag;
 import j2html.tags.DomContent;
 import j2html.tags.UnescapedText;
@@ -202,6 +204,8 @@ public class HtmlBuilder {
         setJsValue("assetsUri", baseUri + "assets/");
         setJsValue("privacyPolicyUri", uriInfo.getBaseUriBuilder().path(Home.class).path(Home.class, "byTag")
             .build("site-privacy-policy").toString());
+        setJsValue("fileGetEndpoint",
+            uriInfo.getBaseUriBuilder().path(Gallery.class).path(Gallery.class, "getFile").toTemplate());
         if (Boolean.parseBoolean(appCache.get(ConfigKey.ENABLE_ADBLOCK_BLOCKER))) {
             setJsValue("enableAdblockBlocker", "true");
         }
@@ -247,8 +251,9 @@ public class HtmlBuilder {
             menu = div(
                 div(
                     iconTextLink("col-6", "view_list", "Article Manager", ArticleManager.class),
-                    div("Menu item 2").withClass("col-6"),
-                    div("Menu item 3").withClass("col-12")
+                    iconTextLink("col-6", "settings", "Settings", Settings.class),
+                    iconTextLink("col-6", "image", "Gallery", Gallery.class),
+                    iconTextLink("col-6", "file_upload", "Upload", Upload.class)
                     ).withClass("row")
                     ).withClass("container menu");
         }
@@ -261,6 +266,17 @@ public class HtmlBuilder {
 
         _footer.condWith(footFragment != null && !footFragment.isEmpty(),
             new UnescapedText(footFragment));
+
+        _footer.with(div(
+            div(
+                div(
+                    a("Impressum").withHref(
+                        uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("impressum").toString()
+                        )
+                    ).withClass("col-12 impressum")
+                    ).withClass("row")
+                    ).withClass("container")
+                );
 
         String doc = document(
             html(
@@ -482,8 +498,6 @@ public class HtmlBuilder {
         setJsValue("enableGallerySupport", "true");
         setJsValue("imageListEndpoint",
             uriInfo.getBaseUriBuilder().path(Gallery.class).path(Gallery.class, "imageList").build().toString());
-        setJsValue("fileGetEndpoint",
-            uriInfo.getBaseUriBuilder().path(Gallery.class).path(Gallery.class, "getFile").toTemplate());
         return this;
     }
 

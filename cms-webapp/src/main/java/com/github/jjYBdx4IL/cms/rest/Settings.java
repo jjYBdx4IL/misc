@@ -22,6 +22,7 @@ import static j2html.TagCreator.input;
 import static j2html.TagCreator.span;
 import static j2html.TagCreator.textarea;
 
+import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigValue;
@@ -70,6 +71,8 @@ public class Settings {
     UriInfo uriInfo;
     @PersistenceContext
     EntityManager em;
+    @Inject
+    AppCache appCache;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -134,6 +137,8 @@ public class Settings {
             configValue.setValue(value);
         }
         em.persist(configValue);
+        
+        appCache.load();
         
         return Response.temporaryRedirect(uriInfo.getAbsolutePathBuilder().build())
             .status(HttpServletResponse.SC_FOUND)

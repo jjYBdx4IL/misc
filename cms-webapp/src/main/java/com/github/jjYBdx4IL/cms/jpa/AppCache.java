@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
@@ -36,7 +37,7 @@ public class AppCache {
     public static final String DEVEL_ADMIN = "devel-1";
     public static final String PROPNAME_CMS_DEVEL = "cms.devel";
     
-    private Map<ConfigKey, String> values = null;
+    private Map<ConfigKey, String> values = new ConcurrentHashMap<>();;
     private Map<String, String> admins = new ConcurrentHashMap<>();
     
     @Inject
@@ -46,8 +47,11 @@ public class AppCache {
     }
     
     @PostConstruct
-    private void load() {
-        values = Collections.synchronizedMap(qf.getAllConfigValuesAsMap());
+    public void load() {
+        for (Entry<ConfigKey, String> entry : qf.getAllConfigValuesAsMap().entrySet()) {
+            values.put(entry.getKey(), entry.getValue());
+        }
+        admins.clear();
         if (values.containsKey(ConfigKey.ADMINS) && values.get(ConfigKey.ADMINS) != null) {
             for (String admin : values.get(ConfigKey.ADMINS).split("[, \\t]+")) {
                 if (!admin.isEmpty()) {
