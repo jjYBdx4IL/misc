@@ -270,6 +270,10 @@ public class HtmlBuilder {
         _footer.with(div(
             div(
                 div(
+                    a("Privacy Policy").withHref(
+                        uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("site-privacy-policy").toString()
+                        ),
+                    span(" - "),
                     a("Impressum").withHref(
                         uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("impressum").toString()
                         )

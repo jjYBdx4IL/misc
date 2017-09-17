@@ -358,6 +358,9 @@ if ((typeof enableGallerySupport !== typeof undefined) && enableGallerySupport) 
 
         appendRowWithWP();
         
+        var imgOrigHeight;
+        var imgOrigWidth;
+        
         function centerImage() {
             if (!$(backpane, 'img').is(":visible")) {
                 return;
@@ -366,9 +369,9 @@ if ((typeof enableGallerySupport !== typeof undefined) && enableGallerySupport) 
             var canvasWidth = $(window).width();
             var canvasHeight = $(window).height();
 
-            var minRatio = Math.min(canvasWidth / img.width, canvasHeight / img.height);
-            var newImgWidth = minRatio * img.width * 0.8;
-            var newImgHeight = minRatio * img.height * 0.8;
+            var minRatio = Math.min(canvasWidth / imgOrigWidth, canvasHeight / imgOrigHeight) * 0.87;
+            var newImgWidth = minRatio * imgOrigWidth;
+            var newImgHeight = minRatio * imgOrigHeight;
 
             var newImgX = (canvasWidth - newImgWidth) / 2;
             var newImgY = (canvasHeight - newImgHeight) / 2;
@@ -397,10 +400,15 @@ if ((typeof enableGallerySupport !== typeof undefined) && enableGallerySupport) 
             $(backpane).imagesLoaded( function() {
                 $(backpane).find('.rotationAnimation').hide(); 
                 $(img).show();
+                imgOrigWidth = $(img).width();
+                imgOrigHeight = $(img).height();
                 $('#imageViewerDesc').text('embed://image/' + m.id + '/' +
                      m.filename + ', ' + m.filesize + ' bytes');
                 centerImage();
             });
+            $(img).hide();
+            $(img).css('height', 'auto');
+            $(img).css('width', 'auto');
             $(img).attr('src', src);
         }
         
@@ -439,4 +447,5 @@ if ((typeof enableGallerySupport !== typeof undefined) && enableGallerySupport) 
         });
     });
 }
+
 
