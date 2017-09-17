@@ -20,6 +20,8 @@ import com.github.jjYBdx4IL.cms.jpa.dto.Article_;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigValue;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigValue_;
+import com.github.jjYBdx4IL.cms.jpa.dto.MediaFile;
+import com.github.jjYBdx4IL.cms.jpa.dto.MediaFile_;
 import com.github.jjYBdx4IL.cms.jpa.dto.Tag;
 import com.github.jjYBdx4IL.cms.jpa.dto.Tag_;
 import com.github.jjYBdx4IL.cms.jpa.dto.User;
@@ -50,6 +52,20 @@ public class QueryFactory {
     EntityManager em;
 
     public QueryFactory() {
+    }
+
+    public TypedQuery<MediaFile> getImagesMeta(Long maxId) {
+        if (maxId == null) {
+            maxId = Long.MAX_VALUE;
+        }
+        final CriteriaBuilder cb = em.getCriteriaBuilder();
+        final CriteriaQuery<MediaFile> cq = cb.createQuery(MediaFile.class);
+        final Root<MediaFile> root = cq.from(MediaFile.class);
+        cq.where(cb.and(cb.like(root.get(MediaFile_.contentType), "image/%"),
+            cb.lessThanOrEqualTo(root.get(MediaFile_.id), maxId)
+        ));
+        cq.orderBy(cb.desc(root.get(MediaFile_.id)));
+        return em.createQuery(cq);
     }
 
     public TypedQuery<Tag> getTag(String tagName) {

@@ -184,53 +184,58 @@ if ((typeof enableJsEditorSupport !== typeof undefined) && enableJsEditorSupport
 }
 
 // replace simple youtube links with iframes
-requirejs([ "jquery", "waypoints" ], function($) {
-    var myRegex = /(\d+)([hms])/gi;
+requirejs([ "jquery", "waypoints" ],
+    function($) {
+        var myRegex = /(\d+)([hms])/gi;
 
-    function toSecs(val) {
-        var secs = 0;
-        while (res = myRegex.exec(val)) {
-            if (res[2] === 's') {
-                secs += 1 * res[1];
-            } else if (res[2] === 'm') {
-                secs += 60 * res[1];
-            } else if (res[2] === 'h') {
-                secs += 3600 * res[1];
+        function toSecs(val) {
+            var secs = 0;
+            while (res = myRegex.exec(val)) {
+                if (res[2] === 's') {
+                    secs += 1 * res[1];
+                } else if (res[2] === 'm') {
+                    secs += 60 * res[1];
+                } else if (res[2] === 'h') {
+                    secs += 3600 * res[1];
+                }
+            }
+            return secs;
+        }
+        function toYoutubeIframe(val, vidId, startPos) {
+            var url = 'https://www.youtube.com/embed/' + vidId;
+            if (startPos) {
+                url += '?start=' + toSecs(startPos);
+            }
+            return '<iframe width="560" height="315" src="' + url + '" frameborder="0" allowfullscreen></iframe>';
+        }
+        function embedStuff(target) {
+            if ($(target).text().match(/\bembed:\/\/youtube\/([a-z0-9_-]{8,})(\/([0-9hms]+))?\b/gi)) {
+                $(target).html(
+                    $(target).html().replace(/\bembed:\/\/youtube\/([a-z0-9_-]{8,})(\/([0-9hms]+))?\b/gi,
+                        toYoutubeIframe));
             }
         }
-        return secs;
-    }
-    function toYoutubeIframe(val, vidId, startPos) {
-        var url = 'https://www.youtube.com/embed/' + vidId;
-        if (startPos) {
-            url += '?start=' + toSecs(startPos);
+        function embedStuffDelayed(target) {
+            if ($(target).text().match(/\bembed:\/\//i)) {
+                // http://imakewebthings.com/waypoints/guides/getting-started/
+                var wp = new Waypoint({
+                    element : target,
+                    handler : function() {
+                        embedStuff(target);
+                        wp.destroy();
+                    },
+                    offset : '100%'
+                });
+            }
         }
-        return '<iframe width="560" height="315" src="' + url + '" frameborder="0" allowfullscreen></iframe>';
-    }
-    function embedStuff(target) {
-        if ($(target).text().match(/\bembed:\/\/youtube\/([a-z0-9_-]{8,})(\/([0-9hms]+))?\b/gi)) {
-            $(target).html(
-                $(target).html().replace(/\bembed:\/\/youtube\/([a-z0-9_-]{8,})(\/([0-9hms]+))?\b/gi, toYoutubeIframe));
-        }
-    }
-    function embedStuffDelayed(target) {
-        if ($(target).text().match(/\bembed:\/\//i)) {
-            // http://imakewebthings.com/waypoints/guides/getting-started/
-            var wp = new Waypoint({
-                element : target,
-                handler : function() {
-                    embedStuff(target);
-                    wp.destroy();
-                },
-                offset : '100%'
-            });
-        }
-    }
-    $(".articleContent").each(function(index) {
-        embedStuffDelayed(this);
-    });
+        $(".articleContent").each(function(index) {
+            embedStuffDelayed(this);
+        });
 
-});
+        
+        
+    }
+);
 
 if ((typeof cookieConsentMessage !== typeof undefined) && cookieConsentMessage) {
     requirejs([ "jquery", "cookieconsent" ], function($) {
@@ -272,5 +277,66 @@ if ((typeof fineUploaderEndpoint !== typeof undefined) && fineUploaderEndpoint) 
                 allowedExtensions : [ 'jpeg', 'jpg', 'gif', 'png' ]
             }
         });
+    });
+}
+
+if ((typeof enableGallerySupport !== typeof undefined) && enableGallerySupport) {
+    requirejs([ "jquery", "waypoints" ], function($) {
+        var previewsPerRequest = 12;
+        var previewsPerLine = 6;
+        var currentRow = null;
+        var colIdx = 0;
+        var lastId = null;
+        console.log($('.gallery.container div'));
+
+        function appendImage(currentRow, image) {
+            $(currentRow).append('<div class="col-2"><img title="'+image.filename
+                +'" src="data:image/png;base64,' + image.preview + '"></div>');
+            colIdx++;
+        }
+
+        function loadRow(currentRow) {
+            $.ajax({
+                url : imageListEndpoint + (lastId === null ? '' : '?maxId=' + (lastId - 1))
+            }).done(function(json) {
+                var res = eval(json);
+                console.log(res);
+                var idx = 0;
+                for ( idx in res) {
+                    if (idx == previewsPerLine) {
+                        currentRow = appendRow();
+                    }
+                    var image = res[idx];
+                    lastId = image.id;
+                    console.log(image);
+                    appendImage(currentRow, image);
+                }
+                if (res.length == previewsPerRequest) {
+                    appendRowWithWP();
+                }
+            });
+        }
+        
+        function appendRow() {
+            $('.gallery.container').append('<div class="row"></div>');
+            var currentRow = $('.gallery.container .row').last();
+            console.log('currentRow=' + currentRow);
+            colIdx = 0;
+            return currentRow;
+        }
+        
+        function appendRowWithWP() {
+            var currentRow = appendRow();
+            var wp = new Waypoint({
+                element : currentRow[0],
+                handler : function() {
+                    loadRow(currentRow);
+                    wp.destroy();
+                },
+                offset : '100%'
+            });
+        }
+        
+        appendRowWithWP();
     });
 }

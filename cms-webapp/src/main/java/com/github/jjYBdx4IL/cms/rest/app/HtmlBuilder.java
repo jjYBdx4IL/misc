@@ -40,6 +40,7 @@ import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
 import com.github.jjYBdx4IL.cms.jpa.dto.Tag;
 import com.github.jjYBdx4IL.cms.rest.ArticleManager;
+import com.github.jjYBdx4IL.cms.rest.Gallery;
 import com.github.jjYBdx4IL.cms.rest.Home;
 import com.github.jjYBdx4IL.cms.rest.LoginSelect;
 import com.github.jjYBdx4IL.cms.rest.Logout;
@@ -114,7 +115,7 @@ public class HtmlBuilder {
         headContent.add(dom);
         return this;
     }
-    
+
     public HtmlBuilder addHeadFragment(String fragment) {
         if (!fragment.isEmpty()) {
             headFragments.add(fragment);
@@ -124,7 +125,7 @@ public class HtmlBuilder {
 
     public HtmlBuilder addHeadFragment(URL resource) {
         try (InputStream is = resource.openStream()) {
-            return addHeadFragment(IOUtils.toString(resource, "UTF-8")); 
+            return addHeadFragment(IOUtils.toString(resource, "UTF-8"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -267,12 +268,12 @@ public class HtmlBuilder {
                     title(title),
                     description != null ? meta().attr("description", description) : null,
                     author != null ? meta().attr("author", author) : null,
-                    noIndex ? meta().attr("name", "robots").attr("content", "noindex") : null,
+                    noIndex ? meta().attr("name", "robots").attr("content", "noindex,noarchive")
+                        : meta().attr("name", "robots").attr("content", "noarchive"),
                     meta().attr("http-equiv", "Content-Type").attr("content", "text/html;charset=UTF-8"),
                     meta().attr("name", "viewport").attr("content", "width=device-width, initial-scale=1"),
                     meta().attr("name", "keywords")
                         .attr("content", metaKeywords != null ? metaKeywords.toString() : ""),
-                    meta().attr("name", "robots").attr("content", "noarchive"),
                     createJsValuesScript(),
                     script().withSrc("//cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js")
                         .attr("async").attr("defer").attr("data-main", baseUri + "assets/app")
@@ -474,6 +475,13 @@ public class HtmlBuilder {
 
     public HtmlBuilder enableJsEditorSupport() {
         setJsValue("enableJsEditorSupport", "true");
+        return this;
+    }
+
+    public HtmlBuilder enableGallerySupport() {
+        setJsValue("enableGallerySupport", "true");
+        setJsValue("imageListEndpoint",
+            uriInfo.getBaseUriBuilder().path(Gallery.class).path(Gallery.class, "imageList").build().toString());
         return this;
     }
 

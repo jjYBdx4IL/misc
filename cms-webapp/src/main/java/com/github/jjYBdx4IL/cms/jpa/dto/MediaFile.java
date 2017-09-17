@@ -24,12 +24,17 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.persistence.Version;
 
 //CHECKSTYLE:OFF
 @SuppressWarnings("serial")
+@Table(indexes = {
+    @Index(name = "MEDIAFILE_CREATEDAT_INDEX", unique = false, columnList = "createdAt")
+})
 @Entity
 public class MediaFile implements Serializable {
 
