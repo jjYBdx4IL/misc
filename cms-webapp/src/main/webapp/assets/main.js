@@ -367,8 +367,7 @@ if ((typeof enableGallerySupport !== typeof undefined) && enableGallerySupport) 
             var newImgY = (canvasHeight - newImgHeight) / 2;
             
             $(img).css('position', 'fixed');
-            $(img).css('top',newImgY+ 'px');
-            $(img).css('left',newImgX+ 'px');
+            $(img).offset({'top': newImgY, 'left': newImgX});
             $(img).width(newImgWidth);
             $(img).height(newImgHeight);
             
@@ -377,9 +376,7 @@ if ((typeof enableGallerySupport !== typeof undefined) && enableGallerySupport) 
             var newSpanX = (canvasWidth - $(span).width()) / 2;
             var newSpanY = newImgY + newImgHeight;
             
-            $(span).css('position', 'fixed');
-            $(span).css('top',newSpanY+ 'px');
-            $(span).css('left',newSpanX+ 'px');
+            $(span).offset({'top': newSpanY, 'left': newSpanX});
         }
         
         var currentlyShownMediaId = null;
