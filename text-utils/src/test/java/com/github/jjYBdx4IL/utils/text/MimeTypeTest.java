@@ -20,24 +20,27 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import javax.activation.MimetypesFileTypeMap;
+
 public class MimeTypeTest {
 
     @Test
     public void test() {
-        MimeType mimeType = new MimeType();
+        MimetypesFileTypeMap mimeType = MimeType.createMap();
         try {
-            mimeType.get(null, null);
+            mimeType.getContentType((String)null);
             fail();
         } catch (NullPointerException ex) {
         }
-        assertEquals("application/octet-stream", mimeType.get("", null));
-        assertEquals("application/octet-stream", mimeType.get(".", null));
-        assertEquals("application/octet-stream", mimeType.get(".....", null));
-        assertEquals("application/octet-stream", mimeType.get(".", "UTF-8"));
-        assertEquals("application/javascript", mimeType.get(".js", null));
-        assertEquals("application/javascript", mimeType.get("a/b.js", null));
-        assertEquals("application/javascript;charset=utf-8", mimeType.get("a/b.js", "UTF-8"));
-        assertEquals("text/css;charset=utf-8", mimeType.get("a/b.css", "UTF-8"));
-        assertEquals("application/pdf", mimeType.get(".pDF", null));
+        assertEquals("application/octet-stream", mimeType.getContentType(""));
+        assertEquals("application/octet-stream", mimeType.getContentType("."));
+        assertEquals("application/octet-stream", mimeType.getContentType("....."));
+        assertEquals("application/octet-stream", mimeType.getContentType("."));
+        assertEquals("application/javascript", mimeType.getContentType(".js"));
+        assertEquals("application/javascript", mimeType.getContentType("a/b.js"));
+        assertEquals("application/javascript", mimeType.getContentType("a/b.js"));
+        assertEquals("text/css", mimeType.getContentType("a/b.css"));
+        assertEquals("application/octet-stream", mimeType.getContentType(".pDF"));
+        assertEquals("application/pdf", mimeType.getContentType(".pdf"));
     }
 }

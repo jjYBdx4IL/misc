@@ -18,6 +18,7 @@ package com.github.jjYBdx4IL.cms.rest;
 import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.rest.app.Role;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
+import com.github.jjYBdx4IL.utils.text.MimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,26 +61,7 @@ public class Gallery {
             LOG.warn("asset file not found: " + file.getAbsolutePath());
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        String fileName = file.getName();
-        String mimeType = mimeTypesMap.getContentType(fileName);
-        if (fileName.contains(".")) {
-            String suffix = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-            if ("js".equals(suffix)) {
-                mimeType = "application/javascript;charset=utf-8";
-            }
-            else if ("css".equals(suffix)) {
-                mimeType = "text/css;charset=utf-8";
-            }
-            else if ("tpl".equals(suffix)) {
-                mimeType = "text/template";
-            }
-            else if ("svg".equals(suffix)) {
-                mimeType = "image/svg+xml";
-            }
-            else if ("svgz".equals(suffix)) {
-                mimeType = "image/svg+xml";
-            }
-        }
+        String mimeType = MimeType.get(file.getName(), "utf-8");
         LOG.info(mimeType + " " + file);
         CacheControl cacheControl = new CacheControl();
         if (appCache.isDevel()) {
