@@ -152,13 +152,18 @@ form textarea {
 	border: solid #ddd;
 }
 
+.articleContent blockquote * {
+	font-family: inherit;
+	font-style: inherit;
+}
+	
 .articleContent blockquote {
 	padding: 0 0.3em;
-/* 	border: solid #ddd; */
-	font-style: normal;
+	/* 	border: solid #ddd; */
+	font-style: italic;
 	margin-left: 32px;
-	font-family: "Segoe Print", "Times New Roman", Verdana;
-/* 	padding-left: 48px; */
+/* 	font-family: Times; */
+	/* 	padding-left: 48px; */
 	background: url('material-icons/ic_format_quote_black_24px.svg');
 	background-repeat: no-repeat;
 	background-size: 55px;

@@ -208,9 +208,9 @@ requirejs([ "jquery", "waypoints" ], function($) {
         return '<iframe width="560" height="315" src="' + url + '" frameborder="0" allowfullscreen></iframe>';
     }
     function embedStuff(target) {
-        if ($(target).text().match(/\bembed:\/\/youtube\/([a-z0-9-]{8,})(\/([0-9hms]+))?\b/gi)) {
+        if ($(target).text().match(/\bembed:\/\/youtube\/([a-z0-9_-]{8,})(\/([0-9hms]+))?\b/gi)) {
             $(target).html(
-                $(target).html().replace(/\bembed:\/\/youtube\/([a-z0-9-]{8,})(\/([0-9hms]+))?\b/gi, toYoutubeIframe));
+                $(target).html().replace(/\bembed:\/\/youtube\/([a-z0-9_-]{8,})(\/([0-9hms]+))?\b/gi, toYoutubeIframe));
         }
     }
     function embedStuffDelayed(target) {

@@ -20,6 +20,7 @@ import static j2html.TagCreator.div;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.MediaFile;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
+import com.github.jjYBdx4IL.cms.rest.app.Role;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 import org.hibernate.Session;
 import org.imgscalr.Scalr;
@@ -42,6 +43,7 @@ import java.util.Map;
 
 import javax.annotation.PreDestroy;
 import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -59,7 +61,7 @@ import javax.ws.rs.core.UriInfo;
 
 //CHECKSTYLE:OFF
 @Path("upload")
-@PermitAll
+@RolesAllowed(Role.ADMIN)
 @Transactional
 public class Upload {
 
