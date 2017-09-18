@@ -227,13 +227,6 @@ public class HtmlBuilder {
         addCssUrl("//fonts.googleapis.com/icon?family=Material+Icons");
         addCssUrl("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.min.css");
 
-        // spinning icons: https://www.w3schools.com/w3css/w3css_icons.asp
-        // if (session.isDevel()) {
-        // addScriptUrl(baseUri + "assets/scripts.js");
-        // } else {
-        // addScriptUrl(baseUri + "assets/site.min.js");
-        // }
-
         if (session.isAuthenticated()) {
             setSignOutLink(uriInfo.getBaseUriBuilder().path(Logout.class).build().toString());
         } else {
@@ -246,17 +239,23 @@ public class HtmlBuilder {
             (session.isAuthenticated() ? "\nCurrently signed in as:\n" + qf.getUserByUid(session.getUid()).getEmail()
                 : "");
 
-        ContainerTag menu = null;
+        String privacyPolicyLink = uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("site-privacy-policy")
+            .toString();
+        String impressumLink = uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("impressum").toString();
+
+        /* build the menu */
+        ContainerTag menuRow = div().withClass("row");
+        ContainerTag menu = div(menuRow).withClass("container menu");
+
         if (session.isAuthenticated()) {
-            menu = div(
-                div(
-                    iconTextLink("col-6", "view_list", "Article Manager", ArticleManager.class),
-                    iconTextLink("col-6", "settings", "Settings", Settings.class),
-                    iconTextLink("col-6", "image", "Gallery", Gallery.class),
-                    iconTextLink("col-6", "file_upload", "Upload", Upload.class)
-                    ).withClass("row")
-                    ).withClass("container menu");
+            menuRow.with(iconTextLink("col-6", "view_list", "Article Manager", ArticleManager.class));
+            menuRow.with(iconTextLink("col-6", "settings", "Settings", Settings.class));
+            menuRow.with(iconTextLink("col-6", "image", "Gallery", Gallery.class));
+            menuRow.with(iconTextLink("col-6", "file_upload", "Upload", Upload.class));
         }
+
+        menuRow.with(iconTextLink("col-6", "info", "Privacy Policy", privacyPolicyLink));
+        menuRow.with(iconTextLink("col-6", "info", "Impressum", impressumLink));
 
         ContainerTag _main = constructMainSection();
 
@@ -270,17 +269,13 @@ public class HtmlBuilder {
         _footer.with(div(
             div(
                 div(
-                    a("Privacy Policy").withHref(
-                        uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("site-privacy-policy").toString()
-                        ),
+                    a("Privacy Policy").withHref(privacyPolicyLink),
                     span(" - "),
-                    a("Impressum").withHref(
-                        uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("impressum").toString()
-                        )
-                    ).withClass("col-12 impressum")
-                    ).withClass("row")
-                    ).withClass("container")
-                );
+                    a("Impressum").withHref(impressumLink)
+                ).withClass("col-12 impressum")
+            ).withClass("row")
+        ).withClass("container")
+        );
 
         String doc = document(
             html(
@@ -300,13 +295,13 @@ public class HtmlBuilder {
                         .withType("text/javascript"),
                     each(headFragments,
                         headFragment -> new UnescapedText(headFragment)
-                        ),
+                    ),
                     each(headContent, dom -> dom),
                     each(cssUrls,
                         stylesheet -> link().withRel("stylesheet").withType("text/css").withHref(stylesheet)),
                     each(scriptUrls, script -> script().withType("text/javascript").withSrc(script).attr("async")
                         .attr("defer"))
-                    ),
+                ),
                 link().withRel("alternate").withType("application/rss+xml").withTitle("Blog")
                     .withHref(uriInfo.getBaseUriBuilder().path(RssFeed.class).path(RssFeed.class, "feed").build()
                         .toString()),
@@ -314,27 +309,24 @@ public class HtmlBuilder {
                     header(
                         div(
                             div(
-                                h3(a(title).withHref(baseUri)).withClass("col-8-sm"),
+                                h3(a(title).withHref(baseUri)).withClass("col-6-sm"),
                                 div().with(
                                     a("search").withHref(searchLink).withClass("material-icons")
-                                    ).condWith(session.isAuthenticated(),
-                                        i("menu").withClass("menuIcon material-icons").attr("title", "Menu")
-                                    ).condWith(signOutLink != null,
-                                        a("exit_to_app").withHref(signOutLink).withClass("signout material-icons")
-                                            .attr("title", signoutTooltipText)
-                                        )
-                                    .condWith(signInLink != null,
-                                        a("vpn_key").withHref(signInLink).withClass("material-icons")
-                                            .attr("title", "Sign in")
-                                        )
-                                    .withClass("col-4-sm right")
-                                ).withClass("row")
-                                ).withClass("container titlebar")
-                                ).condWith(menu != null, menu),
+                                ).with(i("menu").withClass("menuIcon material-icons").attr("title", "Menu")
+                                ).condWith(signOutLink != null,
+                                    a("exit_to_app").withHref(signOutLink).withClass("signout material-icons")
+                                        .attr("title", signoutTooltipText)
+                                ).condWith(signInLink != null,
+                                    a("vpn_key").withHref(signInLink).withClass("material-icons")
+                                        .attr("title", "Sign in")
+                                ).withClass("col-6-sm right")
+                            ).withClass("row")
+                        ).withClass("container titlebar")
+                    ).condWith(menu != null, menu),
                     _main, _footer
-                            )
-                    ).attr("lang", lang)
-                    );
+                )
+            ).attr("lang", lang)
+        );
         if (LOG.isTraceEnabled()) {
             LOG.trace("doc: " + doc);
         }
@@ -353,7 +345,7 @@ public class HtmlBuilder {
         return iconTextLink(
             cssClass, materialIconId, text,
             uriInfo.getBaseUriBuilder().path(resource).path(method).build().toString()
-            );
+        );
     }
 
     public ContainerTag iconTextLink(String cssClass, String materialIconId, String text, Class<?> resource) {
@@ -364,8 +356,8 @@ public class HtmlBuilder {
     public ContainerTag iconTextLink(String cssClass, String materialIconId, String text, String href) {
         ContainerTag result = a(
             i(materialIconId).withClass("material-icons")
-            ).condWith(text != null, span(text)).withHref(href)
-                .withClass((cssClass != null ? cssClass + " " : "") + "iconTextLink");
+        ).condWith(text != null, span(text)).withHref(href)
+            .withClass((cssClass != null ? cssClass + " " : "") + "iconTextLink");
         String baseUri = uriInfo.getBaseUriBuilder().build().toString();
         if (!href.toLowerCase().startsWith(baseUri.toLowerCase())) {
             result.withTarget("_extern");
@@ -385,21 +377,21 @@ public class HtmlBuilder {
     public HtmlBuilder addPageTitleSubItem(String materialIconId, String text, Class<?> resource, String method) {
         pageTitleRowSubItems.add(
             iconTextLink(null, materialIconId, text, resource, method)
-            );
+        );
         return this;
     }
 
     public HtmlBuilder addPageTitleSubItem(String materialIconId, String text, Class<?> resource) {
         pageTitleRowSubItems.add(
             iconTextLink(null, materialIconId, text, resource)
-            );
+        );
         return this;
     }
 
     public HtmlBuilder addPageTitleSubItem(String materialIconId, String text, String href) {
         pageTitleRowSubItems.add(
             iconTextLink(null, materialIconId, text, href)
-            );
+        );
         return this;
     }
 
@@ -414,7 +406,7 @@ public class HtmlBuilder {
             if (!pageTitleRowSubItems.isEmpty()) {
                 ContainerTag subItems = div(
                     pageTitleRowSubItems.toArray(new ContainerTag[pageTitleRowSubItems.size()])
-                    ).withClass(colClass + " pageTitleSubItems");
+                ).withClass(colClass + " pageTitleSubItems");
                 pageTitleRow.with(subItems);
             }
             _main.with(div(pageTitleRow).withClass("container pageTitleContainer"));
@@ -439,20 +431,32 @@ public class HtmlBuilder {
 
     public ContainerTag createArticleListRow(List<Article> articles, boolean showDates, boolean showEditLink) {
         articles.forEach(article -> addMetaKeywords(article));
-        UriBuilder uriBuilder = uriInfo.getBaseUriBuilder().path(Home.class, "byTag");
-        return div(
-            each(articles,
-                article -> div(
-                    h1(a(article.getTitle()).withHref(constructArticleLink(article))).withClass("articleTitle"),
-                    div(createDateInfo(article), createEditLink(article)).withClass("articleMeta"),
-                    div(new UnescapedText(article.getProcessed())).withClass("articleContent"),
-                    span("Tags: ").withClass("tagLineHeader"),
-                    each(article.getTags(),
-                        tag -> a(tag.getName()).withHref(uriBuilder.build(tag.getName()).toString()).withClass("tag")
-                    )
-                    ).withClass("col-12 article")
+        return div(createArticleListRowInner(articles, showDates, showEditLink)).withClass("row articles");
+    }
+
+    // is UriBuilder thread-safe? can we make it static?
+    private UriBuilder uriBuilderByTag = null;
+
+    private UriBuilder getUriBuilderByTag() {
+        if (uriBuilderByTag == null) {
+            uriBuilderByTag = uriInfo.getBaseUriBuilder().path(Home.class, "byTag");
+        }
+        return uriBuilderByTag;
+    }
+
+    public DomContent createArticleListRowInner(List<Article> articles, boolean showDates, boolean showEditLink) {
+        UriBuilder uriBuilder = getUriBuilderByTag();
+        return each(articles,
+            article -> div(
+                h1(a(article.getTitle()).withHref(constructArticleLink(article))).withClass("articleTitle"),
+                div(createDateInfo(article), createEditLink(article)).withClass("articleMeta"),
+                div(new UnescapedText(article.getProcessed())).withClass("articleContent"),
+                span("Tags: ").withClass("tagLineHeader"),
+                each(article.getTags(),
+                    tag -> a(tag.getName()).withHref(uriBuilder.build(tag.getName()).toString()).withClass("tag")
                 )
-                ).withClass("row");
+            ).withClass("col-12 article")
+        );
     }
 
     private ContainerTag createDateInfo(Article article) {

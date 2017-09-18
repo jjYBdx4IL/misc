@@ -20,11 +20,9 @@ import static j2html.TagCreator.div;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,8 +34,10 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 //CHECKSTYLE:OFF
 @Path("")
@@ -47,6 +47,10 @@ public class Home {
 
     private static final Logger LOG = LoggerFactory.getLogger(Home.class);
 
+    public static final int MAX_ARTICLES_PER_REQUEST = 10;
+
+    @Context
+    UriInfo uriInfo;
     @Inject
     HtmlBuilder htmlBuilder;
     @Inject
@@ -55,10 +59,14 @@ public class Home {
     @Path("")
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public Response get() throws SQLException {
+    public Response get() {
         LOG.trace("get()");
 
-        List<Article> articles = qf.getArticleDisplayList(null, null).getResultList();
+        htmlBuilder.setJsValue("articleDisplayContinuationEndpoint",
+            uriInfo.getBaseUriBuilder().path(Home.class).path(Home.class, "cont").toTemplate());
+
+        List<Article> articles = qf.getArticleDisplayList(null, null)
+            .setMaxResults(MAX_ARTICLES_PER_REQUEST).getResultList();
 
         htmlBuilder.mainAdd(
             div(
@@ -66,21 +74,37 @@ public class Home {
             ).withClass("container")
         );
         return Response.ok(htmlBuilder.toString()).build();
+    }
+
+    @Path("continue/{skip}")
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public Response cont(@PathParam("skip") int skip) {
+        LOG.trace("cont()");
+
+        List<Article> articles = qf.getArticleDisplayList(null, null)
+            .setMaxResults(MAX_ARTICLES_PER_REQUEST).setFirstResult(skip).getResultList();
+
+        return Response.ok(htmlBuilder.createArticleListRowInner(articles, false, false).toString()).build();
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("byTag/{tag}")
-    public Response byTag(@PathParam("tag") String selectedTag) throws SQLException {
+    public Response byTag(@PathParam("tag") String selectedTag) {
         LOG.trace("byTag()");
 
         htmlBuilder.setPageTitle("Tag: " + selectedTag);
-        
+        htmlBuilder.setJsValue("articleDisplayContinuationEndpoint",
+            uriInfo.getBaseUriBuilder().path(Home.class).path(Home.class, "byTagCont")
+                .resolveTemplate("tag", selectedTag).toTemplate());
+
         if ("impressum".equalsIgnoreCase(selectedTag)) {
             htmlBuilder.enableNoIndex();
         }
-        
-        List<Article> articles = qf.getArticleDisplayList(selectedTag, null).getResultList();
+
+        List<Article> articles = qf.getArticleDisplayList(selectedTag, null)
+            .setMaxResults(MAX_ARTICLES_PER_REQUEST).getResultList();
 
         htmlBuilder.mainAdd(
             div(
@@ -89,26 +113,38 @@ public class Home {
         );
         return Response.ok(htmlBuilder.toString()).build();
     }
-    
+
+    @Path("continueByTag/{tag}/{skip}")
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public Response byTagCont(@PathParam("tag") String selectedTag, @PathParam("skip") int skip) {
+        LOG.trace("byTagCont()");
+
+        List<Article> articles = qf.getArticleDisplayList(selectedTag, null)
+            .setMaxResults(MAX_ARTICLES_PER_REQUEST).setFirstResult(skip).getResultList();
+
+        return Response.ok(htmlBuilder.createArticleListRowInner(articles, false, false).toString()).build();
+    }
+
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("{year: \\d{4,4}}/{month: \\d{2,2}}/{day: \\d{2,2}}/{pathId}")
-    public Response byPathId(@PathParam("pathId") String pathId) throws SQLException {
+    public Response byPathId(@PathParam("pathId") String pathId) {
         LOG.trace("byPathId()");
 
         if (pathId == null || pathId.isEmpty()) {
             return Response.status(HttpServletResponse.SC_NOT_FOUND).build();
         }
-        
+
         Article article = qf.getArticleByPathId(pathId);
-        
+
         if (article == null) {
             return Response.status(HttpServletResponse.SC_NOT_FOUND).build();
         }
-        
+
         List<Article> articles = new ArrayList<>();
         articles.add(article);
-        
+
         htmlBuilder.mainAdd(
             div(
                 htmlBuilder.createArticleListRow(articles, true, true)

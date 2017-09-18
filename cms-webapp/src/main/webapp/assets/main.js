@@ -184,6 +184,7 @@ if ((typeof enableJsEditorSupport !== typeof undefined) && enableJsEditorSupport
 }
 
 // replace simple youtube links with iframes
+var embedStuffDelayed = function(){};
 requirejs([ "jquery", "waypoints" ],
     function($) {
         var myRegex = /(\d+)([hms])/gi;
@@ -222,7 +223,7 @@ requirejs([ "jquery", "waypoints" ],
                 );
             }
         }
-        function embedStuffDelayed(target) {
+        embedStuffDelayed = function(target) {
             if ($(target).text().match(/\bembed:\/\//i)) {
                 // http://imakewebthings.com/waypoints/guides/getting-started/
                 var wp = new Waypoint({
@@ -235,6 +236,7 @@ requirejs([ "jquery", "waypoints" ],
                 });
             }
         }
+        
         $(".articleContent").each(function(index) {
             embedStuffDelayed(this);
         });
@@ -348,11 +350,12 @@ if ((typeof enableGallerySupport !== typeof undefined) && enableGallerySupport) 
                 offset : '100%'
             });
         }
+            
         
         $('.gallery.container').append(
             '<div id="imageViewerBackPane">'+
-            '<img style="display:none;">'+
-            '<i class="material-icons rotationAnimation">replay</i>'+
+            '<img style="display:none;" class="image">'+
+            '<img src="' + assetsUri + 'images/spinner.gif" class="spinner">'+
             '<span id="imageViewerDesc"></span></div>');
         var backpane = $('#imageViewerBackPane');
 
@@ -362,10 +365,10 @@ if ((typeof enableGallerySupport !== typeof undefined) && enableGallerySupport) 
         var imgOrigWidth;
         
         function centerImage() {
-            if (!$(backpane, 'img').is(":visible")) {
+            if (!$(backpane, 'img.image').is(":visible")) {
                 return;
             }
-            var img = $(backpane).find('img')[0]; 
+            var img = $(backpane).find('img.image')[0]; 
             var canvasWidth = $(window).width();
             var canvasHeight = $(window).height();
 
@@ -393,12 +396,12 @@ if ((typeof enableGallerySupport !== typeof undefined) && enableGallerySupport) 
         function showPic(mediaId) {
             currentlyShownMediaId = mediaId;
             backpane.show();
-            $(backpane).find('.rotationAnimation').show();
+            $(backpane).find('.spinner').show();
             var m = mediaMap[mediaId];
             var src = fileGetEndpoint.replace('{mediaId}', mediaId).replace('{filename}', m.filename);
-            var img = $(backpane).find('img');
+            var img = $(backpane).find('img.image');
             $(backpane).imagesLoaded( function() {
-                $(backpane).find('.rotationAnimation').hide(); 
+                $(backpane).find('.spinner').hide(); 
                 $(img).show();
                 imgOrigWidth = $(img).width();
                 imgOrigHeight = $(img).height();
@@ -423,7 +426,7 @@ if ((typeof enableGallerySupport !== typeof undefined) && enableGallerySupport) 
                 return;
             }
             backpane.hide();
-            $(backpane, "img").hide();
+            $(backpane, "img.image").hide();
         }
         
         $(window).resize(centerImage);
@@ -433,7 +436,7 @@ if ((typeof enableGallerySupport !== typeof undefined) && enableGallerySupport) 
             }
         });
         $(backpane).on( "click", function(event) {
-            var img = $(backpane).find('img')[0];
+            var img = $(backpane).find('img.image')[0];
             if (event.toElement == img) {
                 var m = mediaMap[currentlyShownMediaId];
                 if (event.pageX < $(img).offset().left + $(img).width()/2) {
@@ -448,4 +451,47 @@ if ((typeof enableGallerySupport !== typeof undefined) && enableGallerySupport) 
     });
 }
 
+/* auto-extend article lists */
 
+if ((typeof articleDisplayContinuationEndpoint !== typeof undefined) && articleDisplayContinuationEndpoint) {
+    requirejs([ "jquery", "waypoints" ], function($) {
+        var triggerDiv = null;
+        var skip = $('main .article').length;
+        
+        function loadMoreRows() {
+            $.ajax({
+                url : articleDisplayContinuationEndpoint.replace('{skip}', skip)
+            }).done(function(html) {
+                $("main .articles").append(html);
+                $(triggerDiv).nextAll().find(".articleContent").each(function(index) {
+                    embedStuffDelayed(this);
+                });
+                var skipNew = $('main .article').length;
+                if (skipNew > skip) {
+                    appendTriggerDiv();
+                    skip = skipNew;
+                } else {
+                    $(triggerDiv).remove();
+                }
+            });
+        }
+        
+        function appendTriggerDiv() {
+            if (triggerDiv != null) {
+                $(triggerDiv).remove();
+            }
+            $("main .articles").append('<div class="col-12 articlesWaypointTrigger"><img src="'
+                + assetsUri + 'images/spinner.gif"></div>');
+            triggerDiv = $("main .articles .articlesWaypointTrigger")[0]; 
+            var wp = new Waypoint({
+                element : triggerDiv,
+                handler : function() {
+                    wp.destroy();
+                    loadMoreRows();
+                },
+                offset : '100%'
+            });
+        }
+        appendTriggerDiv();
+    });
+}

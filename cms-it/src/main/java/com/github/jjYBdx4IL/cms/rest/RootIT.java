@@ -10,7 +10,7 @@ import com.github.jjYBdx4IL.cms.jaxb.dto.ExportDump;
 import com.github.jjYBdx4IL.utils.jersey.JerseyClientUtils;
 import com.github.jjYBdx4IL.utils.text.PasswordGenerator;
 import com.github.jjYBdx4IL.wsverifier.WebsiteVerifier;
-
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -42,7 +42,8 @@ public class RootIT {
         final String pathId = "p" + PasswordGenerator.generate55(11);
 
         Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
-            pathId).param("processed", "processed bla");;
+            pathId).param("processed", "processed bla");
+        ;
 
         response = (Response) getTarget("articleManager/create").request()
             .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
@@ -75,13 +76,34 @@ public class RootIT {
         response = (Response) getTarget("articleManager/create").request()
             .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
         assertEquals(HttpServletResponse.SC_BAD_REQUEST, response.getStatus());
-        
+
         // fix title and try again
         form = new Form().param("title", "asd").param("content", content).param("tags", tag).param("pathId",
             pathId).param("processed", "processed bla");
         response = (Response) getTarget("articleManager/create").request()
             .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
         assertEquals(response.readEntity(String.class), HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
+    }
+
+    @Test
+    public void createSpam() throws Exception {
+        Response response = (Response) getTarget("devel/login").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+
+        for (int i = 0; i < 30; i++) {
+            final String title = "t" + PasswordGenerator.generate55(11);
+            final String content = "c" + PasswordGenerator.generate55(11);
+            final String tag = "spam";
+            final String pathId = "p" + PasswordGenerator.generate55(11);
+
+            Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
+                pathId).param("processed", "processed bla");
+
+            response = (Response) getTarget("articleManager/create").request()
+                .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
+            assertEquals(response.readEntity(String.class), HttpServletResponse.SC_MOVED_TEMPORARILY,
+                response.getStatus());
+        }
     }
 
     @Test
