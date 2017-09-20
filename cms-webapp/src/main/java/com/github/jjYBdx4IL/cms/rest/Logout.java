@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -38,6 +39,8 @@ public class Logout {
     
     @Context
     UriInfo uriInfo;
+    @Context
+    HttpServletRequest req;
     @Inject
     private SessionData session;
     
@@ -46,6 +49,7 @@ public class Logout {
         LOG.trace("logout()");
 
         session.logout();
+        req.getSession().setMaxInactiveInterval(900);
 
         return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path(Home.class).build())
             .status(HttpServletResponse.SC_FOUND)

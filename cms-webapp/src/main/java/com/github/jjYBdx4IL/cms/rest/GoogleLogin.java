@@ -41,6 +41,7 @@ import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import javax.ws.rs.GET;
@@ -59,6 +60,8 @@ public class GoogleLogin {
 
     @Context
     UriInfo uriInfo;
+    @Context
+    HttpServletRequest req;
     @Inject
     SessionData session;
     @PersistenceContext
@@ -162,6 +165,7 @@ public class GoogleLogin {
         em.persist(user);
 
         session.setUid(uid);
+        req.getSession().setMaxInactiveInterval(86400);
 
         return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path(Home.class).build())
             .status(HttpServletResponse.SC_FOUND).build();

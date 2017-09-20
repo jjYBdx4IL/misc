@@ -4,6 +4,6 @@
     <!-- needed for proper session persistence when running in WildFly, for development mainly: -->
     <distributable />
     <session-config>
-        <session-timeout>1440</session-timeout>
+        <session-timeout>15</session-timeout>
     </session-config> 
 </web-app>
