@@ -59,7 +59,7 @@ public class Gallery {
     @Inject
     HtmlBuilder htmlBuilder;
     @Inject
-    private AppCache appCache;
+    AppCache appCache;
     @Inject
     QueryFactory qf;
     @PersistenceContext

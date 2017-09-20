@@ -50,6 +50,7 @@ import com.github.jjYBdx4IL.cms.rest.Settings;
 import com.github.jjYBdx4IL.cms.rest.Upload;
 import j2html.tags.ContainerTag;
 import j2html.tags.DomContent;
+import j2html.tags.EmptyTag;
 import j2html.tags.UnescapedText;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -302,7 +303,7 @@ public class HtmlBuilder {
                     each(scriptUrls, script -> script().withType("text/javascript").withSrc(script).attr("async")
                         .attr("defer"))
                 ),
-                link().withRel("alternate").withType("application/rss+xml").withTitle("Blog")
+                link().withRel("alternate").withType("application/rss+xml").withTitle(title)
                     .withHref(uriInfo.getBaseUriBuilder().path(RssFeed.class).path(RssFeed.class, "feed").build()
                         .toString()),
                 body(

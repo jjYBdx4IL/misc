@@ -16,10 +16,14 @@
 package com.github.jjYBdx4IL.cms.rest;
 
 import static j2html.TagCreator.div;
+import static j2html.TagCreator.link;
 
+import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
+import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
+import j2html.tags.EmptyTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +59,8 @@ public class Home {
     HtmlBuilder htmlBuilder;
     @Inject
     QueryFactory qf;
+    @Inject
+    AppCache appCache;
 
     @Path("")
     @GET
@@ -94,7 +100,15 @@ public class Home {
     public Response byTag(@PathParam("tag") String selectedTag) {
         LOG.trace("byTag()");
 
+        String tagRssFeedUrl = uriInfo.getBaseUriBuilder().path(RssFeed.class).path(RssFeed.class, "feedByTag")
+            .build(selectedTag).toString();
+        EmptyTag tagRssFeedLink = link().withRel("alternate").withType("application/rss+xml")
+            .withTitle(appCache.get(ConfigKey.WEBSITE_TITLE) + " - " + selectedTag)
+            .withHref(tagRssFeedUrl);
+        
         htmlBuilder.setPageTitle("Tag: " + selectedTag);
+        htmlBuilder.addPageTitleSubItem("room_service", "Rss feed for this tag", tagRssFeedUrl);
+        htmlBuilder.addHeadContent(tagRssFeedLink);
         htmlBuilder.setJsValue("articleDisplayContinuationEndpoint",
             uriInfo.getBaseUriBuilder().path(Home.class).path(Home.class, "byTagCont")
                 .resolveTemplate("tag", selectedTag).toTemplate());
