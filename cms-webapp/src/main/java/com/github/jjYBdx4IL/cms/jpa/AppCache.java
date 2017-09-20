@@ -44,10 +44,12 @@ public class AppCache {
     QueryFactory qf;
     
     public AppCache() {
+        LOG.trace("init() " + this);
     }
     
     @PostConstruct
     public void load() {
+        LOG.warn("load() " + this);
         for (Entry<ConfigKey, String> entry : qf.getAllConfigValuesAsMap().entrySet()) {
             values.put(entry.getKey(), entry.getValue());
         }

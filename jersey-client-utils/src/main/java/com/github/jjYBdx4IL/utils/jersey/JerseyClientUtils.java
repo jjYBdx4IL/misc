@@ -17,6 +17,7 @@ package com.github.jjYBdx4IL.utils.jersey;
 
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.slf4j.Logger;
@@ -48,6 +49,8 @@ public class JerseyClientUtils {
         java.util.logging.Logger logj = java.util.logging.Logger.getLogger(JerseyClientUtils.class.getName());
         // add cookie handling support:
         ClientConfig clientConfig = new ClientConfig().connectorProvider(new ApacheConnectorProvider());
+        clientConfig = clientConfig.property(ClientProperties.CONNECT_TIMEOUT, 10000);
+        clientConfig = clientConfig.property(ClientProperties.READ_TIMEOUT, 10000);
         logj.setLevel(java.util.logging.Level.FINEST);
         logj.addHandler(new Handler() {
 

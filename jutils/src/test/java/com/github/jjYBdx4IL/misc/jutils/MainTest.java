@@ -64,11 +64,19 @@ public class MainTest {
         ProcRunner pr = new ProcRunner(true, _args);
         pr.setWorkDir(workDir);
         exitCode = pr.run();
-        output = pr.getOutputLines();
+        output = new ArrayList<>();
+        pr.getOutputLines().forEach( line -> filter(line) );
         assertNotNull(output);
         outputBlob = String.join(System.lineSeparator(), output);
         assertNotNull(outputBlob);
         assertFalse(">>" + outputBlob + "<<" + System.lineSeparator(), outputContains("Exception"));
+    }
+    
+    private static void filter(String line) {
+        if (line.startsWith("Picked up _JAVA_OPTIONS:")) {
+            return;
+        }
+        output.add(line);
     }
 
     private static int countMatchesML(String regex) {

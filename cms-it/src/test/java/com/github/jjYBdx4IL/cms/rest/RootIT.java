@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2017 jjYBdx4IL (https://github.com/jjYBdx4IL)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.jjYBdx4IL.cms.rest;
 
 import static org.junit.Assert.assertEquals;
@@ -10,8 +25,11 @@ import com.github.jjYBdx4IL.cms.jaxb.dto.ExportDump;
 import com.github.jjYBdx4IL.utils.jersey.JerseyClientUtils;
 import com.github.jjYBdx4IL.utils.text.PasswordGenerator;
 import com.github.jjYBdx4IL.wsverifier.WebsiteVerifier;
-import org.junit.Ignore;
+import org.junit.After;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 
@@ -27,12 +45,21 @@ import javax.xml.bind.Unmarshaller;
 
 public class RootIT {
 
-    private static final String rootUrl = "http://localhost:" + System.getProperty("jetty.http.port", "8080") + "/";
+    private static final Logger LOG = LoggerFactory.getLogger(RootIT.class);
+    
+    private static final String rootUrl = "http://localhost:" + System.getProperty("http.port", "8080") + "/";
 
-    private Client client = null;
+    private static Client client = null;
 
+    @BeforeClass
+    public static void beforeClass() {
+        Response response = (Response) getTarget("devel/prepareDb4It").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+    }
+    
     @Test
     public void testRssFeed() throws Exception {
+        LOG.info("testRssFeed()");
         Response response = (Response) getTarget("devel/login").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
 
@@ -61,6 +88,7 @@ public class RootIT {
 
     @Test
     public void createSomeArticles() throws Exception {
+        LOG.info("createSomeArticles()");
         Response response = (Response) getTarget("devel/login").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
 
@@ -87,6 +115,7 @@ public class RootIT {
 
     @Test
     public void createSpam() throws Exception {
+        LOG.info("createSpam()");
         Response response = (Response) getTarget("devel/login").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
 
@@ -108,6 +137,7 @@ public class RootIT {
 
     @Test
     public void testWorkflow() throws Exception {
+        LOG.info("testWorkflow()");
         // GET empty main page
         Response response = (Response) getTarget("").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
@@ -230,17 +260,26 @@ public class RootIT {
 
     @Test
     public void verifyLinks() {
+        LOG.info("verifyLinks()");
         WebsiteVerifier verifier = new WebsiteVerifier();
-        if (!verifier.verify(rootUrl)) {
+        if (!verifier.verify(rootUrl, "^googleLogin$")) {
             fail(verifier.resultToString());
         }
     }
+    
+   @After
+   public void after() {
+       if (client != null) {
+           client.close();
+           client = null;
+       }
+   }
 
-    protected WebTarget getTarget(String path) {
+    protected static WebTarget getTarget(String path) {
         return getClient().target(rootUrl + path);
     }
 
-    protected Client getClient() {
+    protected static Client getClient() {
         if (client != null) {
             return client;
         }

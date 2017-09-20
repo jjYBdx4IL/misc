@@ -15,8 +15,11 @@
  */
 package com.github.jjYBdx4IL.cms.rest;
 
+import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
+import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
+import com.github.jjYBdx4IL.cms.jpa.dto.ConfigValue;
 import com.github.jjYBdx4IL.cms.jpa.dto.User;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 import org.slf4j.Logger;
@@ -54,13 +57,15 @@ public class Devel {
     SessionData session;
     @Inject
     QueryFactory qf;
+    @Inject
+    private AppCache appCache;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Transactional
     @Path("login")
     public Response login() {
-        LOG.trace("login()");
+        LOG.warn("login()");
 
         User user = qf.getUserByUid(TEST_UID);
 
@@ -85,7 +90,7 @@ public class Devel {
     @Transactional
     @Path("clean")
     public Response clean() {
-        LOG.trace("clean()");
+        LOG.warn("clean()");
 
         for (Article article : qf.getArticleDisplayList(null, TEST_UID).getResultList()) {
             if (TEST_UID.equals(article.getOwner().getUid())) {
@@ -97,4 +102,21 @@ public class Devel {
         return Response.ok().build();
     }
 
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Transactional
+    @Path("prepareDb4It")
+    public Response prepareDb4It() {
+        LOG.warn("prepareDb4It()");
+
+        if (appCache.get(ConfigKey.GOOGLE_OAUTH2_CLIENT_ID).isEmpty()) {
+            ConfigValue v = new ConfigValue(ConfigKey.GOOGLE_OAUTH2_CLIENT_ID, "dummy");
+            em.persist(v);
+            v = new ConfigValue(ConfigKey.GOOGLE_OAUTH2_CLIENT_SECRET, "dummy");
+            em.persist(v);
+            appCache.load();
+        }
+
+        return Response.ok().build();
+    }
 }

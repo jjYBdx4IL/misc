@@ -15,14 +15,23 @@
  */
 package com.github.jjYBdx4IL.utils.awt;
 
+import static org.junit.Assume.assumeFalse;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
 
 import javax.swing.JInternalFrame;
 
 public class MdiAutoScaleFrameTest {
 
+    @Before
+    public void before() {
+        assumeFalse(GraphicsEnvironment.isHeadless());
+    }
+    
     @Test
     public void test() {
         MdiAutoScaleFrame frame = new MdiAutoScaleFrame(MdiAutoScaleFrame.class.getSimpleName() + " Test");

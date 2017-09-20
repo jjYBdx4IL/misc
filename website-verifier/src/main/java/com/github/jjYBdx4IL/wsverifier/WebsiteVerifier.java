@@ -23,7 +23,6 @@ import com.brucezee.jspider.SpiderConfig;
 import com.brucezee.jspider.SpiderListener;
 import com.brucezee.jspider.common.enums.ResponseType;
 import com.brucezee.jspider.processor.PageProcessor;
-
 import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +33,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+//CHECKSTYLE:OFF
 public class WebsiteVerifier {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebsiteVerifier.class);
@@ -41,6 +41,8 @@ public class WebsiteVerifier {
     // url -> set of referral pages containing the link
     protected final Map<String, Set<String>> sourceUrls = new HashMap<>();
     protected final Set<String> badUrls = new HashSet<>();
+    protected String[] exclusions = null;
+    private String rootUrl = null;
 
     /**
      * verify method. runs the crawling process.
@@ -48,10 +50,15 @@ public class WebsiteVerifier {
      * @param rootUrl
      *            start url, crawling will not follow links that do not start
      *            with this string
+     * @param exclusions
+     *            regexes matched against the URL after removing the rootUrl
+     *            prefix from it
      * @return true iff no problems were found
      */
-    public boolean verify(final String rootUrl) {
+    public boolean verify(final String rootUrl, String... exclusions) {
         clear();
+        this.rootUrl = rootUrl;
+        this.exclusions = exclusions;
 
         // page processor
         PageProcessor pageProcessor = new PageProcessor() {
@@ -70,7 +77,7 @@ public class WebsiteVerifier {
                 // find new urls
                 for (Element element : page.document().select("a")) {
                     String url = element.absUrl("href");
-                    if (!url.startsWith(rootUrl)) {
+                    if (!isFollow(url)) {
                         continue;
                     }
                     LOG.info("url found: " + url);
@@ -79,7 +86,7 @@ public class WebsiteVerifier {
                 }
                 for (Element element : page.document().select("img")) {
                     String url = element.absUrl("src");
-                    if (!url.startsWith(rootUrl)) {
+                    if (!isFollow(url)) {
                         continue;
                     }
                     LOG.info("img url found: " + url);
@@ -88,7 +95,7 @@ public class WebsiteVerifier {
                 }
                 for (Element element : page.document().select("link")) {
                     String url = element.absUrl("href");
-                    if (!url.startsWith(rootUrl)) {
+                    if (!isFollow(url)) {
                         continue;
                     }
                     LOG.info("img url found: " + url);
@@ -97,7 +104,7 @@ public class WebsiteVerifier {
                 }
                 for (Element element : page.document().select("script")) {
                     String url = element.absUrl("src");
-                    if (!url.startsWith(rootUrl)) {
+                    if (!isFollow(url)) {
                         continue;
                     }
                     LOG.info("img url found: " + url);
@@ -114,13 +121,14 @@ public class WebsiteVerifier {
         SpiderConfig config = new SpiderConfig(this.toString(), 1);
         config.setExitWhenComplete(true);
         config.setDestroyWhenExit(true);
+        config.setEmptySleepMillis(1000L);
 
         Spider spider = Spider.create();
         spider.setPageProcessor(pageProcessor)
             .addStartRequests(rootUrl).setSpiderConfig(config);
 
         registerLink(rootUrl, "start");
-        
+
         spider.addSpiderListeners(new SpiderListener() {
 
             @Override
@@ -137,6 +145,19 @@ public class WebsiteVerifier {
         spider.run();
 
         return isOk();
+    }
+    
+    protected boolean isFollow(String url) {
+        if (!url.startsWith(rootUrl)) {
+            return false;
+        }        
+        url = url.substring(rootUrl.length());
+        for (String m : exclusions) {
+            if (url.matches(m)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     protected void clear() {

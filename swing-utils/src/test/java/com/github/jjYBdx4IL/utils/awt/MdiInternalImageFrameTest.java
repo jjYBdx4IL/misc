@@ -15,11 +15,15 @@
  */
 package com.github.jjYBdx4IL.utils.awt;
 
+import static org.junit.Assume.assumeFalse;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +33,11 @@ import javax.swing.JInternalFrame;
 
 public class MdiInternalImageFrameTest {
 
+    @Before
+    public void before() {
+        assumeFalse(GraphicsEnvironment.isHeadless());
+    }
+    
     @Test
     public void test() {
         MdiAutoScaleFrame frame = new MdiAutoScaleFrame(MdiAutoScaleFrame.class.getSimpleName() + " Test");

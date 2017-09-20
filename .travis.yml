@@ -5,4 +5,6 @@ jdk:
   - oraclejdk8
 before_install:
   - mvn install -f release-parent
+install: true
+script: mvn -B clean install
 

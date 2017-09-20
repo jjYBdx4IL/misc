@@ -9,24 +9,10 @@ if [[ -n $DEBUG ]]; then
     set -x
 fi
 
-export JAVA_HOME=/opt/jdk8/jre
-export PATH=$JAVA_HOME/bin:$PATH
-
 scriptDir="$(readlink -f "$(dirname "$0")")"
-startJar="lib/cms-embedded-server-${project.version}.jar"
 # this is used to verify that a process is really OUR process before
 # terminating it:
-PROCIDTAG="${project.groupId}:${project.artifactId}"
-
-cmd=$1
-shift
-
-LOGFILE=$scriptDir/data/log/wrapper.log
-
-cd $scriptDir
-
-install -d data/log
-install -d data/db
+PROCIDTAG=$1
 
 export LC_ALL=C
 export LANG=C
@@ -75,38 +61,14 @@ function shutdown() {
     ! check_started
 }
 
-if [[ $cmd == "start" ]]; then
-    if check_started; then
-        echo "already running" >&2
-        exit 0
-    fi
-
-    authbind=""
-    if which authbind >&/dev/null; then
-        authbind="authbind --deep"
-    fi
-
-    export PROCIDTAG
-    (
-        while true; do
-            $authbind java -Dh2.bindAddress=localhost -jar $startJar || :
-            sleep 10
-        done
-    ) >& $LOGFILE &
-    echo "started" >&2
-elif [[ $cmd == "stop" ]]; then
-    if ! check_started; then
-        echo "not running" >&2
-        exit 0
-    fi
-    if ! shutdown; then
-        echo "shutdown failed" >&2
-        exit 1
-    fi
-    echo "shutdown ok" >&2
-else
-    echo "unknown command: $cmd" >&2
+if ! check_started; then
+    echo "not running" >&2
+    exit 0
+fi
+if ! shutdown; then
+    echo "shutdown failed" >&2
     exit 1
 fi
+echo "shutdown ok" >&2
 
 exit 0

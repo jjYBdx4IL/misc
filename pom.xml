@@ -65,11 +65,7 @@
         <module>cli-utils</module>
         <module>config-utils</module>
         <module>cms-webapp</module>
-        <module>cms-dist</module>
-        <module>cms-embedded-server</module>
         <module>cms-it</module>
-        <module>cms-jpa</module>
-        <module>cms-parent</module>
         <module>db-utils</module>
         <module>diskcache</module>
         <module>env-utils</module>

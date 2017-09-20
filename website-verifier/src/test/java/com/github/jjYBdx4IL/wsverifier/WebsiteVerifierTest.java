@@ -82,6 +82,24 @@ public class WebsiteVerifierTest extends AbstractHandler {
     }
     
     @Test
+    public void testExclusions() throws Exception {
+        WebsiteVerifier verifier = new WebsiteVerifier();
+        assertFalse(verifier.verify(serverUrl, "^invalid$"));
+        assertFalse(verifier.isOk());
+
+        LOG.info(verifier.resultToString());
+
+        Set<String> badUrls = verifier.getBadUrls();
+        assertEquals(1, badUrls.size());
+        LOG.info("" + badUrls);
+        assertTrue(badUrls.contains(serverUrl + "a.png"));
+        assertFalse(badUrls.contains(serverUrl + "invalid"));
+        Set<String> referralUrls = verifier.getPagesContainingUrl(serverUrl + "a.png");
+        assertEquals(1, referralUrls.size());
+        assertTrue(referralUrls.contains(serverUrl));
+    }
+    
+    @Test
     public void testBadInitialUrl() {
         WebsiteVerifier verifier = new WebsiteVerifier();
         assertFalse(verifier.verify(serverUrl + "//lakjsdasf8usadfn/a/s/df"));
