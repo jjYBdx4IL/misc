@@ -1,0 +1,58 @@
+[INFO] 
+[INFO] --- maven-enforcer-plugin:1.4.1:enforce (enforce) @ gwt-example-devel-it ---
+[WARNING] Rule 3: org.apache.maven.plugins.enforcer.RequireUpperBoundDeps failed with message:
+Failed while enforcing RequireUpperBoundDeps. The error(s) are [
+Require upper bound dependencies error for org.seleniumhq.selenium:selenium-api:3.5.2 paths to dependency are:
++-com.github.jjYBdx4IL.maven.examples:gwt-example-devel-it:1.0-SNAPSHOT
+  +-com.github.jjYBdx4IL.utils:selenium-test-utils:1.0
+    +-org.seleniumhq.selenium:htmlunit-driver:2.26
+      +-org.seleniumhq.selenium:selenium-api:3.5.2
+and
++-com.github.jjYBdx4IL.maven.examples:gwt-example-devel-it:1.0-SNAPSHOT
+  +-com.github.jjYBdx4IL.utils:selenium-test-utils:1.0
+    +-org.seleniumhq.selenium:selenium-chrome-driver:3.5.2
+      +-org.seleniumhq.selenium:selenium-api:3.5.2 (managed) <-- org.seleniumhq.selenium:selenium-api:3.5.3
+and
++-com.github.jjYBdx4IL.maven.examples:gwt-example-devel-it:1.0-SNAPSHOT
+  +-com.github.jjYBdx4IL.utils:selenium-test-utils:1.0
+    +-org.seleniumhq.selenium:selenium-firefox-driver:3.5.2
+      +-org.seleniumhq.selenium:selenium-api:3.5.2 (managed) <-- org.seleniumhq.selenium:selenium-api:3.5.3
+and
++-com.github.jjYBdx4IL.maven.examples:gwt-example-devel-it:1.0-SNAPSHOT
+  +-com.github.jjYBdx4IL.utils:selenium-test-utils:1.0
+    +-org.seleniumhq.selenium:selenium-remote-driver:3.5.2
+      +-org.seleniumhq.selenium:selenium-api:3.5.2 (managed) <-- org.seleniumhq.selenium:selenium-api:3.5.3
+and
++-com.github.jjYBdx4IL.maven.examples:gwt-example-devel-it:1.0-SNAPSHOT
+  +-com.github.jjYBdx4IL.utils:selenium-test-utils:1.0
+    +-org.seleniumhq.selenium:htmlunit-driver:2.26
+      +-org.seleniumhq.selenium:selenium-support:3.5.3
+        +-org.seleniumhq.selenium:selenium-api:3.5.2 (managed) <-- org.seleniumhq.selenium:selenium-api:3.5.3
+, 
+Require upper bound dependencies error for org.seleniumhq.selenium:selenium-remote-driver:3.5.2 paths to dependency are:
++-com.github.jjYBdx4IL.maven.examples:gwt-example-devel-it:1.0-SNAPSHOT
+  +-com.github.jjYBdx4IL.utils:selenium-test-utils:1.0
+    +-org.seleniumhq.selenium:selenium-remote-driver:3.5.2
+and
++-com.github.jjYBdx4IL.maven.examples:gwt-example-devel-it:1.0-SNAPSHOT
+  +-com.github.jjYBdx4IL.utils:selenium-test-utils:1.0
+    +-org.seleniumhq.selenium:selenium-chrome-driver:3.5.2
+      +-org.seleniumhq.selenium:selenium-remote-driver:3.5.2 (managed) <-- org.seleniumhq.selenium:selenium-remote-driver:3.5.3
+and
++-com.github.jjYBdx4IL.maven.examples:gwt-example-devel-it:1.0-SNAPSHOT
+  +-com.github.jjYBdx4IL.utils:selenium-test-utils:1.0
+    +-org.seleniumhq.selenium:selenium-firefox-driver:3.5.2
+      +-org.seleniumhq.selenium:selenium-remote-driver:3.5.2 (managed) <-- org.seleniumhq.selenium:selenium-remote-driver:3.5.3
+and
++-com.github.jjYBdx4IL.maven.examples:gwt-example-devel-it:1.0-SNAPSHOT
+  +-com.github.jjYBdx4IL.utils:selenium-test-utils:1.0
+    +-org.seleniumhq.selenium:htmlunit-driver:2.26
+      +-org.seleniumhq.selenium:selenium-support:3.5.3
+        +-org.seleniumhq.selenium:selenium-remote-driver:3.5.2 (managed) <-- org.seleniumhq.selenium:selenium-remote-driver:3.5.3
+]
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Maven Project Setup Examples ....................... SUCCESS [  0.208 s]
+[INFO] Maven Examples :: Antrun Conditional ............... SUCCESS [  1.367 s]
+[INFO] Maven E

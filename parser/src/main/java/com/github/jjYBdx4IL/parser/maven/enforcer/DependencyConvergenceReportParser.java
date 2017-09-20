@@ -36,6 +36,9 @@ public class DependencyConvergenceReportParser {
 
     private static final Pattern dependencyPattern = Pattern.compile("^\\s*\\+-([^:]+):([^:]+):([^:]+)$",
         Pattern.CASE_INSENSITIVE);
+    private static final Pattern upperBoundPattern = Pattern.compile(
+        "^\\s*\\+-[^:]+:[^:]+:[^:]+\\s+\\(\\S+\\)\\s+<--\\s+([^:]+):([^:]+):([^:]+)$",
+        Pattern.CASE_INSENSITIVE);
 
     /**
      * The parse method.
@@ -57,7 +60,14 @@ public class DependencyConvergenceReportParser {
             Matcher matcher = dependencyPattern.matcher(line);
             if (matcher.matches()) {
                 lastMatchedDependency = new MavenDependency(matcher.group(1), matcher.group(2), matcher.group(3));
-            } else if (lastMatchedDependency != null) {
+                continue;
+            }
+            matcher = upperBoundPattern.matcher(line);
+            if (matcher.matches()) {
+                lastMatchedDependency = new MavenDependency(matcher.group(1), matcher.group(2), matcher.group(3));
+                continue;
+            }
+            if (lastMatchedDependency != null) {
                 deps.add(lastMatchedDependency);
                 lastMatchedDependency = null;
             }
@@ -104,10 +114,10 @@ public class DependencyConvergenceReportParser {
      */
     public static String toMavenPomXmlFragment(Collection<MavenDependency> deps)
         throws XMLStreamException, UnsupportedEncodingException {
-        
+
         List<MavenDependency> list = new ArrayList<>(deps);
         Collections.sort(list);
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
         XMLStreamWriter xml = outputFactory.createXMLStreamWriter(baos, "UTF-8");
@@ -132,7 +142,7 @@ public class DependencyConvergenceReportParser {
         }
 
         xml.flush();
-        
+
         return baos.toString("UTF-8");
     }
 }

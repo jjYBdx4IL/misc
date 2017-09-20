@@ -72,6 +72,22 @@ public class DependencyConvergenceReportParserTest {
     }
 
     @Test
+    public void testSelectNewestOnly2() throws IOException {
+        String dependencyConvergenceErrorOutput = IOUtils
+            .toString(getClass().getResourceAsStream("DependencyConvergenceReport2.txt"), "UTF-8");
+
+        Collection<MavenDependency> deps = DependencyConvergenceReportParser.parse(dependencyConvergenceErrorOutput);
+        Collection<MavenDependency> newest = DependencyConvergenceReportParser.selectNewestOnly(deps);
+
+        assertEquals(2, newest.size());
+
+        assertTrue(newest
+            .contains(new MavenDependency("org.seleniumhq.selenium", "selenium-api", "3.5.3")));
+        assertFalse(newest
+            .contains(new MavenDependency("org.seleniumhq.selenium", "selenium-api", "3.5.2")));
+    }
+
+    @Test
     public void testToMavenPomXmlFragment() throws Exception {
         String dependencyConvergenceErrorOutput = IOUtils
             .toString(getClass().getResourceAsStream("DependencyConvergenceReport.txt"), "UTF-8");

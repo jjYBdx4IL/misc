@@ -130,4 +130,17 @@ public class MavenDependency implements Comparable<MavenDependency> {
         return 0;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("MavenDependency [groupId=");
+        builder.append(groupId);
+        builder.append(", artifactId=");
+        builder.append(artifactId);
+        builder.append(", version=");
+        builder.append(version);
+        builder.append("]");
+        return builder.toString();
+    }
+
 }
