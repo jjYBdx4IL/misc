@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,12 +31,18 @@ import java.util.regex.Pattern;
 import freemarker.template.TemplateException;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.channel.direct.Session;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jjYBdx4IL
  */
 public class VMData {
 
+    private static final Logger LOG = LoggerFactory.getLogger(VMData.class);
+    
     public static final int SSH_MIN_PORT = 5000;
     public static final int SSH_MAX_PORT = 64000;
     public static final String VM_NAME_REGEX = "^[a-z][a-z0-9-]*$";
@@ -60,6 +67,12 @@ public class VMData {
         String basedir = System.getProperty("basedir");
         if (basedir != null && !basedir.isEmpty()) {
             workDir = new File(basedir, "target" + File.separator + getClass().getPackage().getName());
+        } else {
+            try {
+                workDir = Files.createTempDirectory("tmpvmdata").toFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -272,6 +285,18 @@ public class VMData {
         return sshResources.session;
     }
 
+    void releaseResources() {
+        releaseSSHResources();
+        try {
+            FileUtils.deleteDirectory(workDir);
+        } catch (IOException e) {
+            if (SystemUtils.IS_OS_LINUX) {
+                LOG.warn("failed to delete " + workDir);
+            }
+            workDir.deleteOnExit();
+        }
+    }
+    
     void releaseSSHResources() {
         if (sshResources != null) {
             sshResources.close();

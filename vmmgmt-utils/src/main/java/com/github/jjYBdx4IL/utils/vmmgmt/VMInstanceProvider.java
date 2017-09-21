@@ -69,7 +69,7 @@ public class VMInstanceProvider implements AutoCloseable {
     @Override
     public void close() throws VMMgmtException {
         for (VMData vm : vms) {
-            vm.releaseSSHResources();
+            vm.releaseResources();
         }
         try {
             conn.close();
