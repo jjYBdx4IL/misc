@@ -143,6 +143,14 @@ public class Search {
             articles = new ArrayList<>();
         }
 
-        return articles;
+        List<Article> articlesPublished = new ArrayList<>();
+        articles.forEach(article -> {
+            if (article.isPublished()) {
+                articlesPublished.add(article);
+            }
+        });
+
+        return articlesPublished;
     }
+
 }

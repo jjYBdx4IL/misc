@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Basic;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
@@ -36,6 +37,9 @@ public class ArticleDTO implements Serializable {
     private String processed;
     private Date createdAt;
     private Date lastModified;
+    private Date firstPublishedAt;
+    private boolean published;
+    
     private List<String> tag = new ArrayList<>();
     
     public String getTitle() {
@@ -94,6 +98,22 @@ public class ArticleDTO implements Serializable {
         this.processed = processed;
     }
     
+    public Date getFirstPublishedAt() {
+        return firstPublishedAt;
+    }
+
+    public void setFirstPublishedAt(Date firstPublishedAt) {
+        this.firstPublishedAt = firstPublishedAt;
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
+    }
+
     /**
      * Create instance from the corresponding jpa instance.
      * 
@@ -107,6 +127,8 @@ public class ArticleDTO implements Serializable {
         dto.setContent(article.getContent());
         dto.setProcessed(article.getProcessed());
         dto.setCreatedAt(article.getCreatedAt());
+        dto.setPublished(article.isPublished());
+        dto.setFirstPublishedAt(article.getFirstPublishedAt());
         dto.setLastModified(article.getLastModified());
         article.getTags().forEach(tag -> dto.getTags().add(tag.getName()));
         return dto;

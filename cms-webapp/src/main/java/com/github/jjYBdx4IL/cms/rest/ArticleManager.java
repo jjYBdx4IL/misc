@@ -20,6 +20,8 @@ import static j2html.TagCreator.div;
 import static j2html.TagCreator.each;
 import static j2html.TagCreator.form;
 import static j2html.TagCreator.input;
+import static j2html.TagCreator.label;
+import static j2html.TagCreator.text;
 import static j2html.TagCreator.textarea;
 
 import com.github.jjYBdx4IL.cms.jaxb.dto.ArticleDTO;
@@ -33,6 +35,7 @@ import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
 import com.github.jjYBdx4IL.cms.rest.app.Role;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 import j2html.tags.ContainerTag;
+import j2html.tags.Text;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 import org.owasp.html.Sanitizers;
@@ -97,16 +100,22 @@ public class ArticleManager {
     public Response get() {
         LOG.trace("get()");
 
-        List<Article> articles = qf.getArticleDisplayList(null, session.getUid()).getResultList();
+        List<Article> articles = qf.getArticleDisplayList(null, session.getUid(), false).getResultList();
 
         UriBuilder urlTpl = uriInfo.getAbsolutePathBuilder().path(ArticleManager.class, "edit");
 
         ContainerTag articleListRow = div(
             each(articles,
-                article -> a(
-                    div(article.getTitle()).withClass("articleTitle")
-                ).withHref(urlTpl.build(article.getId()).toString())
-                    .withClass("col-12 article")
+                article -> div().withClass("col-12 article " + (article.isPublished() ? "published" : "notpublished"))
+                    .with(
+                        a(
+                            div(article.getTitle()).withClass("articleTitle")
+                        ).withHref(urlTpl.build(article.getId()).toString()))
+                    .with(new Text(
+                        article.isPublished()
+                            ? String.format(" (published: %s)", HtmlBuilder.fmtDate(article.getFirstPublishedAt()))
+                            : " (not published)"))
+
             )
         ).withClass("row");
 
@@ -146,8 +155,11 @@ public class ArticleManager {
         @FormParam("pathId") String pathId,
         @FormParam("content") String content,
         @FormParam("processed") String processed,
-        @FormParam("tags") String tagsValue) {
+        @FormParam("tags") String tagsValue,
+        @FormParam("published") String _published) {
         LOG.trace("createSave()");
+
+        boolean published = "on".equalsIgnoreCase(_published);
 
         if (title == null || title.isEmpty() || !title.equals(sanitizeHtml(title))) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("title required").build();
@@ -167,15 +179,20 @@ public class ArticleManager {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("bad tag name").build();
         }
 
+        content = content.replace("\r\n", "\n");
+        
+        Date now = new Date();
         Article article = new Article();
         article.setTitle(title);
         article.setPathId(pathId);
         article.setContent(content);
         article.setProcessed(sanitizeHtml(processed));
         article.setOwner(qf.getUserByUid(session.getUid()));
-        article.setCreatedAt(new Date());
-        article.setLastModified(article.getCreatedAt());
+        article.setCreatedAt(now);
+        article.setLastModified(now);
         article.setTags(tags);
+        article.setPublished(published);
+        article.setFirstPublishedAt(published ? now : null);
         em.persist(article);
 
         return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path(ArticleManager.class).build())
@@ -224,8 +241,11 @@ public class ArticleManager {
         @FormParam("pathId") String pathId,
         @FormParam("content") String content,
         @FormParam("processed") String processed,
-        @FormParam("tags") String tagsValue) {
+        @FormParam("tags") String tagsValue,
+        @FormParam("published") String _published) {
         LOG.trace("editSave()");
+
+        boolean published = "on".equalsIgnoreCase(_published);
 
         if (title == null || title.isEmpty()) {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("title required").build();
@@ -251,13 +271,23 @@ public class ArticleManager {
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("access denied").build();
         }
 
+        content = content.replace("\r\n", "\n");
+        
+        Date now = new Date();
         article.setTitle(title);
         // article.setPathId(pathId); // the pathId should be constant and never
         // modified
+        String oldContent = article.getContent().replace("\r\n", "\n");
         article.setContent(content);
         article.setProcessed(sanitizeHtml(processed));
-        article.setLastModified(new Date());
+        if (!content.equals(oldContent)) {
+            article.setLastModified(now);
+        }
         article.setTags(tags);
+        article.setPublished(published);
+        if (published && article.getFirstPublishedAt() == null) {
+            article.setFirstPublishedAt(now);
+        }
         em.persist(article);
 
         return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path(ArticleManager.class).build())
@@ -289,7 +319,7 @@ public class ArticleManager {
     public Response exportDump() throws JAXBException {
         LOG.trace("export()");
 
-        List<Article> articles = qf.getArticleDisplayList(null, session.getUid()).getResultList();
+        List<Article> articles = qf.getArticleDisplayList(null, session.getUid(), false).getResultList();
         List<ConfigValue> configValues = qf.getAllConfigValues().getResultList();
 
         return Response.ok().header("Content-Disposition",
@@ -322,6 +352,8 @@ public class ArticleManager {
             article.setCreatedAt(dto.getCreatedAt());
             article.setLastModified(dto.getLastModified());
             article.setOwner(user);
+            article.setPublished(dto.isPublished());
+            article.setFirstPublishedAt(dto.getFirstPublishedAt());
             List<Tag> tags = new ArrayList<>();
             for (String tagName : dto.getTags()) {
                 String tagId = tagName.toLowerCase();
@@ -354,6 +386,9 @@ public class ArticleManager {
                 input().withName("processed").withType("hidden"),
                 input().withName("tags").withId("tags").withPlaceholder("Tags")
                     .withValue(createTagsString(article)).withClass("col-12"),
+                label(input().withName("published").withType("checkbox")
+                    .condAttr(article == null || article.isPublished(), "checked", "checked"),
+                    text("published")).withClass("col-12"),
                 input().withType("submit").withName("submitButton").withValue("save").withClass("col-12")
                 ).withClass("editForm")
             ).withClass("row");

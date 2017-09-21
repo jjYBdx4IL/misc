@@ -461,6 +461,19 @@ public class HtmlBuilder {
     }
 
     private ContainerTag createDateInfo(Article article) {
+        if (article.getFirstPublishedAt() != null) {
+            String publishedAt = fmtDate(article.getFirstPublishedAt());
+            String lastModified = fmtDate(article.getLastModified());
+            StringBuilder sb = new StringBuilder();
+            sb.append("Published: ");
+            sb.append(publishedAt);
+            if (article.getLastModified().getTime() > article.getFirstPublishedAt().getTime()
+                && !publishedAt.equals(lastModified)) {
+                sb.append(" / Updated: ");
+                sb.append(lastModified);
+            }
+            return span(sb.toString());
+        }
         String createdAt = fmtDate(article.getCreatedAt());
         String lastModified = fmtDate(article.getLastModified());
         StringBuilder sb = new StringBuilder();
@@ -473,7 +486,7 @@ public class HtmlBuilder {
         return span(sb.toString());
     }
 
-    private String fmtDate(Date date) {
+    public static String fmtDate(Date date) {
         LocalDateTime ldt = LocalDateTime.ofEpochSecond(date.getTime() / 1000L, 0, ZoneOffset.UTC);
         return ldt.format(DateTimeFormatter.ISO_DATE);
     }

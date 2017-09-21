@@ -71,7 +71,7 @@ public class Home {
         htmlBuilder.setJsValue("articleDisplayContinuationEndpoint",
             uriInfo.getBaseUriBuilder().path(Home.class).path(Home.class, "cont").toTemplate());
 
-        List<Article> articles = qf.getArticleDisplayList(null, null)
+        List<Article> articles = qf.getArticleDisplayList(null, null, true)
             .setMaxResults(MAX_ARTICLES_PER_REQUEST).getResultList();
 
         htmlBuilder.mainAdd(
@@ -88,7 +88,7 @@ public class Home {
     public Response cont(@PathParam("skip") int skip) {
         LOG.trace("cont()");
 
-        List<Article> articles = qf.getArticleDisplayList(null, null)
+        List<Article> articles = qf.getArticleDisplayList(null, null, true)
             .setMaxResults(MAX_ARTICLES_PER_REQUEST).setFirstResult(skip).getResultList();
 
         return Response.ok(htmlBuilder.createArticleListRowInner(articles, false, false).toString()).build();
@@ -117,7 +117,7 @@ public class Home {
             htmlBuilder.enableNoIndex();
         }
 
-        List<Article> articles = qf.getArticleDisplayList(selectedTag, null)
+        List<Article> articles = qf.getArticleDisplayList(selectedTag, null, true)
             .setMaxResults(MAX_ARTICLES_PER_REQUEST).getResultList();
 
         htmlBuilder.mainAdd(
@@ -134,7 +134,7 @@ public class Home {
     public Response byTagCont(@PathParam("tag") String selectedTag, @PathParam("skip") int skip) {
         LOG.trace("byTagCont()");
 
-        List<Article> articles = qf.getArticleDisplayList(selectedTag, null)
+        List<Article> articles = qf.getArticleDisplayList(selectedTag, null, true)
             .setMaxResults(MAX_ARTICLES_PER_REQUEST).setFirstResult(skip).getResultList();
 
         return Response.ok(htmlBuilder.createArticleListRowInner(articles, false, false).toString()).build();

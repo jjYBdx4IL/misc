@@ -32,6 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.client.Client;
@@ -41,12 +43,13 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 public class RootIT {
 
     private static final Logger LOG = LoggerFactory.getLogger(RootIT.class);
-    
+
     private static final String rootUrl = "http://localhost:" + System.getProperty("http.port", "8080") + "/";
 
     private static Client client = null;
@@ -56,7 +59,7 @@ public class RootIT {
         Response response = (Response) getTarget("devel/prepareDb4It").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
     }
-    
+
     @Test
     public void testRssFeed() throws Exception {
         LOG.info("testRssFeed()");
@@ -69,7 +72,7 @@ public class RootIT {
         final String pathId = "p" + PasswordGenerator.generate55(11);
 
         Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
-            pathId).param("processed", "processed bla");
+            pathId).param("processed", "processed bla").param("published", "on");
         ;
 
         response = (Response) getTarget("articleManager/create").request()
@@ -98,7 +101,7 @@ public class RootIT {
         final String pathId = "p" + PasswordGenerator.generate55(11);
 
         Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
-            pathId).param("processed", "processed bla");
+            pathId).param("processed", "processed bla").param("published", "on");
 
         // rejected because title has stuff in it that needs sanitizing
         response = (Response) getTarget("articleManager/create").request()
@@ -126,7 +129,7 @@ public class RootIT {
             final String pathId = "p" + PasswordGenerator.generate55(11);
 
             Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
-                pathId).param("processed", "processed bla");
+                pathId).param("processed", "processed bla").param("published", "on");
 
             response = (Response) getTarget("articleManager/create").request()
                 .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
@@ -165,14 +168,14 @@ public class RootIT {
         final String pathIdB = "c" + contentB.substring(1);
 
         Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
-            title).param("processed", content);
+            title).param("processed", content).param("published", "on");
 
         response = (Response) getTarget("articleManager/create").request()
             .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
         assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
 
         form = new Form().param("title", titleB).param("content", contentB).param("tags", tagB).param("pathId",
-            pathIdB).param("processed", contentB);
+            pathIdB).param("processed", contentB).param("published", "on");
 
         response = (Response) getTarget("articleManager/create").request()
             .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
@@ -207,6 +210,139 @@ public class RootIT {
         response = (Response) getTarget("byTag/notexisting12345asd").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
         assertFalse(response.readEntity(String.class).contains(title));
+    }
+
+    @Test
+    public void testPublishedFlag() throws JAXBException {
+        // clean up
+        Response response = (Response) getTarget("devel/clean").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+
+        // login
+        response = (Response) getTarget("devel/login").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+
+        final String title = "t" + PasswordGenerator.generate55(11);
+        final String content = "c" + PasswordGenerator.generate55(11);
+        final String tag = "a" + PasswordGenerator.generate55(11);
+        final String pathId = title + "2";
+
+        Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
+            pathId).param("processed", content);
+
+        response = (Response) getTarget("articleManager/create").request()
+            .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
+        assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
+
+        // saved but not published
+        response = (Response) getTarget("").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        assertFalse(response.readEntity(String.class).contains(title));
+
+        response = (Response) getTarget("byTag/" + tag).request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        assertFalse(response.readEntity(String.class).contains(title));
+
+        response = (Response) getTarget("0000/00/00/" + pathId).request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
+        assertFalse(response.readEntity(String.class).contains(title));
+
+        response = (Response) getTarget("search?q=" + title).request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        String responseContent = response.readEntity(String.class);
+        assertFalse(responseContent, responseContent.contains(content));
+
+        response = (Response) getTarget("feed/rss.xml").request(MediaType.APPLICATION_ATOM_XML).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        responseContent = response.readEntity(String.class);
+        assertFalse(responseContent, responseContent.contains(">" + title + "<"));
+
+        // get article id for editing
+        response = (Response) getTarget("articleManager").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        String html = response.readEntity(String.class);
+        Pattern pat = Pattern.compile("articleManager/edit/\\d+");
+        Matcher m = pat.matcher(html);
+        assertTrue(m.find());
+
+        // publish it
+        form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
+            title + "2").param("processed", content).param("published", "on");
+
+        response = (Response) getTarget(m.group(0)).request()
+            .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
+        assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
+
+        // saved and published
+        response = (Response) getTarget("").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        assertTrue(response.readEntity(String.class).contains(title));
+
+        response = (Response) getTarget("byTag/" + tag).request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        assertTrue(response.readEntity(String.class).contains(title));
+
+        response = (Response) getTarget("0000/00/00/" + pathId).request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        assertTrue(response.readEntity(String.class).contains(title));
+
+        response = (Response) getTarget("search?q=" + title).request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        responseContent = response.readEntity(String.class);
+        assertTrue(responseContent, responseContent.contains(content));
+
+        response = (Response) getTarget("feed/rss.xml").request(MediaType.APPLICATION_ATOM_XML).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        responseContent = response.readEntity(String.class);
+        assertTrue(responseContent, responseContent.contains(">" + title + "<"));
+
+        // unpublish it again
+        form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
+            title + "2").param("processed", content);
+
+        response = (Response) getTarget(m.group(0)).request()
+            .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
+        assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
+
+        // unpublished
+        response = (Response) getTarget("").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        assertFalse(response.readEntity(String.class).contains(title));
+
+        response = (Response) getTarget("byTag/" + tag).request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        assertFalse(response.readEntity(String.class).contains(title));
+
+        response = (Response) getTarget("0000/00/00/" + pathId).request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
+        assertFalse(response.readEntity(String.class).contains(title));
+
+        response = (Response) getTarget("search?q=" + title).request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        responseContent = response.readEntity(String.class);
+        assertFalse(responseContent, responseContent.contains(content));
+
+        response = (Response) getTarget("feed/rss.xml").request(MediaType.APPLICATION_ATOM_XML).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        responseContent = response.readEntity(String.class);
+        assertFalse(responseContent, responseContent.contains(">" + title + "<"));
+    }
+
+    @Test
+    public void testSearch() {
+        Response response = (Response) getTarget("devel/login").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+
+        final String title = "t" + PasswordGenerator.generate55(11);
+        final String content = "c" + PasswordGenerator.generate55(11);
+        final String tag = "a" + PasswordGenerator.generate55(11);
+
+        Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
+            title + "2").param("processed", content).param("published", "on");
+
+        response = (Response) getTarget("articleManager/create").request()
+            .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
+        assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
 
         // check /search?q=...
         response = (Response) getTarget("search?q=" + title).request(MediaType.TEXT_HTML_TYPE).get();
@@ -220,10 +356,19 @@ public class RootIT {
         response = (Response) getTarget("search?q=notexisting389jk4387d").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
         assertFalse(response.readEntity(String.class).contains(title));
+    }
 
-        // check export
-        form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
-            title + "2").param("processed", content);
+    @Test
+    public void testExportImport() throws JAXBException {
+        Response response = (Response) getTarget("devel/login").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+
+        final String title = "t" + PasswordGenerator.generate55(11);
+        final String content = "c" + PasswordGenerator.generate55(11);
+        final String tag = "a" + PasswordGenerator.generate55(11);
+
+        Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
+            title + "2").param("processed", content).param("published", "on");
 
         response = (Response) getTarget("articleManager/create").request()
             .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
@@ -231,11 +376,13 @@ public class RootIT {
 
         response = (Response) getTarget("articleManager/export").request(MediaType.TEXT_XML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
-        responseContent = response.readEntity(String.class);
+        String export = response.readEntity(String.class);
+
+        LOG.info("export: " + export);
 
         JAXBContext jaxbContext = JAXBContext.newInstance(ExportDump.class);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        ExportDump dump = (ExportDump) jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(responseContent.getBytes()));
+        ExportDump dump = (ExportDump) jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(export.getBytes()));
 
         ArticleDTO article = null;
         for (ArticleDTO _article : dump.getArticles()) {
@@ -248,10 +395,26 @@ public class RootIT {
         assertEquals(1, article.getTags().size());
         assertTrue(article.getTags().contains(tag));
 
+        // clean up
+        response = (Response) getTarget("devel/clean").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+
+        // verify it's deleted
+        response = (Response) getTarget("").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        String responseContent = response.readEntity(String.class);
+        assertFalse(responseContent.contains(title));
+
         // check import
         response = (Response) getTarget("articleManager/import").request()
-            .post(Entity.entity(responseContent, MediaType.TEXT_XML));
+            .post(Entity.entity(export, MediaType.TEXT_XML));
         assertEquals(HttpServletResponse.SC_NO_CONTENT, response.getStatus());
+
+        // verify it's restored
+        response = (Response) getTarget("").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        responseContent = response.readEntity(String.class);
+        assertTrue(responseContent.contains(title));
 
         // clean up
         response = (Response) getTarget("devel/clean").request(MediaType.TEXT_HTML_TYPE).get();
@@ -266,14 +429,14 @@ public class RootIT {
             fail(verifier.resultToString());
         }
     }
-    
-   @After
-   public void after() {
-       if (client != null) {
-           client.close();
-           client = null;
-       }
-   }
+
+    @After
+    public void after() {
+        if (client != null) {
+            client.close();
+            client = null;
+        }
+    }
 
     protected static WebTarget getTarget(String path) {
         return getClient().target(rootUrl + path);

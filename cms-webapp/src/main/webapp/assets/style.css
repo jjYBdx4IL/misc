@@ -92,7 +92,7 @@ main a.iconTextLink:active {
 	color: black;
 }
 
-form input {
+form input[type=text] {
 	width: 90%;
 }
 

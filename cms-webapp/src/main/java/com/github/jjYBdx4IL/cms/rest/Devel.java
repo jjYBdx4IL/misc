@@ -92,7 +92,7 @@ public class Devel {
     public Response clean() {
         LOG.warn("clean()");
 
-        for (Article article : qf.getArticleDisplayList(null, TEST_UID).getResultList()) {
+        for (Article article : qf.getArticleDisplayList(null, TEST_UID, false).getResultList()) {
             if (TEST_UID.equals(article.getOwner().getUid())) {
                 LOG.warn("DELETE: " + article);
                 em.remove(article);

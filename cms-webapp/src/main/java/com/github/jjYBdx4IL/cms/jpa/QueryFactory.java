@@ -27,6 +27,7 @@ import com.github.jjYBdx4IL.cms.jpa.dto.Tag_;
 import com.github.jjYBdx4IL.cms.jpa.dto.User;
 import com.github.jjYBdx4IL.cms.jpa.dto.User_;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,7 +99,7 @@ public class QueryFactory {
         final CriteriaBuilder cb = em.getCriteriaBuilder();
         final CriteriaQuery<Article> cq = cb.createQuery(Article.class);
         final Root<Article> root = cq.from(Article.class);
-        cq.where(cb.equal(root.get(Article_.pathId), pathId));
+        cq.where(cb.and(cb.equal(root.get(Article_.pathId), pathId), cb.equal(root.get(Article_.published), true)));
 
         List<Article> articles = em.createQuery(cq).getResultList();
         if (articles.isEmpty()) {
@@ -107,11 +108,13 @@ public class QueryFactory {
         return articles.get(0);
     }
 
-    public TypedQuery<Article> getArticleDisplayList(String tag, String uid) {
+    public TypedQuery<Article> getArticleDisplayList(String tag, String uid, boolean publishedOnly) {
         final CriteriaBuilder cb = em.getCriteriaBuilder();
         final CriteriaQuery<Article> cq = cb.createQuery(Article.class);
         final Root<Article> root = cq.from(Article.class);
 
+        List<Predicate> restrictions = new ArrayList<>();
+        
         if (tag != null) {
             final Subquery<Long> sq = cq.subquery(Long.class);
             final Root<Article> fromArticle = sq.from(Article.class);
@@ -119,12 +122,20 @@ public class QueryFactory {
             sq.select(fromArticle.get(Article_.id))
                 .where(cb.equal(articleTag.get(Tag_.id), tag.toLowerCase()));
 
-            cq.where(cb.in(root.get(Article_.id)).value(sq));
+            restrictions.add(cb.in(root.get(Article_.id)).value(sq));
         }
 
         if (uid != null) {
             final Join<Article, User> userRoot = root.join(Article_.owner, JoinType.LEFT);
-            cq.where(cb.equal(userRoot.get(User_.uid), uid));
+            restrictions.add(cb.equal(userRoot.get(User_.uid), uid));
+        }
+
+        if (publishedOnly) {
+            restrictions.add(cb.equal(root.get(Article_.published), true));
+        }
+        
+        if (!restrictions.isEmpty() ) {
+            cq.where(restrictions.toArray(new Predicate[restrictions.size()]));
         }
 
         cq.orderBy(cb.desc(root.get(Article_.createdAt)));

@@ -85,7 +85,7 @@ public class RssFeed {
     }
     
     private String generateAtomFeed(String tag) {
-        List<Article> articles = qf.getArticleDisplayList(tag, null).setMaxResults(MAX_ENTRIES).getResultList();
+        List<Article> articles = qf.getArticleDisplayList(tag, null, true).setMaxResults(MAX_ENTRIES).getResultList();
 
         SyndFeed feed = new SyndFeedImpl();
         feed.setFeedType("rss_2.0");

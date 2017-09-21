@@ -84,6 +84,12 @@ public class Article implements Serializable {
     @Column(name = "createdAt")
     private Date createdAt;
 
+    @Basic(optional = true)
+    private Date firstPublishedAt;
+    
+    @Basic(optional = false)
+    private boolean published;
+    
     @Basic(optional = false)
     private Date lastModified;
 
@@ -167,6 +173,22 @@ public class Article implements Serializable {
         this.processed = processed;
     }
 
+    public Date getFirstPublishedAt() {
+        return firstPublishedAt;
+    }
+
+    public void setFirstPublishedAt(Date firstPublishedAt) {
+        this.firstPublishedAt = firstPublishedAt;
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -184,6 +206,10 @@ public class Article implements Serializable {
         builder.append(processed);
         builder.append(", createdAt=");
         builder.append(createdAt);
+        builder.append(", firstPublishedAt=");
+        builder.append(firstPublishedAt);
+        builder.append(", published=");
+        builder.append(published);
         builder.append(", lastModified=");
         builder.append(lastModified);
         builder.append(", pathId=");
