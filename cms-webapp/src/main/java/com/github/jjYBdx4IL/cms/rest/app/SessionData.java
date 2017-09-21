@@ -15,9 +15,6 @@
  */
 package com.github.jjYBdx4IL.cms.rest.app;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.Serializable;
 
 import javax.enterprise.context.SessionScoped;
@@ -27,8 +24,6 @@ import javax.enterprise.context.SessionScoped;
 @SessionScoped
 public class SessionData implements Serializable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SessionData.class);
-    
     private String uid = null;
     private String googleOauth2StateSecret = null;
 

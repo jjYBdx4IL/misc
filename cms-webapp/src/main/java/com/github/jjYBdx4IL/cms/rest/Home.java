@@ -32,6 +32,7 @@ import java.util.List;
 
 import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import javax.ws.rs.GET;
@@ -61,13 +62,13 @@ public class Home {
     QueryFactory qf;
     @Inject
     AppCache appCache;
-
+    
     @Path("")
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response get() {
         LOG.trace("get()");
-
+        
         htmlBuilder.setJsValue("articleDisplayContinuationEndpoint",
             uriInfo.getBaseUriBuilder().path(Home.class).path(Home.class, "cont").toTemplate());
 
