@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 //CHECKSTYLE:OFF
 /**
  *
- * @author mark
  */
 public class SimpleXmlAppCfgTest {
 

@@ -44,4 +44,13 @@ public enum Key {
     public String toString() {
         return name;
     }
+    
+    public static Key byName(String name) {
+        for (Key key : values()) {
+            if (key.name.equalsIgnoreCase(name)) {
+                return key;
+            }
+        }
+        return null;
+    }
 }
