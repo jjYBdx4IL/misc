@@ -240,6 +240,7 @@ public class HtmlBuilder {
             (session.isAuthenticated() ? "\nCurrently signed in as:\n" + qf.getUserByUid(session.getUid()).getEmail()
                 : "");
 
+        String aboutLink = uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("site-about").toString();
         String privacyPolicyLink = uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("site-privacy-policy")
             .toString();
         String impressumLink = uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("impressum").toString();
@@ -255,6 +256,7 @@ public class HtmlBuilder {
             menuRow.with(iconTextLink("col-6", "file_upload", "Upload", Upload.class));
         }
 
+        menuRow.with(iconTextLink("col-6", "info", "About", aboutLink));
         menuRow.with(iconTextLink("col-6", "info", "Privacy Policy", privacyPolicyLink));
         menuRow.with(iconTextLink("col-6", "info", "Impressum", impressumLink));
 
