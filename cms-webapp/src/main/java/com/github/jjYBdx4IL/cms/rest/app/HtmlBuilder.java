@@ -203,6 +203,8 @@ public class HtmlBuilder {
         String baseUri = uriInfo.getBaseUriBuilder().build().toString();
 
         setJsValue("assetsUri", baseUri + "assets/");
+        setJsValue("byTagUri", uriInfo.getBaseUriBuilder().path(Home.class).path(Home.class, "byTag")
+            .toTemplate());
         setJsValue("privacyPolicyUri", uriInfo.getBaseUriBuilder().path(Home.class).path(Home.class, "byTag")
             .build("site-privacy-policy").toString());
         setJsValue("fileGetEndpoint",
@@ -272,6 +274,8 @@ public class HtmlBuilder {
         _footer.with(div(
             div(
                 div(
+                    a("About").withHref(aboutLink),
+                    span(" - "),
                     a("Privacy Policy").withHref(privacyPolicyLink),
                     span(" - "),
                     a("Impressum").withHref(impressumLink)

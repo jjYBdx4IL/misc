@@ -3,7 +3,11 @@
 A Java webapp providing blog-like publishing functionality based on JavaEE
 technologies and j2html.
 
-The fulltext search index is stored below ~/.cms-webapp.
+The fulltext search index is stored below ~/lucene/cms-webapp.
+
+The database file is stored at ~/h2.mv.db.
+
+
 
 ## Google Oauth2
 
@@ -17,6 +21,11 @@ Add your personal Google Oauth2 API credentials as follows:
         ('GOOGLE_OAUTH2_CLIENT_SECRET', '...'),
         ('HTML_HEAD_FRAGMENT', '<script>...</script>')
 
+You can use the h2-frontend war package to access the SQL database directly.
+It denies connections from anything else than localhost. 
+
+
+
 ## Other DB config values
 
     INSERT INTO CONFIGVALUE (KEY, VALUE)
@@ -24,21 +33,38 @@ Add your personal Google Oauth2 API credentials as follows:
         ('WEBSITE_TITLE', '...')
 
 Beware! The CONFIGVALUE table is annotated with @Cacheable. You might need
-to clear the cache after having done updates to it.
+to clear the cache after having done updates to it. (currently, the AppCache bean is
+doing the caching, and when using the settings page, an automatic reload is done
+on save)
+
+See ConfigKey class for a complete list of possible config values. Or simply visit
+the settings page.
+
+
 
 ## set up admin user
 
-Define the admin user via server system property:
+Define the admin user via 'ADMINS' config key:
 
-    cms.webapp.admin.uid = $uid
+    INSERT INTO CONFIGVALUE (KEY, VALUE)
+    VALUES
+        ('ADMINS', 'google-$uid')
 
-$uid currently is your Google account's unique subject prefixed with "google-".
+$uid currently is your Google account's unique subject/unique google user id.
 
-See the follow up call in GoogleLogin.callback() to a successful oauth2 request.
+To get your unique google user id, login to the application. Upon redirect from
+the Google confirmation form page, the server will log that information. Search
+for "unique google user id".
+
+Currently, all pages that require login, also require admin status.
+
+
 
 ## system properties for production
 
-    hibernate.hbm2ddl.auto = validate
+None. Defaults should be appropriate.
+
+
 
 ## system properties for development
 
@@ -46,18 +72,21 @@ See the follow up call in GoogleLogin.callback() to a successful oauth2 request.
     hibernate.show_sql = true (stdout, or use your logger)
     hibernate.format_sql = true
     hibernate.use_sql_comments = true
-    env.devel = true
+    cms.devel = true
 
-The `env.devel` system property enables access to /devel/login which is needed
-for testing (currently there is the RootIT unit test available from the cms-it
-package).
+See also cms-it/pom.xml where you can find the test setup.
 
-## remarks
+The `cms.devel` system property enables access to /devel/login which is needed
+for automated testing.
+
+
+
+## dev remarks
 
 Values provided by hibernate.xml take precedence, so make sure the aforementioned
 properties are not listed there.
 
-Setting system properties in WildFly 11 requires a server restart.
+Setting system properties in WildFly 11 requires a server restart/reload.
 
 HTTP session persistence requres &lt;distributable/> tag in web.xml. There is another
 variant, but that's not reliable (too fast reloads tend to lose the session store).
@@ -70,30 +99,42 @@ descriptor files for glassfish and wildfly to fix this issue (ie. set the defaul
 encoding to UTF-8, accept-charset params in html forms must have the same value!).
 Only WildFly 11 CR1 is tested.
 
+
+
 ## embedding, sanitization, markdown processing
 
 Javascript performs the following steps in the listed order:
 
-1. Markdown conversion.
-2. XSS protection is done using DOMPurify
-3. replacing embed://service/id tags.
+1. Markdown conversion (on editor save)
+2. HTML sanitization (server side, on save)
+3. replacing embed://service/id tags on page load, async, not delaying the page load, deferred until
+   user scrolls stuff into his browser view
 
 Currently only youtube is supported via:
 
     embed://youtube/$videoId
     embed://youtube/$videoId/1h3m  (<- start position)
+    embed://image/<image-id>/<image-filename>
+    embed://tag/<tag-name>
+
+The editor's live preview only includes step 1.
 
 
 
-The editor's live preview only includes step 1 atm.
+## Google AdSense and Analytics
 
-## cookieconsent2
+Go to the settings page and insert the corresponding javascripts into header and/or footer.
 
-It's assumed that Google Analytics and stuff is inserted into the HTML HEAD.
-So by default we have cookieconsent enabled (opt-out mode). It links
-to a privacy page tagged with "site-privacy-policy".
 
-Example content:
+
+## Cookie Consent
+
+Cookieconsent is enabled by setting its message on the settings page. The cookie consent message displayed
+to the user will contain a link pointing to the tag 'site-privacy-policy'. For that reason, select a single post
+and give it that tag, and put your privacy policy there. You also need to follow Google's privacy policy guide lines
+if using any of their stuff.
+
+Example cookie consent message:
 
 ```
 We use cookies to personalise content and ads, to provide social media features and to analyse our traffic. We also share information about your use of our site with our social media, advertising and analytics partners who may combine it with other information you’ve provided to them or they’ve collected from your use of their services.
@@ -103,63 +144,12 @@ We use cookies to personalise content and ads, to provide social media features 
 On top of that, we need cookies to keep track of authorization/login status.
 ```
 
-Adjust to your own needs. We don't take any responsibility. This is just an example.
+Adjust to your own needs. I don't take any responsibility. This is just an example.
 
-```
-INSERT INTO CONFIGVALUE (KEY, VALUE)
-VALUES
-        ('HTML_HEAD_FRAGMENT',
-'
-<!-- Cookie consent banner --> 
-<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.4/cookieconsent.min.css" /> 
-<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.4/cookieconsent.min.js"></script> 
-<script> 
-window.addEventListener("load", function(){ 
-window.cookieconsent.initialise({ 
-  "palette": { 
-    "popup": { 
-      "background": "#000000", 
-      "text": "#cccccc" 
-    }, 
-    "button": { 
-      "background": "#cfcfcf" 
-    } 
-  }, 
-  "theme": "edgeless",
-  "content": {
-    "message": "We use cookies to personalise content and ads, to provide social media features and to analyse our traffic. We also share information about your use of our site with our social media, advertising and analytics partners who may combine it with other information you’ve provided to them or they’ve collected from your use of their services.",
-    "href": privacyPolicyUri
-  }  
-})}); 
-</script> 
-')
-```
+
 
 ## Ad-blocker detection
 
-Put this into the footer fragment:
+Go to settings page and set the corresponding option to TRUE.
 
-```
-<script  src="//cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script>
-
-<script  src="//cdnjs.cloudflare.com/ajax/libs/blockadblock/3.2.1/blockadblock.min.js">
-</script>
-
-<script>
-function adBlockDetected() {
-/* http://malsup.com/jquery/block/#options */
-    $.blockUI({message:  '<h1>Ad-blocker detected. Deactivate, then reload the page.</h1>',
-     overlayCSS:  { 
-        backgroundColor: '#000', 
-        opacity:         1.0
-    } });
-}
-
-if(typeof blockAdBlock === 'undefined') {
-    adBlockDetected();
-} else {
-    blockAdBlock.onDetected(adBlockDetected);
-}
-</script>
-```
 

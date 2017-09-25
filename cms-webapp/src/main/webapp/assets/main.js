@@ -4,10 +4,17 @@ if ((typeof enableAdblockBlocker !== typeof undefined) && enableAdblockBlocker) 
     function adBlockDetected() {
         /* http://malsup.com/jquery/block/#options */
         $.blockUI({
-            message : '<h1>Ad-blocker detected. Deactivate, then reload the page.</h1>',
+            message : '<h1>Ad-blocker detected. Deactivate, then reload the page.</h1><img src="'+assetsUri+'images/sad-face.svg.med.png">',
             overlayCSS : {
                 backgroundColor : '#000',
-                opacity : 0.5
+                opacity : 0.92
+            },
+            css : {
+                width: '80%',
+                height: '80%',
+                top: '10%',
+                left: '10%',
+                background: '#ddd'
             }
         });
     }
@@ -213,6 +220,10 @@ requirejs([ "jquery", "waypoints" ],
             var url = fileGetEndpoint.replace('{mediaId}', mediaId).replace('{filename}', fileName);
             return '<img src="' + url + '">';
         }
+        function toTagUrl(val, tag) {
+            var url = byTagUri.replace('{tag}', tag);
+            return '<a href="' + url + '">'+tag+'</a>';
+        }
         
         function embedStuff(target) {
             if ($(target).text().match(/\bembed:\/\//i)) {
@@ -220,6 +231,7 @@ requirejs([ "jquery", "waypoints" ],
                     $(target).html()
                         .replace(/\bembed:\/\/youtube\/([a-z0-9_-]{8,})(\/([0-9hms]+))?\b/gi, toYoutubeIframe)
                         .replace(/\bembed:\/\/image\/([0-9]{1,})\/(\S*?\.(?:png|jpg|jpeg|gif|svgz?))\b/gi, toImage)
+                        .replace(/\bembed:\/\/tag\/([a-z0-9][a-z0-9-]*[a-z0-9])\b/gi, toTagUrl)
                 );
             }
         }
