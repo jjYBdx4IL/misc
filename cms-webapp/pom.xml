@@ -71,6 +71,15 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <attachClasses>true</attachClasses>
+<!--                     <packagingExcludes> -->
+<!--                         assets/main.js, -->
+<!--                         assets/site.js, -->
+<!--                         assets/requirejs.html, -->
+<!--                         assets/simplegrid.css, -->
+<!--                         assets/site.css, -->
+<!--                         assets/style.css, -->
+<!--                         assets/test.html -->
+<!--                     </packagingExcludes> -->
                 </configuration>
             </plugin>
 <!--             <plugin> -->
@@ -241,6 +250,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+<!--         <dependency> -->
+<!--             <groupId>com.google.apis</groupId> -->
+<!--             <artifactId>google-api-services-webmasters</artifactId> -->
+<!--             <version>v3-rev24-1.22.0</version> -->
+<!--         </dependency> -->
         <dependency>
             <groupId>org.imgscalr</groupId>
             <artifactId>imgscalr-lib</artifactId>
@@ -255,6 +269,11 @@
             <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
             <artifactId>owasp-java-html-sanitizer</artifactId>
             <version>20170515.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.dfabulich</groupId>
+            <artifactId>sitemapgen4j</artifactId>
+            <version>1.0.6</version>
         </dependency>
 
         <dependency>

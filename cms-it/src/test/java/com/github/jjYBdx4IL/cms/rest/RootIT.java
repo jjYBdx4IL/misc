@@ -257,6 +257,11 @@ public class RootIT {
         responseContent = response.readEntity(String.class);
         assertFalse(responseContent, responseContent.contains(">" + title + "<"));
 
+        response = (Response) getTarget("sitemap.xml").request(MediaType.APPLICATION_XML).get();
+        assertEquals(HttpServletResponse.SC_NO_CONTENT, response.getStatus());
+        responseContent = response.readEntity(String.class);
+        assertFalse(responseContent, responseContent.contains("/" + pathId + "</loc>"));
+
         // get article id for editing
         response = (Response) getTarget("articleManager").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
@@ -296,6 +301,11 @@ public class RootIT {
         responseContent = response.readEntity(String.class);
         assertTrue(responseContent, responseContent.contains(">" + title + "<"));
 
+        response = (Response) getTarget("sitemap.xml").request(MediaType.APPLICATION_XML).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        responseContent = response.readEntity(String.class);
+        assertTrue(responseContent, responseContent.contains("/" + pathId + "</loc>"));
+
         // unpublish it again
         form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
             title + "2").param("processed", content);
@@ -326,6 +336,11 @@ public class RootIT {
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
         responseContent = response.readEntity(String.class);
         assertFalse(responseContent, responseContent.contains(">" + title + "<"));
+        
+        response = (Response) getTarget("sitemap.xml").request(MediaType.APPLICATION_XML).get();
+        assertEquals(HttpServletResponse.SC_NO_CONTENT, response.getStatus());
+        responseContent = response.readEntity(String.class);
+        assertFalse(responseContent, responseContent.contains("/" + pathId + "</loc>"));
     }
 
     @Test
