@@ -39,6 +39,7 @@ import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
 import com.github.jjYBdx4IL.cms.jpa.dto.Tag;
+import com.github.jjYBdx4IL.cms.rest.Administration;
 import com.github.jjYBdx4IL.cms.rest.ArticleManager;
 import com.github.jjYBdx4IL.cms.rest.Gallery;
 import com.github.jjYBdx4IL.cms.rest.Home;
@@ -92,7 +93,7 @@ public class HtmlBuilder {
     @Inject
     QueryFactory qf;
     @Inject
-    private AppCache appCache;
+    AppCache appCache;
 
     private String pageTitle = "";
     private String lang = "en";
@@ -256,6 +257,7 @@ public class HtmlBuilder {
             menuRow.with(iconTextLink("col-6", "settings", "Settings", Settings.class));
             menuRow.with(iconTextLink("col-6", "image", "Gallery", Gallery.class));
             menuRow.with(iconTextLink("col-6", "file_upload", "Upload", Upload.class));
+            menuRow.with(iconTextLink("col-6", "settings_applications", "Administration", Administration.class));
         }
 
         menuRow.with(iconTextLink("col-6", "info", "About", aboutLink));
@@ -526,6 +528,11 @@ public class HtmlBuilder {
         setJsValue("enableGallerySupport", "true");
         setJsValue("imageListEndpoint",
             uriInfo.getBaseUriBuilder().path(Gallery.class).path(Gallery.class, "imageList").build().toString());
+        return this;
+    }
+
+    public HtmlBuilder enableJsAminSupport() {
+        setJsValue("enableJsAdminSupport", "true");
         return this;
     }
 

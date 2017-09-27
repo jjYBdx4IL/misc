@@ -507,3 +507,36 @@ if ((typeof articleDisplayContinuationEndpoint !== typeof undefined) && articleD
         appendTriggerDiv();
     });
 }
+
+if ((typeof enableJsAdminSupport !== typeof undefined) && enableJsAdminSupport) {
+    requirejs([ "jquery" ], function($) {
+        $(".importXmlForm").submit(function(e) {
+            e.preventDefault();
+            var action = $(this).attr('action');
+            var file = $(this).find("input[type=file]").prop("files")[0];
+            
+            var reader = new FileReader();
+            
+            reader.onload = (function(theFile) {
+                return function(e) {
+                    $.ajax({
+                        method: "POST",
+                        url: action,
+                        data: e.target.result,
+                        contentType: "text/xml; charset=utf-8"
+                    }).done(function(html) {
+                        alert('upload ok');
+                    });
+                };
+            })(file);
+
+            reader.readAsText(file, "UTF-8");
+        });        
+    });
+}
+
+
+
+
+
+
