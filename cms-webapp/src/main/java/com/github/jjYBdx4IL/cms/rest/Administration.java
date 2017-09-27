@@ -20,23 +20,27 @@ import static j2html.TagCreator.div;
 import static j2html.TagCreator.form;
 import static j2html.TagCreator.hr;
 import static j2html.TagCreator.input;
-import static j2html.TagCreator.label;
 import static j2html.TagCreator.li;
-import static j2html.TagCreator.span;
-import static j2html.TagCreator.text;
-import static j2html.TagCreator.textarea;
 import static j2html.TagCreator.ul;
 
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
+import com.github.jjYBdx4IL.cms.rest.app.Role;
 import j2html.tags.ContainerTag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.util.Collections;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
-import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.transaction.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -49,11 +53,9 @@ import javax.ws.rs.core.UriInfo;
 
 //CHECKSTYLE:OFF
 @Path("admin")
-@PermitAll
+@RolesAllowed(Role.ADMIN)
 @Transactional
 public class Administration {
-
-    private static final Logger LOG = LoggerFactory.getLogger(Administration.class);
 
     @Context
     UriInfo uriInfo;
@@ -61,26 +63,40 @@ public class Administration {
     HtmlBuilder htmlBuilder;
     @Inject
     QueryFactory qf;
+    @PersistenceContext
+    EntityManager em;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response admin() throws MalformedURLException, IllegalArgumentException, UriBuilderException {
-        LOG.trace("admin()");
 
         htmlBuilder.setPageTitle("Administration");
         htmlBuilder.enableJsAminSupport();
-
+        ContainerTag row = div().withClass("row");
+        
+        row.with(hr().withClass("col-12"));
+        
+        // DB snapshot dump download
+        String dbDumpLink = uriInfo.getBaseUriBuilder().path(Administration.class)
+            .path(Administration.class, "dbDump").build().toString();
+        row.with(div(
+            a("download database snapshot dump (includes all data except SSL key/cert)").withHref(dbDumpLink)
+        ).withClass("col-12"));
+        
+        row.with(hr().withClass("col-12"));
+        
+        // XML export
         String exportDumpLink = uriInfo.getBaseUriBuilder().path(ArticleManager.class)
             .path(ArticleManager.class, "exportDump").build().toString();
+        row.with(div(
+            a("download XML dump (does not include media files, images etc.)").withHref(exportDumpLink)
+        ).withClass("col-12"));
+        
+        row.with(hr().withClass("col-12"));
+        
+        // XML import
         String importDumpLink = uriInfo.getBaseUriBuilder().path(ArticleManager.class)
             .path(ArticleManager.class, "importDump").build().toString();
-
-        ContainerTag row = div().withClass("row");
-        row.with(hr().withClass("col-12"));
-        row.with(div(
-            a("export XML dump (does not include media files, images etc.)").withHref(exportDumpLink)
-        ).withClass("col-12"));
-        row.with(hr().withClass("col-12"));
         row.with(
             form().withMethod("post").attr("accept-charset", "utf-8").withAction(importDumpLink)
                 .with(
@@ -95,11 +111,51 @@ public class Administration {
             li("No import of configuration values."),
             li("Articles will be imported under your current login.")
         ));
+        
         row.with(hr().withClass("col-12"));
 
         htmlBuilder.mainAdd(div(row).withClass("container"));
-
         return Response.ok().entity(htmlBuilder.toString()).build();
     }
-
+    
+    @Path("dbDump.zip")
+    @GET
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response dbDump() {
+        
+        Query q = em.createNativeQuery("backup to 'backup.zip'");
+        q.executeUpdate();
+        
+        File file = new File("backup.zip");
+        
+        if (!testZipFile(file)) {
+            return Response.serverError().build();
+        }
+        
+        return Response.ok().entity(file).build();
+    }
+    
+    public static boolean testZipFile(File file) {
+        
+        long count = 0;
+        
+        byte[] buf = new byte[4096];
+        
+        try (ZipFile zipFile = new ZipFile(file)) {
+            for (ZipEntry zipEntry : Collections.list(zipFile.entries())) {
+                try (InputStream is = zipFile.getInputStream(zipEntry)) {
+                    while (is.read(buf) != -1) {}
+                }
+                zipEntry.getCrc();
+                zipEntry.getCompressedSize();
+                zipEntry.getName();
+                count++;
+            }
+        } catch (IOException e) {
+            return false;
+        }
+        
+        return count > 0;
+    }
+    
 }
