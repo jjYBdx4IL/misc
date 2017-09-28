@@ -77,7 +77,7 @@ requirejs([ "jquery" ], function($) {
 });
 
 /*
- * trivial drop-down menu: it's always below the header bar, but only when the user click on the menu icon the header
+ * trivial drop-down menu: it's always below the header bar, but only when the user clicks on the menu icon the header
  * bar gets extended downwards and reveals the menu's contents.
  */
 requirejs([ "jquery" ], function($) {
@@ -91,6 +91,13 @@ requirejs([ "jquery" ], function($) {
         } else {
             $("header").css("height", "auto");
             state = 1;
+        }
+    });
+    $("header").mouseleave(function() {
+        var height = $("header").css("height");
+        if (state == 1) {
+            $("header").css("height", rememberedHeight);
+            state = 0;
         }
     });
 });

@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -73,27 +74,27 @@ public class Administration {
         htmlBuilder.setPageTitle("Administration");
         htmlBuilder.enableJsAminSupport();
         ContainerTag row = div().withClass("row");
-        
+
         row.with(hr().withClass("col-12"));
-        
+
         // DB snapshot dump download
         String dbDumpLink = uriInfo.getBaseUriBuilder().path(Administration.class)
             .path(Administration.class, "dbDump").build().toString();
         row.with(div(
             a("download database snapshot dump (includes all data except SSL key/cert)").withHref(dbDumpLink)
         ).withClass("col-12"));
-        
+
         row.with(hr().withClass("col-12"));
-        
+
         // XML export
         String exportDumpLink = uriInfo.getBaseUriBuilder().path(ArticleManager.class)
             .path(ArticleManager.class, "exportDump").build().toString();
         row.with(div(
             a("download XML dump (does not include media files, images etc.)").withHref(exportDumpLink)
         ).withClass("col-12"));
-        
+
         row.with(hr().withClass("col-12"));
-        
+
         // XML import
         String importDumpLink = uriInfo.getBaseUriBuilder().path(ArticleManager.class)
             .path(ArticleManager.class, "importDump").build().toString();
@@ -111,40 +112,38 @@ public class Administration {
             li("No import of configuration values."),
             li("Articles will be imported under your current login.")
         ));
-        
+
         row.with(hr().withClass("col-12"));
 
         htmlBuilder.mainAdd(div(row).withClass("container"));
         return Response.ok().entity(htmlBuilder.toString()).build();
     }
-    
+
     @Path("dbDump.zip")
     @GET
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response dbDump() {
-        
-        Query q = em.createNativeQuery("backup to 'backup.zip'");
-        q.executeUpdate();
-        
+
         File file = new File("backup.zip");
-        
+        Query q = em.createNativeQuery(
+            String.format(Locale.ROOT, "backup to '%s'", file.getAbsolutePath().replace("'", "''")));
+        q.executeUpdate();
+
         if (!testZipFile(file)) {
             return Response.serverError().build();
         }
-        
+
         return Response.ok().entity(file).build();
     }
-    
+
     public static boolean testZipFile(File file) {
-        
         long count = 0;
-        
         byte[] buf = new byte[4096];
-        
         try (ZipFile zipFile = new ZipFile(file)) {
             for (ZipEntry zipEntry : Collections.list(zipFile.entries())) {
                 try (InputStream is = zipFile.getInputStream(zipEntry)) {
-                    while (is.read(buf) != -1) {}
+                    while (is.read(buf) != -1) {
+                    }
                 }
                 zipEntry.getCrc();
                 zipEntry.getCompressedSize();
@@ -154,8 +153,7 @@ public class Administration {
         } catch (IOException e) {
             return false;
         }
-        
         return count > 0;
     }
-    
+
 }
