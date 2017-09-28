@@ -71,6 +71,7 @@ public class Home {
         
         htmlBuilder.setJsValue("articleDisplayContinuationEndpoint",
             uriInfo.getBaseUriBuilder().path(Home.class).path(Home.class, "cont").toTemplate());
+        htmlBuilder.enableShareButtons();
 
         List<Article> articles = qf.getArticleDisplayList(null, null, true)
             .setMaxResults(MAX_ARTICLES_PER_REQUEST).getResultList();
@@ -113,7 +114,8 @@ public class Home {
         htmlBuilder.setJsValue("articleDisplayContinuationEndpoint",
             uriInfo.getBaseUriBuilder().path(Home.class).path(Home.class, "byTagCont")
                 .resolveTemplate("tag", selectedTag).toTemplate());
-
+        htmlBuilder.enableShareButtons();
+        
         if ("impressum".equalsIgnoreCase(selectedTag)) {
             htmlBuilder.enableNoIndex();
         }
@@ -160,6 +162,7 @@ public class Home {
         List<Article> articles = new ArrayList<>();
         articles.add(article);
 
+        htmlBuilder.enableShareButtons();
         htmlBuilder.mainAdd(
             div(
                 htmlBuilder.createArticleListRow(articles, true, true)

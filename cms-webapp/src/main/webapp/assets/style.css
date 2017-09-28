@@ -55,7 +55,7 @@ header .titlebar .material-icons {
 }
 
 .material-icons:hover {
-	cursor: move;
+	cursor: pointer;
 }
 
 header a:link {
@@ -122,6 +122,11 @@ form textarea {
 }
 
 /* article display */
+
+.article .articleContent {
+    font-weight: 200;
+}
+
 .articleContent h1, .article h1 {
 	font-size: 1.6rem;
 }
@@ -268,6 +273,10 @@ footer .impressum a {
     font-size: 0.7em;
 }
 
-
+.twttr-share-button {
+	display: inline-block;
+	vertical-align: middle;
+	padding-left: 0.7em;
+}
 
 /* radial-gradient(ellipse at center, #604060 0%, #1d1d2b 100%) */

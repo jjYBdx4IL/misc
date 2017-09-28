@@ -69,6 +69,7 @@ public class Search {
 
         htmlBuilder.setPageTitle("Search");
         htmlBuilder.enableNoIndex();
+        htmlBuilder.enableShareButtons();
         ContainerTag container = div().withClass("container");
 
         container.with(

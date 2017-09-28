@@ -51,7 +51,6 @@ import com.github.jjYBdx4IL.cms.rest.Settings;
 import com.github.jjYBdx4IL.cms.rest.Upload;
 import j2html.tags.ContainerTag;
 import j2html.tags.DomContent;
-import j2html.tags.EmptyTag;
 import j2html.tags.UnescapedText;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -521,6 +520,11 @@ public class HtmlBuilder {
 
     public HtmlBuilder enableJsEditorSupport() {
         setJsValue("enableJsEditorSupport", "true");
+        return this;
+    }
+
+    public HtmlBuilder enableShareButtons() {
+        setJsValue("enableShareButtons", "true");
         return this;
     }
 

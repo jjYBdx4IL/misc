@@ -13,6 +13,7 @@ requirejs.config({
       "cookieconsent" : "//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.4/cookieconsent.min",
       "fineuploader" : appFineUploaderRoot + "jquery.fine-uploader.min",
       "imagesLoaded" : "//cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min",
+      "twitter" : "https://platform.twitter.com/widgets"
     },
     "shim": {
         "blockUI": ["jquery"],

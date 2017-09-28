@@ -472,6 +472,8 @@ if ((typeof enableGallerySupport !== typeof undefined) && enableGallerySupport) 
 
 /* auto-extend article lists */
 
+var addShareButtons = function(){}
+
 if ((typeof articleDisplayContinuationEndpoint !== typeof undefined) && articleDisplayContinuationEndpoint) {
     requirejs([ "jquery", "waypoints" ], function($) {
         var triggerDiv = null;
@@ -485,6 +487,7 @@ if ((typeof articleDisplayContinuationEndpoint !== typeof undefined) && articleD
                 $(triggerDiv).nextAll().find(".articleContent").each(function(index) {
                     embedStuffDelayed(this);
                 });
+                $(triggerDiv).nextAll(".article").each(addShareButtons);
                 var skipNew = $('main .article').length;
                 if (skipNew > skip) {
                     appendTriggerDiv();
@@ -542,8 +545,24 @@ if ((typeof enableJsAdminSupport !== typeof undefined) && enableJsAdminSupport) 
     });
 }
 
+/* twitter */
 
-
+if ((typeof enableShareButtons !== typeof undefined) && enableShareButtons) {
+    requirejs([ "jquery", "twitter" ], function($) {
+        addShareButtons = function() {
+            var title = $(this).find(".articleTitle").text();
+            if (title.length > 100) {
+                title = title.substring(0, 100) + "...";
+            }
+            var href = $(this).find(".articleTitle a").attr("href");
+            var html = "<div class='twttr-share-button'></div>";
+            $(this).find(".articleMeta").append(html);
+            var el = $(this).find(".articleMeta").children().last()[0];
+            twttr.widgets.createShareButton(href, el, { text: title });                
+        }
+        $("main .articles .article").each(addShareButtons);
+    });
+}
 
 
 
