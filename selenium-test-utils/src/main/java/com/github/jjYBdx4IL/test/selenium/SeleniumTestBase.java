@@ -47,6 +47,7 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -353,8 +354,23 @@ public class SeleniumTestBase {
     public WebElement click(String text) throws WebElementNotFoundException {
         LOG.info("click(" + text + ")");
         WebElement el = waitForElement(text);
-        el.click();
+        clickWaitForClickable(el);
         return el;
+    }
+    
+    public void clickWaitForClickable(WebElement el) {
+        new WebDriverWait(getDriver(), DEFAULT_WAIT_SECS).until(ExpectedConditions.elementToBeClickable(el));
+        new WebDriverWait(getDriver(), DEFAULT_WAIT_SECS).until(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver driver) {
+                try {
+                    el.click();
+                    return true;
+                } catch (WebDriverException ex) {
+                }
+                return false;
+            }
+        });
     }
 
     public void scrollAndClick(WebElement clickable) {
