@@ -242,6 +242,7 @@ public class HtmlBuilder {
             (session.isAuthenticated() ? "\nCurrently signed in as:\n" + qf.getUserByUid(session.getUid()).getEmail()
                 : "");
 
+        String poweredByLink = uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("site-software").toString();
         String aboutLink = uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("site-about").toString();
         String privacyPolicyLink = uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("site-privacy-policy")
             .toString();
@@ -275,6 +276,8 @@ public class HtmlBuilder {
         _footer.with(div(
             div(
                 div(
+                    a("Powered By").withHref(poweredByLink),
+                    span(" - "),
                     a("About").withHref(aboutLink),
                     span(" - "),
                     a("Privacy Policy").withHref(privacyPolicyLink),
