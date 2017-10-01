@@ -32,6 +32,7 @@ import static j2html.TagCreator.main;
 import static j2html.TagCreator.meta;
 import static j2html.TagCreator.script;
 import static j2html.TagCreator.span;
+import static j2html.TagCreator.style;
 import static j2html.TagCreator.title;
 
 import com.github.jjYBdx4IL.cms.jpa.AppCache;
@@ -220,7 +221,7 @@ public class HtmlBuilder {
             setJsValue("cookieConsentMessage", cookieConsentMessage);
             addCssUrl("//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.4/cookieconsent.min.css");
         }
-
+        
         if (appCache.isDevel()) {
             addCssUrl(baseUri + "assets/simplegrid.css");
             addCssUrl(baseUri + "assets/style.css");
@@ -229,6 +230,10 @@ public class HtmlBuilder {
         }
         addCssUrl("//fonts.googleapis.com/icon?family=Material+Icons");
         addCssUrl("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.min.css");
+        addHeadContent(style(new UnescapedText(
+            "@import url('https://fonts.googleapis.com/css?family=Montserrat');" + 
+            "font-family:'Montserrat',Georgia,\"Times New Roman\",Times,serif;"
+        )));
 
         if (session.isAuthenticated()) {
             setSignOutLink(uriInfo.getBaseUriBuilder().path(Logout.class).build().toString());
@@ -433,8 +438,8 @@ public class HtmlBuilder {
             return null;
         }
         StringBuilder sb = new StringBuilder();
-        jsValues.forEach((k, v) -> sb.append("    var ").append(k).append(" = '")
-            .append(StringEscapeUtils.escapeEcmaScript(v)).append("';\n")
+        jsValues.forEach((k, v) -> sb.append("var ").append(k).append(" = '")
+            .append(StringEscapeUtils.escapeEcmaScript(v)).append("';")
         );
         return script().withType("text/javascript")
             .with(new UnescapedText(StringEscapeUtils.escapeHtml4(sb.toString())));

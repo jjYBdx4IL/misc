@@ -8,7 +8,6 @@ header {
 	background: black;
 	color: white;
 	height: 40px;
-	/* 	height: auto; */
 	position: fixed;
 	top: 0px;
 	transition: top 200ms ease-in-out;
@@ -107,8 +106,6 @@ form textarea {
 
 .tag {
 	background: #ccf;
-	/* 	border: 2px solid blue; */
-	/*     border-radius: 1em; */
 	display: inline;
 	font-size: 0.82em;
 	padding: 0 0.2em;
@@ -124,31 +121,31 @@ form textarea {
 /* article display */
 
 .article .articleContent {
-    font-weight: 200;
+    font-size: 1.5em;
 }
 
 .articleContent h1, .article h1 {
-	font-size: 1.6rem;
+	font-size: 1.9em;
 }
 
 .articleContent h2 {
-	font-size: 1.375rem;
+	font-size: 1.6em;
 }
 
 .articleContent h3 {
-	font-size: 1.125rem;
+	font-size: 1.4em;
 }
 
 .articleContent h4 {
-	font-size: 1rem;
+	font-size: 1.2em;
 }
 
 .articleContent h5 {
-	font-size: 0.875rem;
+	font-size: 1em;
 }
 
 .articleContent h6 {
-	font-size: 0.8rem;
+	font-size: 0.9em;
 }
 
 .articleContent table {
@@ -164,15 +161,12 @@ form textarea {
 	
 .articleContent blockquote {
 	padding: 0 0.3em;
-	/* 	border: solid #ddd; */
 	font-style: italic;
 	margin-left: 32px;
-/* 	font-family: Times; */
-	/* 	padding-left: 48px; */
 	background: url('material-icons/ic_format_quote_black_24px.svg');
 	background-repeat: no-repeat;
 	background-size: 55px;
-	background-position: 0 -1em;
+	background-position: 0 -0.5em;
 	min-height: 40px;
 	text-indent: 55px;
 }

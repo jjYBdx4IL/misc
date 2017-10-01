@@ -16,13 +16,13 @@ body {
   left: 0;
   top: 40px;
   font-size: 100%;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 /* ROOT FONT STYLES */
 
 * {
-  font-family: 'Lato', Helvetica, sans-serif;
-/*   color: #333447; */
   line-height: 1.5;
 }
 
@@ -50,12 +50,6 @@ h5 {
 
 h6 {
   font-size: 0.875rem;
-}
-
-p {
-  font-size: 1.125rem;
-  font-weight: 200;
-  line-height: 1.8;
 }
 
 .font-light {
