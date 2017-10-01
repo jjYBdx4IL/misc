@@ -31,7 +31,7 @@ import j2html.tags.ContainerTag;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
@@ -49,7 +49,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilderException;
 import javax.ws.rs.core.UriInfo;
 
 //CHECKSTYLE:OFF
@@ -69,7 +68,7 @@ public class Administration {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public Response admin() throws MalformedURLException, IllegalArgumentException, UriBuilderException {
+    public Response admin() throws Exception {
 
         htmlBuilder.setPageTitle("Administration");
         htmlBuilder.enableJsAminSupport();
@@ -86,6 +85,15 @@ public class Administration {
 
         row.with(hr().withClass("col-12"));
 
+        // Submit sitemap to BING
+        String siteMapLink = uriInfo.getBaseUriBuilder().path(SiteMap.class).build().toString();
+        String bingSiteMapSubLink = "http://www.bing.com/ping?sitemap=" + URLEncoder.encode(siteMapLink, "UTF-8");        
+        row.with(div(
+            a("submit sitemap to BING").withHref(bingSiteMapSubLink)
+        ).withClass("col-12"));
+
+        row.with(hr().withClass("col-12"));
+        
         // XML export
         String exportDumpLink = uriInfo.getBaseUriBuilder().path(ArticleManager.class)
             .path(ArticleManager.class, "exportDump").build().toString();

@@ -17,6 +17,7 @@ package com.github.jjYBdx4IL.cms.rest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -59,6 +60,47 @@ public class RootIT {
         Response response = (Response) getTarget("devel/prepareDb4It").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
     }
+    
+    @Test
+    public void testRobotsTxtAndSiteMap() throws Exception {
+        LOG.info("testRobotsTxtAndSiteMap()");
+
+        // create some site content
+        Response response = (Response) getTarget("devel/login").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+
+        final String title = "test title mit ö" + PasswordGenerator.generate55(11);
+        final String content = "content" + PasswordGenerator.generate55(11);
+        final String tag = "aTag" + PasswordGenerator.generate55(11);
+        final String pathId = "p" + PasswordGenerator.generate55(11);
+
+        Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
+            pathId).param("processed", "processed bla").param("published", "on");
+
+        response = (Response) getTarget("articleManager/create").request()
+            .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
+        assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
+
+        response = (Response) getTarget("logout").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        
+        // get sitemap url from robots.txt
+        response = (Response) getTarget("robots.txt").request(MediaType.TEXT_PLAIN_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        String responseContent = response.readEntity(String.class);
+        
+        Pattern pat = Pattern.compile("^sitemap:\\s*(.+)\\s*$", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+        Matcher m = pat.matcher(responseContent);
+        assertTrue(m.find());
+        String siteMapLink = m.group(1);
+        assertNotNull(siteMapLink);
+        
+        // and fetch sitemap at that url
+        response = (Response) getClient().target(siteMapLink).request(MediaType.APPLICATION_XML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        responseContent = response.readEntity(String.class);
+        assertTrue(responseContent.contains("<urlset"));
+    }
 
     @Test
     public void testRssFeed() throws Exception {
@@ -73,7 +115,6 @@ public class RootIT {
 
         Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
             pathId).param("processed", "processed bla").param("published", "on");
-        ;
 
         response = (Response) getTarget("articleManager/create").request()
             .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
