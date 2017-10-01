@@ -119,31 +119,117 @@ public class MidiMessageParser {
     }
 
     public static Sequence remapChannels(Sequence in, int targetChannel) throws InvalidMidiDataException {
+        int[] channelMap = new int[16];
+        for (int i = 0; i < channelMap.length; i++) {
+            channelMap[i] = targetChannel;
+        }
+        return remapChannels(in, channelMap, false);
+    }
+
+    public static Sequence remapChannels(Sequence in, int[] channelMap, boolean isBitMask) throws InvalidMidiDataException {
+        if (channelMap.length != 16) {
+            throw new IllegalArgumentException();
+        }
         Sequence out = new Sequence(in.getDivisionType(), in.getResolution());
         for (Track inTrack : in.getTracks()) {
             Track outTrack = out.createTrack();
             for (int i = 0; i < inTrack.size(); i++) {
                 MidiEvent eventIn = inTrack.get(i);
                 MidiMessage msgIn = eventIn.getMessage();
-                MidiMessage msgOut;
                 if (msgIn instanceof MetaMessage) {
-                    msgOut = msgIn;
+                    outTrack.add(new MidiEvent(msgIn, eventIn.getTick()));
                 } else {
                     PMidiMessage parsedMsg = MidiMessageParser.parse(msgIn);
                     if (parsedMsg == null) {
                         throw new InvalidMidiDataException(
-                            "failed to parse midi message: " + toString(msgIn.getMessage()));
+                            "failed to parse midi message: " + MidiMessageParser.toString(msgIn.getMessage()));
                     }
                     if (parsedMsg instanceof HasChannel) {
-                        ((HasChannel) parsedMsg).setChannel(targetChannel);
+                        int channel = ((HasChannel) parsedMsg).getChannel();
+                        if (!isBitMask) {
+                            ((HasChannel) parsedMsg).setChannel(channelMap[channel]);
+                            outTrack.add(new MidiEvent(parsedMsg.toMidiMessage(), eventIn.getTick()));
+                        } else {
+                            for (int j=0; j<16; j++) {
+                                if ((channelMap[channel] & (1 << j))==0) {
+                                    continue;
+                                }
+                                ((HasChannel) parsedMsg).setChannel(j);
+                                outTrack.add(new MidiEvent(parsedMsg.toMidiMessage(), eventIn.getTick()));
+                            }
+                        }
                     }
-                    msgOut = parsedMsg.toMidiMessage();
                 }
-                MidiEvent eventOut = new MidiEvent(msgOut, eventIn.getTick());
-                outTrack.add(eventOut);
             }
         }
         return out;
     }
 
+    public static Sequence compactChannels(Sequence in) throws InvalidMidiDataException {
+        int[] channelMap = getChannelsInUse(in);
+        int targetChannel = 0;
+        for (int i = 0; i < channelMap.length; i++) {
+            if (channelMap[i] != 0) {
+                channelMap[i] = targetChannel;
+                targetChannel++;
+            }
+        }
+        return remapChannels(in, channelMap, false);
+    }
+    
+    public static Sequence compactAndDuplicateChannels(Sequence in, int maxDuplFactor) throws InvalidMidiDataException {
+        int[] channelMap = getChannelsInUse(in);
+        int channelCount = 0;
+        for (int i = 0; i < channelMap.length; i++) {
+            if (channelMap[i] != 0) {
+                channelCount++;
+            }
+        }
+        int duplFactor = Math.min(16 / channelCount, maxDuplFactor > 0 ? maxDuplFactor : Integer.MAX_VALUE);
+        int targetChannel = 0;
+        for (int i = 0; i < channelMap.length; i++) {
+            if (channelMap[i] != 0) {
+                channelMap[i] = 0;
+                for (int j = 0; j < duplFactor; j++) {
+                    channelMap[i] |= (1 << targetChannel);
+                    targetChannel++;
+                }
+            }
+        }
+        return remapChannels(in, channelMap, true);
+    }
+
+    public static int getMaxChannelInUse(Sequence in) throws InvalidMidiDataException {
+        int[] channelMap = getChannelsInUse(in);
+        int max = -1;
+        for (int i = 0; i < channelMap.length; i++) {
+            if (channelMap[i] != 0) {
+                max = i;
+            }
+        }
+        return max;
+    }
+
+    public static int[] getChannelsInUse(Sequence in) throws InvalidMidiDataException {
+        int[] channels = new int[16];
+        for (Track inTrack : in.getTracks()) {
+            for (int i = 0; i < inTrack.size(); i++) {
+                MidiEvent eventIn = inTrack.get(i);
+                MidiMessage msgIn = eventIn.getMessage();
+                if (msgIn instanceof MetaMessage) {
+                } else {
+                    PMidiMessage parsedMsg = MidiMessageParser.parse(msgIn);
+                    if (parsedMsg == null) {
+                        throw new InvalidMidiDataException(
+                            "failed to parse midi message: " + MidiMessageParser.toString(msgIn.getMessage()));
+                    }
+                    if (parsedMsg instanceof HasChannel) {
+                        int channel = ((HasChannel) parsedMsg).getChannel();
+                        channels[channel]++;
+                    }
+                }
+            }
+        }
+        return channels;
+    }
 }
