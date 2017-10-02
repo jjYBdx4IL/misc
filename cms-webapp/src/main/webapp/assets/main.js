@@ -223,6 +223,10 @@ requirejs([ "jquery", "waypoints" ],
             }
             return '<iframe width="560" height="315" src="' + url + '" frameborder="0" allowfullscreen></iframe>';
         }
+        function toImageWithClass(val, klazz, mediaId, fileName) {
+            var url = fileGetEndpoint.replace('{mediaId}', mediaId).replace('{filename}', fileName);
+            return '<img src="' + url + '" class="' + klazz + '">';
+        }
         function toImage(val, mediaId, fileName) {
             var url = fileGetEndpoint.replace('{mediaId}', mediaId).replace('{filename}', fileName);
             return '<img src="' + url + '">';
@@ -237,6 +241,7 @@ requirejs([ "jquery", "waypoints" ],
                 $(target).html(
                     $(target).html()
                         .replace(/\bembed:\/\/youtube\/([a-z0-9_-]{8,})(\/([0-9hms]+))?\b/gi, toYoutubeIframe)
+                        .replace(/\bembed:\/\/imageWithClass\/([^\/\s]*)\/([0-9]{1,})\/(\S*?\.(?:png|jpg|jpeg|gif|svgz?))\b/gi, toImageWithClass)
                         .replace(/\bembed:\/\/image\/([0-9]{1,})\/(\S*?\.(?:png|jpg|jpeg|gif|svgz?))\b/gi, toImage)
                         .replace(/\bembed:\/\/tag\/([a-z0-9][a-z0-9-]*[a-z0-9])\b/gi, toTagUrl)
                 );

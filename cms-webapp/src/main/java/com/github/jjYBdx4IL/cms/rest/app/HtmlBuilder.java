@@ -325,7 +325,7 @@ public class HtmlBuilder {
                     header(
                         div(
                             div(
-                                h3(a(title).withHref(baseUri)).withClass("col-6-sm"),
+                                h1(a(title).withHref(baseUri)).withClass("col-6-sm"),
                                 div().with(
                                     a("search").withHref(searchLink).withClass("material-icons")
                                 ).with(i("menu").withClass("menuIcon material-icons").attr("title", "Menu")

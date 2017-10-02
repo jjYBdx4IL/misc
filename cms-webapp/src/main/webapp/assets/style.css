@@ -20,8 +20,8 @@ header {
 	top: -40px;
 }
 
-header div.row h3 {
-	margin: 0.2em 2% !important;
+header div.row h1 {
+	margin: -0.1em 2% !important;
 }
 
 header div.row>div {
@@ -164,6 +164,46 @@ form textarea {
 	border: dashed #ccc medium;
 }
 
+.articleContent img {
+	padding: 1em;
+}
+.articleContent img.r30 {
+	max-width: 30%;
+	float: right;
+}
+.articleContent img.r40 {
+    max-width: 40%;
+    float: right;
+}
+.articleContent img.r50 {
+    max-width: 50%;
+    float: right;
+}
+.articleContent img.right {
+    max-width: 50%;
+    float: right;
+}
+.articleContent img.l30 {
+    max-width: 30%;
+    float: left;
+}
+.articleContent img.l40 {
+    max-width: 40%;
+    float: left;
+}
+.articleContent img.l50 {
+    max-width: 50%;
+    float: left;
+}
+.articleContent img.l100 {
+    max-width: 100%;
+    padding: 0;
+    float: left;
+}
+.articleContent img.left {
+	float: left;
+}
+
 .article {
 	border-left: thick solid #ddd;
 	padding-left: 0.5em;
@@ -224,7 +264,6 @@ footer {
 }
 
 #imageViewerBackPane span {
-/* 	position: fixed; */
 	color: white;
 	background: black;
 	z-index: 221;
