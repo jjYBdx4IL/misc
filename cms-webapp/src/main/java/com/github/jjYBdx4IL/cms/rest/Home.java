@@ -162,6 +162,7 @@ public class Home {
         List<Article> articles = new ArrayList<>();
         articles.add(article);
 
+        htmlBuilder.setHeadTitlePrefix(article.getTitle());
         htmlBuilder.enableShareButtons();
         htmlBuilder.mainAdd(
             div(

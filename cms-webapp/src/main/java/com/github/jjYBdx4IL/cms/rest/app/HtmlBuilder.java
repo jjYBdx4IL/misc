@@ -95,7 +95,8 @@ public class HtmlBuilder {
     @Inject
     AppCache appCache;
 
-    private String pageTitle = "";
+    private String pageTitle = ""; // shown on top of html -> body -> main
+    private String headTitlePrefix = ""; // prefix for html -> head -> title
     private String lang = "en";
     private String description = null;
     private String author = null;
@@ -296,7 +297,7 @@ public class HtmlBuilder {
         String doc = document(
             html(
                 head(
-                    title(title),
+                    title(getHeadTitlePrefix()  + title),
                     description != null ? meta().attr("description", description) : null,
                     author != null ? meta().attr("author", author) : null,
                     noIndex ? meta().attr("name", "robots").attr("content", "noindex,noarchive")
@@ -546,6 +547,14 @@ public class HtmlBuilder {
     public HtmlBuilder enableJsAminSupport() {
         setJsValue("enableJsAdminSupport", "true");
         return this;
+    }
+
+    public String getHeadTitlePrefix() {
+        return headTitlePrefix;
+    }
+
+    public void setHeadTitlePrefix(String headTitlePrefix) {
+        this.headTitlePrefix = headTitlePrefix + " - ";
     }
 
 }
