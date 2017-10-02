@@ -121,31 +121,7 @@ form textarea {
 /* article display */
 
 .article .articleContent {
-    font-size: 1.5em;
-}
-
-.articleContent h1, .article h1 {
-	font-size: 1.9em;
-}
-
-.articleContent h2 {
-	font-size: 1.6em;
-}
-
-.articleContent h3 {
-	font-size: 1.4em;
-}
-
-.articleContent h4 {
-	font-size: 1.2em;
-}
-
-.articleContent h5 {
-	font-size: 1em;
-}
-
-.articleContent h6 {
-	font-size: 0.9em;
+    font-size: 22px;
 }
 
 .articleContent table {
@@ -172,15 +148,20 @@ form textarea {
 }
 
 .articleContent code {
-	background: #eee;
+	background: #bfb;
 	font-family: monospace;
+    font-size: 80%;
 }
 
+.articleContent pre code {
+	background: inherit;
+}
 .articleContent pre {
 	background: #eee;
 	font-family: monospace;
 	display: inline-block;
 	padding: 0.3em;
+	border: dashed #ccc medium;
 }
 
 .article {
@@ -190,6 +171,7 @@ form textarea {
 }
 
 .article .articleTitle {
+    font-size: 22px;
 	display: inline;
 }
 

@@ -7,6 +7,7 @@ The fulltext search index is stored below ~/lucene/cms-webapp.
 
 The database file is stored at ~/h2.mv.db.
 
+An up-to-date list of features can be found at: https://gruust.stream/byTag/site-software
 
 
 ## Google Oauth2
