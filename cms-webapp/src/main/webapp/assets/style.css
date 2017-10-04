@@ -74,21 +74,27 @@ header a:active {
 	color: white;
 }
 
-main a.iconTextLink:link {
+main a.iconTextLink:link, main a.open-article:link {
 	text-decoration: none;
 	color: black;
 }
 
-main a.iconTextLink:visited {
+main a.iconTextLink:visited, main a.open-article:visited {
 	color: black;
 }
 
-main a.iconTextLink:hover {
+main a.iconTextLink:hover, main a.open-article:hover {
 	color: black;
 }
 
-main a.iconTextLink:active {
+main a.iconTextLink:active, main a.open-article:active {
 	color: black;
+}
+
+main a.open-article.material-icons {
+	font-size: 1em;
+	padding-left: 0.7em;
+	padding-right: 0.3em;
 }
 
 form input[type=text] {

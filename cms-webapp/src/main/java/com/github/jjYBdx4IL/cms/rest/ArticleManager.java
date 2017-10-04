@@ -19,6 +19,7 @@ import static j2html.TagCreator.a;
 import static j2html.TagCreator.div;
 import static j2html.TagCreator.each;
 import static j2html.TagCreator.form;
+import static j2html.TagCreator.i;
 import static j2html.TagCreator.input;
 import static j2html.TagCreator.label;
 import static j2html.TagCreator.text;
@@ -111,6 +112,10 @@ public class ArticleManager {
                         a(
                             div(article.getTitle()).withClass("articleTitle")
                         ).withHref(urlTpl.build(article.getId()).toString()))
+                    .condWith(article.isPublished(),
+                        a("open_in_new").withHref(htmlBuilder.constructArticleLink(article))
+                            .withClass("material-icons open-article").withTarget("_extern")
+                    )
                     .with(new Text(
                         article.isPublished()
                             ? String.format(" (published: %s)", HtmlBuilder.fmtDate(article.getFirstPublishedAt()))
@@ -180,7 +185,7 @@ public class ArticleManager {
         }
 
         content = content.replace("\r\n", "\n");
-        
+
         Date now = new Date();
         Article article = new Article();
         article.setTitle(title);
@@ -272,7 +277,7 @@ public class ArticleManager {
         }
 
         content = content.replace("\r\n", "\n");
-        
+
         Date now = new Date();
         article.setTitle(title);
         // article.setPathId(pathId); // the pathId should be constant and never
