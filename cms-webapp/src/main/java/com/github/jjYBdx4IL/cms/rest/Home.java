@@ -108,6 +108,7 @@ public class Home {
             .withTitle(appCache.get(ConfigKey.WEBSITE_TITLE) + " - " + selectedTag)
             .withHref(tagRssFeedUrl);
         
+        htmlBuilder.setHeadTitlePrefix(selectedTag);
         htmlBuilder.setPageTitle("Tag: " + selectedTag);
         htmlBuilder.addPageTitleSubItem("room_service", "Rss feed for this tag", tagRssFeedUrl);
         htmlBuilder.addHeadContent(tagRssFeedLink);
