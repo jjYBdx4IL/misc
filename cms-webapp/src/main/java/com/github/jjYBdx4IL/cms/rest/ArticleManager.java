@@ -166,7 +166,7 @@ public class ArticleManager {
 
         boolean published = "on".equalsIgnoreCase(_published);
 
-        if (title == null || title.isEmpty() || !title.equals(sanitizeHtml(title))) {
+        if (title == null || title.isEmpty()) { // no sanitization of the title needed, j2html will do that on output
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("title required").build();
         }
         if (pathId == null || pathId.isEmpty() || !Article.PATHID_PATTERN.matcher(pathId).find()) {

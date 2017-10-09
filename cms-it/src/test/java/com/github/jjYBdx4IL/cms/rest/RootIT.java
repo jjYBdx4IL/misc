@@ -136,22 +136,14 @@ public class RootIT {
         Response response = (Response) getTarget("devel/login").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
 
-        final String title = "test title <script>window.alert('ups');</script>";
-        final String content = "embed://youtube/d4e03F3lLco/19m29s";
+        final String title = "test title";
+        final String content = "embed://youtube/d4e03F3lLco/19m29s <script>window.alert('ups');</script>";
         final String tag = "aTag";
         final String pathId = "p" + PasswordGenerator.generate55(11);
 
         Form form = new Form().param("title", title).param("content", content).param("tags", tag).param("pathId",
             pathId).param("processed", "processed bla").param("published", "on");
 
-        // rejected because title has stuff in it that needs sanitizing
-        response = (Response) getTarget("articleManager/create").request()
-            .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
-        assertEquals(HttpServletResponse.SC_BAD_REQUEST, response.getStatus());
-
-        // fix title and try again
-        form = new Form().param("title", "asd").param("content", content).param("tags", tag).param("pathId",
-            pathId).param("processed", "processed bla");
         response = (Response) getTarget("articleManager/create").request()
             .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
         assertEquals(response.readEntity(String.class), HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
