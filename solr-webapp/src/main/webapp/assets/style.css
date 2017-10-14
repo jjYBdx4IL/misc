@@ -1,0 +1,303 @@
+/*  header stuff */
+body {
+	padding-top: 40px !important;
+	height: auto !important;
+}
+
+header {
+	background: black;
+	color: white;
+	height: 40px;
+	position: fixed;
+	top: 0px;
+	transition: top 200ms ease-in-out;
+	width: 100%;
+	z-index: 210;
+	overflow: hidden;
+}
+
+.nav-up {
+	top: -40px;
+}
+
+header div.row h1 {
+	margin: -0.1em 2% !important;
+}
+
+header div.row>div {
+	margin: 0.6em 2% !important;
+}
+
+.signin {
+	border: 0.1em solid white;
+	border-radius: 160px;
+	padding: 0em 0.3em 0.3em 0.3em;
+	top: -0.2em;
+	position: relative;
+	background: #666;
+}
+
+/* a.signout { */
+header .titlebar .material-icons {
+	top: -0.16em;
+	position: relative;
+	font-size: 2em;
+	padding-left: 0.5em;
+}
+
+.container .row .iconTextLink * {
+	vertical-align: middle;
+}
+
+.signin:hover {
+	background: #999;
+}
+
+.material-icons:hover {
+	cursor: pointer;
+}
+
+header a:link {
+	text-decoration: none;
+	color: white;
+}
+
+header a:visited {
+	color: white;
+}
+
+header a:hover {
+	color: white;
+}
+
+header a:active {
+	color: white;
+}
+
+main a.iconTextLink:link, main a.open-article:link {
+	text-decoration: none;
+	color: black;
+}
+
+main a.iconTextLink:visited, main a.open-article:visited {
+	color: black;
+}
+
+main a.iconTextLink:hover, main a.open-article:hover {
+	color: black;
+}
+
+main a.iconTextLink:active, main a.open-article:active {
+	color: black;
+}
+
+main a.open-article.material-icons {
+	font-size: 1em;
+	padding-left: 0.7em;
+	padding-right: 0.3em;
+}
+
+form input[type=text] {
+	width: 90%;
+}
+
+form textarea {
+	width: 90%;
+	height: 24em;
+}
+
+.tagLineHeader {
+	font-size: 0.82em;
+}
+
+.tag {
+	background: #ccf;
+	display: inline;
+	font-size: 0.82em;
+	padding: 0 0.2em;
+	margin: 0 0.2em;
+}
+
+/* jquery */
+.ui-autocomplete-loading {
+	background: white url("images/spinner.gif") right center no-repeat;
+	background-size: 16px;
+}
+
+/* article display */
+
+.article .articleContent {
+    font-size: 22px;
+}
+
+.articleContent table {
+	background: #eee;
+	padding: 0 0.3em;
+	border: solid #ddd;
+}
+
+.articleContent blockquote * {
+	font-family: inherit;
+	font-style: inherit;
+}
+	
+.articleContent blockquote {
+	padding: 0 0.3em;
+	font-style: italic;
+	margin-left: 32px;
+	background: url('material-icons/ic_format_quote_black_24px.svg');
+	background-repeat: no-repeat;
+	background-size: 55px;
+	background-position: 0 -0.5em;
+	min-height: 40px;
+	text-indent: 55px;
+}
+
+.articleContent code {
+	background: #bfb;
+	font-family: monospace;
+    font-size: 80%;
+}
+
+.articleContent pre code {
+	background: inherit;
+}
+.articleContent pre {
+	background: #eee;
+	font-family: monospace;
+	display: inline-block;
+	padding: 0.3em;
+	border: dashed #ccc medium;
+}
+
+.articleContent img {
+	padding: 1em;
+}
+.articleContent img.r30 {
+	max-width: 30%;
+	float: right;
+}
+.articleContent img.r40 {
+    max-width: 40%;
+    float: right;
+}
+.articleContent img.r50 {
+    max-width: 50%;
+    float: right;
+}
+.articleContent img.right {
+    max-width: 50%;
+    float: right;
+}
+.articleContent img.l30 {
+    max-width: 30%;
+    float: left;
+}
+.articleContent img.l40 {
+    max-width: 40%;
+    float: left;
+}
+.articleContent img.l50 {
+    max-width: 50%;
+    float: left;
+}
+.articleContent img.l100 {
+    max-width: 100%;
+    padding: 0;
+    float: left;
+}
+.articleContent img.left {
+	float: left;
+}
+
+.article {
+	border-left: thick solid #ddd;
+	padding-left: 0.5em;
+	background: #f3f3f3;
+}
+
+.article .articleTitle {
+    font-size: 22px;
+	display: inline;
+}
+
+.article .articleMeta .iconTextLink * {
+	padding-left: 1em;
+	font-size: 1em;
+}
+
+.article .articleMeta {
+	font-family: monospace;
+	font-size: 1em;
+	color: #777;
+}
+
+.articleManager textarea, .articleManager input {
+	font-family: monospace;
+}
+
+input[readonly] {
+	background-color: #ddd;
+}
+
+.settings .editForm {
+	border-top: dashed #ddd;
+}
+
+.settings .editForm textarea {
+	font-family: monospace;
+}
+
+footer {
+	padding-top: 3em;
+	text-align: center;
+}
+
+/* image viewer */
+
+#imageViewerBackPane {
+	position: fixed;
+	top: 0;
+	left: 0;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.5);
+	z-index: 220;
+	display: none;
+    vertical-align: middle;
+    text-align: center;
+}
+
+#imageViewerBackPane span {
+	color: white;
+	background: black;
+	z-index: 221;
+	padding: 0.3em;
+	margin: 0.3em;
+}
+
+#imageViewerBackPane .spinner {
+	z-index: 221;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+
+.articlesWaypointTrigger {
+	text-align: center;
+}
+
+footer .impressum a {
+    text-decoration: none;
+    color: gray;
+    font-size: 0.7em;
+}
+
+.twttr-share-button {
+	display: inline-block;
+	vertical-align: middle;
+	padding-left: 0.7em;
+}
+
+/* radial-gradient(ellipse at center, #604060 0%, #1d1d2b 100%) */

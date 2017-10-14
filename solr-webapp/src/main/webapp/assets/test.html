@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- <meta http-equiv="refresh" content="1"> -->
+<meta charset="utf-8">
+
+<title>The HTML5 Herald</title>
+<meta name="description" content="The HTML5 Herald">
+<meta name="author" content="SitePoint">
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="simplegrid.css">
+<!-- spinning icons: https://www.w3schools.com/w3css/w3css_icons.asp -->
+<!-- https://material.io/icons/ -->
+<link href="//fonts.googleapis.com/icon?family=Material+Icons"
+	rel="stylesheet">
+<script
+	src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.4/cookieconsent.min.css"/>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.4/cookieconsent.min.js"></script>
+<script type="application/javascript">
+$(function() {
+	var myRegex = /(\d+)([hms])/gi;
+	function toSecs(val) {
+		var secs = 0;
+		while (res = myRegex.exec(val)) {
+		    console.log(val + ' => ' + res[2] + ", " + secs);
+		    if (res[2] === 's') {
+		    	secs += 1 * res[1];
+		    }
+		    else if (res[2] === 'm') {
+                secs += 60 * res[1];
+            }
+            else if (res[2] === 'h') {
+                secs += 3600 * res[1];
+            }
+		}
+		return secs;
+	}
+    console.log(toSecs('1m1s1h'));
+});
+    
+$(function() {
+window.cookieconsent.initialise({
+  "palette": {
+    "popup": {
+      "background": "#000"
+    },
+    "button": {
+      "background": "#f1d600"
+    }
+  },
+  "content": {
+    "message": "We use cookies to personalise content and ads, to provide social media features and to analyse our traffic. We also share information about your use of our site with our social media, advertising and analytics partners who may combine it with other information you’ve provided to them or they’ve collected from your use of their services.",
+    "href": "http://www.google.de"
+  }
+})});
+
+</script>
+<!-- <script src="scripts.js"></script> -->
+</head>
+<body>
+	<header>
+		<div class="container">
+			<div class="row">
+				<h3 class="col-8-sm">Gruust's Corner</h3>
+				<div class="col-4-sm right">sign in</div>
+			</div>
+		</div>
+	</header>
+	<main>
+	
+	<div class="container">
+		<div class="row">
+			<div class="col-4"><a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>
+			<div class="col-4">one two three</div>
+			<div class="col-4">one two three</div>
+			<iframe class="col-12" src="https://docs.google.com/document/d/e/2PACX-1vQg_8O8KzytM2rTdmpLs0xslyFeNkijyG76uDQhDWFmRHxjLuXPlmBDJ5vID3Fx-MIwI0Kwq9RJLDSD/pub?embedded=true"></iframe>
+		</div>
+	</div>
+	<div id="output"></div>
+	<iframe width="560" height="315"
+		src="https://www.youtube.com/embed/8k1UptFsN4k?start=300"
+		frameborder="0" allowfullscreen></iframe> </main>
+	<footer></footer>
+</body>
+</html>

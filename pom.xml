@@ -85,6 +85,7 @@
         <module>proc-utils</module>
         <module>release-parent</module>
         <module>selenium-test-utils</module>
+        <module>solr-webapp</module>
         <module>swing-utils</module>
         <module>text-utils</module>
         <module>vmmgmt-utils</module>
