@@ -22,20 +22,16 @@ import static j2html.TagCreator.input;
 import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
-import com.github.jjYBdx4IL.cms.solr.SolrConfig;
-import com.github.jjYBdx4IL.cms.solr.WebPageBean;
 import j2html.tags.ContainerTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -44,12 +40,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 //CHECKSTYLE:OFF
-@Path("")
+@Path("submitWebSite")
 @PermitAll
 @Transactional
-public class Home {
+public class SubmiteWebSite {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Home.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SubmiteWebSite.class);
 
     @Context
     UriInfo uriInfo;
@@ -60,58 +56,34 @@ public class Home {
     @Inject
     AppCache appCache;
 
-    @Path("")
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public Response get(@QueryParam("q") String searchTerm) throws Exception {
-        if (searchTerm == null) {
-            htmlBuilder.setPageTitle("Search");
-        } else {
-            htmlBuilder.setPageTitle("Search Results");
-            htmlBuilder.enableNoIndex();
-        }
-        
-        htmlBuilder.addPageTitleSubItem("add_to_queue", "Submit website", SubmiteWebSite.class);
-        
+    public Response submit(@QueryParam("site") String site) throws Exception {
+        htmlBuilder.setPageTitle("Submit Website");
+
         ContainerTag container = div().withClass("container");
 
+        if (site != null) {
+            
+        }
+        
         container.with(
+            div(
+                div("Indexing websites currently works via site-maps located via sitemap entries in robots.txt.")
+                    .withClass("col-12")
+            ).withClass("row")
+        ).with(
             form().withMethod("GET").attr("accept-charset", "utf-8").with(
-                input().withName("q").withPlaceholder("Enter search term(s)").isRequired()
-                    .withCondValue(searchTerm != null, searchTerm)
+                input().withName("q")
+                    .withPlaceholder("https://your.website.com (only domain, no pages/query parts, no port)")
+                    .isRequired()
                     .attr("autofocus")
                     .withClass("col-12")
-            ).withClass("row searchForm")
+            ).withClass("row submitWebSiteForm")
         );
-
-        appendSearchResults(container, searchTerm, 0);
 
         htmlBuilder.mainAdd(container);
 
         return Response.ok(htmlBuilder.toString()).build();
     }
-
-    @Path("continue/{skip}")
-    @GET
-    @Produces(MediaType.TEXT_HTML)
-    public Response cont(@PathParam("skip") int skip) {
-
-        return Response.ok(htmlBuilder.toString()).build();
-    }
-
-    protected void appendSearchResults(ContainerTag container, String searchTerm, int pageIndex) throws Exception {
-        if (searchTerm == null || searchTerm.isEmpty()) {
-            return;
-        }
-
-        List<WebPageBean> pages = SolrConfig.queryWebPages(searchTerm, pageIndex);
-        pages.forEach(page -> container.with(
-            div(
-                div(
-
-                ).withClass("col-12")
-            ).withClass("row")
-        ));
-    }
-
 }

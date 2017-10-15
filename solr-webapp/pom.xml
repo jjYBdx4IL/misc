@@ -25,6 +25,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <hibernate.version>5.2.10.Final</hibernate.version>
+        <solr.version>7.0.1</solr.version>
         <webappAssetsDirectory>${project.build.directory}/${project.build.finalName}/assets</webappAssetsDirectory>
     </properties>
 
@@ -208,6 +209,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj</artifactId>
+            <version>${solr.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.github.jjYBdx4IL.utils</groupId>
             <artifactId>text-utils</artifactId>
             <version>1.1-SNAPSHOT</version>
@@ -216,6 +222,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
             <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.crawler-commons</groupId>
+            <artifactId>crawler-commons</artifactId>
+            <version>0.8</version>
         </dependency>
         <dependency>
             <groupId>com.google.api-client</groupId>
@@ -259,6 +270,16 @@
                 <groupId>javax.activation</groupId>
                 <artifactId>activation</artifactId>
                 <version>1.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.5</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>4.4.1</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.mail</groupId>
