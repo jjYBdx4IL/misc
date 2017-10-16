@@ -1,4 +1,4 @@
-package com.github.jjYBdx4IL.cms;
+package com.github.jjYBdx4IL.cms.solr;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

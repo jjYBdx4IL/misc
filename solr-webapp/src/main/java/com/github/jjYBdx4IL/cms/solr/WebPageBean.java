@@ -24,18 +24,21 @@ import java.util.Date;
 public class WebPageBean extends SolrBean {
 
     private String content;
+    private String contentNoStore;
     private String keywords;
     private Date modified;
     private Date retrieved;
     private Date lastChecked;
- 
-    public WebPageBean(String url, String content, String keywords, Date modified, Date retrieved, Date lastChecked) {
+
+    public WebPageBean(String url, String content, String contentNoStore, String keywords, Date modified,
+        Date retrieved, Date lastChecked) {
         super(new BasicURLNormalizer().filter(url), SolrBeanType.WEBPAGE);
         this.content = content;
+        this.contentNoStore = contentNoStore;
         this.keywords = keywords;
         this.modified = new Date(modified.getTime());
-        this.retrieved = new Date(retrieved.getTime());;
-        this.lastChecked = new Date(lastChecked.getTime());;
+        this.retrieved = new Date(retrieved.getTime());
+        this.lastChecked = new Date(lastChecked.getTime());
     }
 
     /**
@@ -57,7 +60,7 @@ public class WebPageBean extends SolrBean {
     public String getKeywords() {
         return keywords;
     }
-    
+
     @Field("keywords")
     public void setKeywords(String keywords) {
         this.keywords = keywords;
@@ -88,6 +91,15 @@ public class WebPageBean extends SolrBean {
     @Field("lastChecked")
     public void setLastChecked(Date lastChecked) {
         this.lastChecked = lastChecked;
+    }
+
+    public String getContentNoStore() {
+        return contentNoStore;
+    }
+
+    @Field("contentNoStore")
+    public void setContentNoStore(String contentNoStore) {
+        this.contentNoStore = contentNoStore;
     }
 
 }

@@ -27,10 +27,8 @@ public class WebSiteBean extends SolrBean {
     private Date retrieved;
     private Date lastChecked;
  
-    public WebSiteBean(String url, String content, String keywords, Date modified, Date retrieved, Date lastChecked) {
+    public WebSiteBean(String url, Date modified, Date retrieved, Date lastChecked) {
         super("site-" + new ProtoHostURLNormalizer().filter(url), SolrBeanType.WEBSITE);
-        this.content = content;
-        this.keywords = keywords;
         this.modified = new Date(modified.getTime());
         this.retrieved = new Date(retrieved.getTime());;
         this.lastChecked = new Date(lastChecked.getTime());;
@@ -41,24 +39,6 @@ public class WebSiteBean extends SolrBean {
      */
     public String getUrl() {
         return getId();
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    @Field("content")
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getKeywords() {
-        return keywords;
-    }
-    
-    @Field("keywords")
-    public void setKeywords(String keywords) {
-        this.keywords = keywords;
     }
 
     public Date getModified() {
