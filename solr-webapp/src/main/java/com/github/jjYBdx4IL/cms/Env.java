@@ -13,25 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jjYBdx4IL.utils.solr.beans;
+package com.github.jjYBdx4IL.cms;
 
-//CHECKSTYLE:OFF
-public enum FieldType {
-    /**
-     * fixed string.
-     * 
-     * Does <b>not</b> get analyzed/tokenized.
-     */
-    string,
-    /**
-     * string that gets analyzed/tokenized.
-     */
-    text_general,
-    /**
-     * floating-point numbers.
-     */
-    pdoubles,
-    booleans,
-    pdates,
-    plongs;
+public class Env {
+    
+    public static final String PROPNAME_ENV_DEVEL = "cms.devel";
+
+    private Env() {
+    }
+
+    public static boolean isDevel() {
+        return Boolean.getBoolean(PROPNAME_ENV_DEVEL);
+    }
+
 }

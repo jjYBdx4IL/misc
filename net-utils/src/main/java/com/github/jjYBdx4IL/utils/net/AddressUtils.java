@@ -32,7 +32,8 @@ public class AddressUtils {
         try {
             InetAddress candidateAddress = null;
             // Iterate all NICs (network interface cards)...
-            for (Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces(); ifaces.hasMoreElements();) {
+            for (Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces(); ifaces
+                .hasMoreElements();) {
                 NetworkInterface iface = ifaces.nextElement();
                 // Iterate all IP addresses assigned to each card...
                 for (Enumeration<InetAddress> inetAddrs = iface.getInetAddresses(); inetAddrs.hasMoreElements();) {
@@ -40,27 +41,35 @@ public class AddressUtils {
                     if (!inetAddr.isLoopbackAddress()) {
 
                         if (inetAddr.isSiteLocalAddress() && inetAddr.getHostAddress().startsWith("192.168.")) {
-                            // Found non-loopback site-local address. Return it immediately...
+                            // Found non-loopback site-local address. Return it
+                            // immediately...
                             return inetAddr;
                         } else if (candidateAddress == null) {
-                            // Found non-loopback address, but not necessarily site-local.
-                            // Store it as a candidate to be returned if site-local address is not subsequently found...
+                            // Found non-loopback address, but not necessarily
+                            // site-local.
+                            // Store it as a candidate to be returned if
+                            // site-local address is not subsequently found...
                             candidateAddress = inetAddr;
-                            // Note that we don't repeatedly assign non-loopback non-site-local addresses as candidates,
-                            // only the first. For subsequent iterations, candidate will be non-null.
+                            // Note that we don't repeatedly assign non-loopback
+                            // non-site-local addresses as candidates,
+                            // only the first. For subsequent iterations,
+                            // candidate will be non-null.
                         }
                     }
                 }
             }
             if (candidateAddress != null) {
-                // We did not find a site-local address, but we found some other non-loopback address.
-                // Server might have a non-site-local address assigned to its NIC (or it might be running
+                // We did not find a site-local address, but we found some other
+                // non-loopback address.
+                // Server might have a non-site-local address assigned to its
+                // NIC (or it might be running
                 // IPv6 which deprecates the "site-local" concept).
                 // Return this non-loopback candidate address...
                 return candidateAddress;
             }
         } catch (SocketException e) {
-            UnknownHostException unknownHostException = new UnknownHostException("Failed to determine LAN address: " + e);
+            UnknownHostException unknownHostException = new UnknownHostException(
+                "Failed to determine LAN address: " + e);
             unknownHostException.initCause(e);
             throw unknownHostException;
         }
@@ -68,6 +77,26 @@ public class AddressUtils {
         throw new UnknownHostException("The JDK InetAddress.getLocalHost() method unexpectedly returned null.");
     }
 
-    private AddressUtils() {}
+    /**
+     * Returns true only iff none of the ip address resolved are associated with the local machine including
+     * its public ip addresses.
+     */
+    public static boolean isSimpleNonLocalAddress(String hostname) throws UnknownHostException {
+        if (hostname == null || hostname.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        for (InetAddress addr : InetAddress.getAllByName(hostname)) {
+            if (addr.isLoopbackAddress() || addr.isSiteLocalAddress() || addr.isAnyLocalAddress()
+                || addr.isLinkLocalAddress() || addr.isMCGlobal() || addr.isMCLinkLocal()
+                || addr.isMCNodeLocal() || addr.isMCOrgLocal() || addr.isMCSiteLocal()
+                || addr.isMulticastAddress()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private AddressUtils() {
+    }
 
 }

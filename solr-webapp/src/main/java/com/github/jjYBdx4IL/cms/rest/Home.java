@@ -60,6 +60,7 @@ public class Home {
     @Inject
     AppCache appCache;
 
+    // https://www.finalist.nl/techblog/2015/06/improving-search-result-with-search-api-solr-better-search-excerpts/
     @Path("")
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -71,7 +72,7 @@ public class Home {
             htmlBuilder.enableNoIndex();
         }
         
-        htmlBuilder.addPageTitleSubItem("add_to_queue", "Submit website", SubmiteWebSite.class);
+        htmlBuilder.addPageTitleSubItem("add_to_queue", "Submit website", SubmitWebSite.class);
         
         ContainerTag container = div().withClass("container");
 

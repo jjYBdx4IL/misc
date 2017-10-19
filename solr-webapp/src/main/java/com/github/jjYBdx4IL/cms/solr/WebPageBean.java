@@ -15,37 +15,41 @@
  */
 package com.github.jjYBdx4IL.cms.solr;
 
-import com.github.jjYBdx4IL.cms.solr.SolrBean;
-import crawlercommons.filters.basic.BasicURLNormalizer;
+import com.github.jjYBdx4IL.utils.solr.beans.FieldConfig;
+import com.github.jjYBdx4IL.utils.solr.beans.FieldType;
 import org.apache.solr.client.solrj.beans.Field;
 
-import java.util.Date;
+public class WebPageBean {
 
-public class WebPageBean extends SolrBean {
-
+    private String url;
+    private String title;
     private String content;
-    private String contentNoStore;
     private String keywords;
-    private Date modified;
-    private Date retrieved;
-    private Date lastChecked;
+    private String contentType;
+    private String parsedBy;
 
-    public WebPageBean(String url, String content, String contentNoStore, String keywords, Date modified,
-        Date retrieved, Date lastChecked) {
-        super(new BasicURLNormalizer().filter(url), SolrBeanType.WEBPAGE);
-        this.content = content;
-        this.contentNoStore = contentNoStore;
-        this.keywords = keywords;
-        this.modified = new Date(modified.getTime());
-        this.retrieved = new Date(retrieved.getTime());
-        this.lastChecked = new Date(lastChecked.getTime());
+    public WebPageBean() {
     }
 
-    /**
-     * Alias for {@link #getId()}.
-     */
+    public WebPageBean(String url, String title, String content, String keywords, String contentType,
+        String parsedBy) {
+
+        this.url = url;
+        this.title = title;
+        this.content = content;
+        this.keywords = keywords;
+        this.contentType = contentType;
+        this.parsedBy = parsedBy;
+    }
+
     public String getUrl() {
-        return getId();
+        return url;
+    }
+
+    @Field("id")
+    @FieldConfig(type = FieldType.string, indexed = true, required = true, stored = true)
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getContent() {
@@ -53,6 +57,7 @@ public class WebPageBean extends SolrBean {
     }
 
     @Field("content")
+    @FieldConfig(indexed = true, type = FieldType.text_general, stored = true)
     public void setContent(String content) {
         this.content = content;
     }
@@ -62,44 +67,38 @@ public class WebPageBean extends SolrBean {
     }
 
     @Field("keywords")
+    @FieldConfig(indexed = true, type = FieldType.text_general, stored = true)
     public void setKeywords(String keywords) {
         this.keywords = keywords;
     }
 
-    public Date getModified() {
-        return modified;
+    public String getTitle() {
+        return title;
     }
 
-    @Field("modified")
-    public void setModified(Date modified) {
-        this.modified = modified;
+    @Field("title")
+    @FieldConfig(indexed = true, type = FieldType.text_general, stored = true)
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public Date getRetrieved() {
-        return retrieved;
+    public String getContentType() {
+        return contentType;
     }
 
-    @Field("retrieved")
-    public void setRetrieved(Date retrieved) {
-        this.retrieved = retrieved;
+    @Field("contentType")
+    @FieldConfig(indexed = false, type = FieldType.string, stored = true)
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
-    public Date getLastChecked() {
-        return lastChecked;
+    public String getParsedBy() {
+        return parsedBy;
     }
 
-    @Field("lastChecked")
-    public void setLastChecked(Date lastChecked) {
-        this.lastChecked = lastChecked;
+    @Field("parsedBy")
+    @FieldConfig(indexed = false, type = FieldType.string, stored = true)
+    public void setParsedBy(String parsedBy) {
+        this.parsedBy = parsedBy;
     }
-
-    public String getContentNoStore() {
-        return contentNoStore;
-    }
-
-    @Field("contentNoStore")
-    public void setContentNoStore(String contentNoStore) {
-        this.contentNoStore = contentNoStore;
-    }
-
 }

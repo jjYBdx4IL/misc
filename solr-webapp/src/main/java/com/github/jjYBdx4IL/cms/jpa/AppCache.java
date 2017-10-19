@@ -15,11 +15,11 @@
  */
 package com.github.jjYBdx4IL.cms.jpa;
 
+import com.github.jjYBdx4IL.cms.Env;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,7 +35,6 @@ public class AppCache {
     private static final Logger LOG = LoggerFactory.getLogger(AppCache.class);
     
     public static final String DEVEL_ADMIN = "devel-1";
-    public static final String PROPNAME_CMS_DEVEL = "cms.devel";
     
     private Map<ConfigKey, String> values = new ConcurrentHashMap<>();;
     private Map<String, String> admins = new ConcurrentHashMap<>();
@@ -61,7 +60,7 @@ public class AppCache {
                 }
             }
         }
-        if (isDevel()) {
+        if (Env.isDevel()) {
             LOG.warn("detected development environment, adding default admin: " + DEVEL_ADMIN);
             admins.put(DEVEL_ADMIN, DEVEL_ADMIN);
         }
@@ -82,10 +81,6 @@ public class AppCache {
     
     public boolean isAdmin(String uid) {
         return admins.containsKey(uid);
-    }
-    
-    public boolean isDevel() {
-        return Boolean.getBoolean(PROPNAME_CMS_DEVEL);
     }
     
 }

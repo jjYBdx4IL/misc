@@ -19,7 +19,15 @@ package com.github.jjYBdx4IL.utils.net;
 import com.github.jjYBdx4IL.utils.env.CI;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import static org.junit.Assert.*;
+
+import org.apache.commons.lang.StringUtils;
 import org.junit.Assume;
 
 /**
@@ -28,6 +36,8 @@ import org.junit.Assume;
  */
 public class AddressUtilsTest {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AddressUtilsTest.class);
+    
     public AddressUtilsTest() {
     }
 
@@ -39,4 +49,15 @@ public class AddressUtilsTest {
         assertTrue(AddressUtils.getNonLocalHostIPAddress().getHostAddress().startsWith("192.168."));
     }
 
+    @Test
+    public void testIsSimpleNonLocalAddress() throws UnknownHostException {
+        assertTrue(AddressUtils.isSimpleNonLocalAddress("1.2.3.4"));
+        assertTrue(AddressUtils.isSimpleNonLocalAddress("ibm.com"));
+        assertFalse(AddressUtils.isSimpleNonLocalAddress("localhost"));
+        assertFalse(AddressUtils.isSimpleNonLocalAddress("::1"));
+        assertFalse(AddressUtils.isSimpleNonLocalAddress("127.0.0.1"));
+        assertFalse(AddressUtils.isSimpleNonLocalAddress("127.0.0.2"));
+        assertFalse(AddressUtils.isSimpleNonLocalAddress(InetAddress.getLocalHost().getHostAddress()));
+    }
+    
 }

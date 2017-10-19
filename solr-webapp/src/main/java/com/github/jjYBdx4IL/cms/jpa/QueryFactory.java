@@ -15,17 +15,22 @@
  */
 package com.github.jjYBdx4IL.cms.jpa;
 
+import com.github.jjYBdx4IL.cms.Env;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigValue;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigValue_;
+import com.github.jjYBdx4IL.cms.jpa.dto.Domain;
+import com.github.jjYBdx4IL.cms.jpa.dto.Domain_;
 import com.github.jjYBdx4IL.cms.jpa.dto.User;
 import com.github.jjYBdx4IL.cms.jpa.dto.User_;
+import com.github.jjYBdx4IL.cms.jpa.dto.WebPageMeta;
+import com.github.jjYBdx4IL.cms.jpa.dto.WebPageMeta_;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.enterprise.context.RequestScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -36,9 +41,10 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 //CHECKSTYLE:OFF
-@RequestScoped
 public class QueryFactory {
 
+    public static final long SPAM_DELAY_MS = Env.isDevel() ? 0L : 900L * 1000L;
+    
     @PersistenceContext
     EntityManager em;
 
@@ -108,4 +114,40 @@ public class QueryFactory {
         }
         return result;
     }
+
+    public Domain getDomainByUrl(String url) {
+        final CriteriaBuilder cb = em.getCriteriaBuilder();
+        final CriteriaQuery<Domain> cq = cb.createQuery(Domain.class);
+        final Root<Domain> root = cq.from(Domain.class);
+        Predicate predicateKey = cb.equal(root.get(Domain_.url), url);
+        cq.where(predicateKey);
+        List<Domain> results = em.createQuery(cq).getResultList();
+        return results.isEmpty() ? null : results.get(0);
+    }
+
+    public TypedQuery<Domain> getDomain4Processing() {
+        final CriteriaBuilder cb = em.getCriteriaBuilder();
+        final CriteriaQuery<Domain> cq = cb.createQuery(Domain.class);
+        final Root<Domain> root = cq.from(Domain.class);
+        cq.where(cb.and(
+            cb.isNotNull(root.get(Domain_.scheduledUpdate)),
+            cb.lessThan(root.get(Domain_.scheduledUpdate), new Date()),
+            cb.lessThan(root.get(Domain_.lastProcessed), new Date(System.currentTimeMillis() - SPAM_DELAY_MS))));
+        cq.orderBy(cb.asc(root.get(Domain_.scheduledUpdate)));
+        TypedQuery<Domain> tq = em.createQuery(cq);
+        tq.setMaxResults(1);
+        return tq;
+    }
+
+    public TypedQuery<WebPageMeta> getWebPageMetaQuery() {
+        final CriteriaBuilder cb = em.getCriteriaBuilder();
+        final CriteriaQuery<WebPageMeta> cq = cb.createQuery(WebPageMeta.class);
+        final Root<WebPageMeta> root = cq.from(WebPageMeta.class);
+        Predicate predicateKey = cb.equal(
+            root.get(WebPageMeta_.url),
+            cb.parameter(WebPageMeta_.url.getJavaType(), "url"));
+        cq.where(predicateKey);
+        return em.createQuery(cq);
+    }
+
 }

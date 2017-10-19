@@ -50,7 +50,7 @@ public class SolrUtils {
         LOG.debug(reply);
         int maxTime = -1;
         try {
-                maxTime = (int) JsonPath.parse(reply).read("$['config']['updateHandler']['autoSoftCommit']['maxTime']");
+            maxTime = (int) JsonPath.parse(reply).read("$['config']['updateHandler']['autoSoftCommit']['maxTime']");
         } catch (PathNotFoundException ex) {
         }
         if (maxTime <= 0) {
@@ -65,7 +65,7 @@ public class SolrUtils {
                 "    }\n").asJson();
         }
     }
-    
+
     public static void verifyOrDisableAutoCreateFields(String collectionUrl) throws IOException, UnirestException {
         String overlayConfigUrl = collectionUrl + "/config/overlay?omitHeader=true";
         String reply = Unirest.get(overlayConfigUrl).asString().getBody();
@@ -162,18 +162,10 @@ public class SolrUtils {
                 if (beanConfig.unique()) {
                     fieldAttributes.put("unique", beanConfig.unique());
                 }
-                if (beanConfig.indexed()) {
-                    fieldAttributes.put("indexed", beanConfig.indexed());
-                }
-                if (beanConfig.stored()) {
-                    fieldAttributes.put("stored", beanConfig.stored());
-                }
-                if (beanConfig.required()) {
-                    fieldAttributes.put("required", beanConfig.required());
-                }
-                if (beanConfig.multiValued()) {
-                    fieldAttributes.put("multiValued", beanConfig.multiValued());
-                }
+                fieldAttributes.put("indexed", beanConfig.indexed());
+                fieldAttributes.put("stored", beanConfig.stored());
+                fieldAttributes.put("required", beanConfig.required());
+                fieldAttributes.put("multiValued", beanConfig.multiValued());
                 SchemaRequest.AddField addFieldRequest = new SchemaRequest.AddField(fieldAttributes);
                 UpdateResponse updateResponse = addFieldRequest.process(client);
                 LOG.debug("response: " + updateResponse);

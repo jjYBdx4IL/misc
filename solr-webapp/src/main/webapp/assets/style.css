@@ -300,4 +300,14 @@ footer .impressum a {
 	padding-left: 0.7em;
 }
 
+.error {
+	color: red;
+	font-weight: bold;
+}
+
+.success {
+	color: green;
+	font-weight: bold;
+}
+
 /* radial-gradient(ellipse at center, #604060 0%, #1d1d2b 100%) */

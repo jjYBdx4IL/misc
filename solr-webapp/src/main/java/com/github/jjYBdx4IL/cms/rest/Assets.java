@@ -15,6 +15,7 @@
  */
 package com.github.jjYBdx4IL.cms.rest;
 
+import com.github.jjYBdx4IL.cms.Env;
 import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 import com.github.jjYBdx4IL.utils.text.MimeType;
@@ -23,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
@@ -61,7 +61,7 @@ public class Assets {
         String mimeType = MimeType.get(file.getName(), "utf-8");
         LOG.info(mimeType + " " + file);
         CacheControl cacheControl = new CacheControl();
-        if (appCache.isDevel()) {
+        if (Env.isDevel()) {
             cacheControl.setNoCache(true);
         } else {
             cacheControl.setMaxAge(7200); // seconds

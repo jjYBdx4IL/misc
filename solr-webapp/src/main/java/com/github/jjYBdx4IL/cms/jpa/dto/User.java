@@ -78,7 +78,7 @@ public class User implements Serializable {
     }
 
     public void setLastLoginAt(Date lastLoginAt) {
-        this.lastLoginAt = lastLoginAt;
+        this.lastLoginAt = lastLoginAt == null ? null : (Date) lastLoginAt.clone();
     }
 
     public Date getCreatedAt() {
@@ -86,7 +86,7 @@ public class User implements Serializable {
     }
 
     public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+        this.createdAt = createdAt == null ? null : (Date) createdAt.clone();
     }
 
     public int getVersion() {

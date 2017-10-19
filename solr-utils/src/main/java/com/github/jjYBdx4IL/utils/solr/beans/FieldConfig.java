@@ -32,13 +32,14 @@ public @interface FieldConfig {
     boolean stored() default true;
 
     boolean required() default false;
-    
+
     /**
      * required for searching.
      * 
      * @return true if search should be supported for this field
      */
     boolean indexed() default false;
+
     boolean multiValued() default false;
 
     FieldType type() default FieldType.string;
