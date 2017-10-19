@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class SolrConfig {
 
@@ -41,25 +42,6 @@ public class SolrConfig {
         HttpSolrClient solr = new HttpSolrClient.Builder(SOLR_CONNECTION).build();
         solr.setParser(new XMLResponseParser());
         return solr;
-    }
-
-    public static List<WebPageBean> queryWebPages(String queryString, int pageIndex)
-        throws SolrServerException, IOException {
-
-        try (SolrClient client = getClient()) {
-            return queryWebPages(client, queryString, pageIndex);
-        }
-    }
-
-    public static List<WebPageBean> queryWebPages(SolrClient client, String queryString, int pageIndex)
-        throws SolrServerException, IOException {
-
-        SolrQuery query = new SolrQuery();
-        query.set("q", queryString);
-        query.set("rows", MAX_RESULTS_PER_REQUEST);
-        query.set("start", pageIndex * MAX_RESULTS_PER_REQUEST);
-        QueryResponse response = client.query(query);
-        return response.getBeans(WebPageBean.class);
     }
 
     public static void init() {
@@ -79,16 +61,5 @@ public class SolrConfig {
             client.commit();
         }
     }
-
-//    public static WebPageBean getWebPageBean(SolrClient client, String url) throws SolrServerException, IOException {
-//        String id = WebPageBean.constructId(url);
-//        SolrQuery query = new SolrQuery();
-//        query.set("q", "id:" + id);
-//        query.set("rows", 1);
-//        query.set("start", 0);
-//        QueryResponse response = client.query(query);
-//        List<WebPageBean> results = response.getBeans(WebPageBean.class);
-//        return results.isEmpty() ? null : results.get(0);
-//    }
-
+    
 }

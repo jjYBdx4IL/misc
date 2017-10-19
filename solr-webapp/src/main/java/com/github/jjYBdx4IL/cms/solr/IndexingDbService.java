@@ -37,7 +37,8 @@ public class IndexingDbService {
     private static final Logger LOG = LoggerFactory.getLogger(IndexingDbService.class);
 
     public static final long DOMAIN_PROC_DELAY_SUCCESS_MS = 24 * 3600L * 1000L;
-    public static final long DOMAIN_PROC_DELAY_ERROR_MS = 1 * 3600L * 1000L;
+    public static final long DOMAIN_PROC_DELAY_ERROR_MS_INC = 1 * 3600L * 1000L;
+    public static final long DOMAIN_PROC_DELAY_ERROR_MS_MAX = 72 * 3600L * 1000L;
 
     private TypedQuery<WebPageMeta> pageMetaQuery;
 
@@ -63,7 +64,7 @@ public class IndexingDbService {
             } else {
                 domain2.setConsecutiveErrorCount(domain2.getConsecutiveErrorCount() + 1);
                 domain2.setScheduledUpdate(new Date(System.currentTimeMillis()
-                    + DOMAIN_PROC_DELAY_ERROR_MS * domain2.getConsecutiveErrorCount()));
+                    + DOMAIN_PROC_DELAY_ERROR_MS_INC * domain2.getConsecutiveErrorCount()));
             }
             domain2.setLastProcessed(new Date());
             em.persist(domain2);

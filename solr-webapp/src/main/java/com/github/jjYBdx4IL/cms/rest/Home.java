@@ -15,6 +15,7 @@
  */
 package com.github.jjYBdx4IL.cms.rest;
 
+import static j2html.TagCreator.a;
 import static j2html.TagCreator.div;
 import static j2html.TagCreator.form;
 import static j2html.TagCreator.input;
@@ -24,11 +25,21 @@ import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
 import com.github.jjYBdx4IL.cms.solr.SolrConfig;
 import com.github.jjYBdx4IL.cms.solr.WebPageBean;
+import com.github.jjYBdx4IL.utils.solr.SolrUtils;
 import j2html.tags.ContainerTag;
+import j2html.tags.UnescapedText;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
@@ -71,9 +82,9 @@ public class Home {
             htmlBuilder.setPageTitle("Search Results");
             htmlBuilder.enableNoIndex();
         }
-        
+
         htmlBuilder.addPageTitleSubItem("add_to_queue", "Submit website", SubmitWebSite.class);
-        
+
         ContainerTag container = div().withClass("container");
 
         container.with(
@@ -105,14 +116,69 @@ public class Home {
             return;
         }
 
-        List<WebPageBean> pages = SolrConfig.queryWebPages(searchTerm, pageIndex);
-        pages.forEach(page -> container.with(
+        String queryString = SolrUtils.xformQuery(searchTerm, "title", "content", "keywords");
+
+        List<WebPageBean> pages = null;
+        Map<String, Map<String, List<String>>> hl = null;
+
+        QueryResponse response = null;
+        try (SolrClient client = SolrConfig.getClient()) {
+            SolrQuery query = new SolrQuery();
+            query.set("q", queryString);
+            query.set("rows", SolrConfig.MAX_RESULTS_PER_REQUEST);
+            query.set("start", pageIndex * SolrConfig.MAX_RESULTS_PER_REQUEST);
+            query.set("hl", true);
+            query.set("hl.fl", "content,title,keywords");
+            response = client.query(query);
+            hl = response.getHighlighting();
+            pages = response.getBeans(WebPageBean.class);
+        }
+
+        container.with(
             div(
                 div(
-
+                    String.format("%d results found", response.getResults().getNumFound())
                 ).withClass("col-12")
             ).withClass("row")
-        ));
+        );
+
+        for (WebPageBean page : pages) {
+            ContainerTag resultContainer = div().with(
+                div(
+                    div(
+                        a(page.getTitle()).withHref(page.getUrl())
+                    ).withClass("col-12")
+                ).withClass("row")
+            ).withClass("searchResult");
+            for (String frag : getHlFrags(hl, page.getUrl())) {
+                resultContainer.with(
+                    div(
+                        div(
+                            new UnescapedText(sanitizeHtml(frag))
+                        ).withClass("col-12")
+                    ).withClass("row")
+                );
+                break;
+            }
+            container.with(resultContainer);
+        }
     }
 
+    private List<String> getHlFrags(Map<String, Map<String, List<String>>> hl, String url) {
+        List<String> frags = new ArrayList<>();
+        Map<String, List<String>> hl2 = hl.get(url);
+        if (hl2 == null) {
+            return frags;
+        }
+        for (String field : hl2.keySet()) {
+            frags.addAll(hl2.get(field));
+        }
+        return frags;
+    }
+
+    protected String sanitizeHtml(String untrustedHTML) {
+        PolicyFactory policy = new HtmlPolicyBuilder().allowElements("em").toFactory();
+        policy = policy.and(Sanitizers.FORMATTING);
+        return policy.sanitize(untrustedHTML);
+    }
 }

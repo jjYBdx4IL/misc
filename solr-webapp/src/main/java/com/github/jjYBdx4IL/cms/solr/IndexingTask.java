@@ -76,6 +76,7 @@ public class IndexingTask implements Runnable {
     public static final String COLLECTION = "WebSearchCollection";
     public static final String SOLR_COLLECTION_URL = "http://127.0.0.1:8983/solr/" + COLLECTION;
     public static final int MAX_PAGES_PER_WEBSITE = 100;
+    public static final int MAX_SITEMAPS_PER_WEBSITE = 10;
     public static final long DEF_WEBPAGE_REINDEX_IVAL_MS = 30 * 24 * 3600L * 1000L;
     public static final long ERR_WEBPAGE_REINDEX_IVAL_MS = 1 * 24 * 3600L * 1000L;
     public static final SiteMapURL.ChangeFrequency MAX_CHANGE_FREQUENCY = ChangeFrequency.MONTHLY;
@@ -142,6 +143,10 @@ public class IndexingTask implements Runnable {
         BaseRobotRules rules = getRobots(domain.getUrl());
         List<SiteMapURL> pageLinks = fetchSiteLinks(domain.getUrl(), rules);
 
+        if (shutdownLatch.await(1, TimeUnit.MICROSECONDS)) {
+            return;
+        }
+        
         RequestConfig requestConfig = RequestConfig.custom().
             setConnectTimeout(30000).
             setConnectionRequestTimeout(30000).
@@ -204,7 +209,6 @@ public class IndexingTask implements Runnable {
     private boolean handleResponse(CloseableHttpResponse response, WebPageMeta pageMeta) {
         checkNotNull(pageMeta);
 
-        LOG.info("handleResponse: " + pageMeta.getUrl());
         LOG.info("" + response.getStatusLine());
 
         int status = response.getStatusLine().getStatusCode();
@@ -248,7 +252,9 @@ public class IndexingTask implements Runnable {
         try (InputStream is = response.getEntity().getContent()){
             while(baos.size() < MAX_DOC_SIZE && is.available() > 0) {
                 int n = is.read(buf);
-                baos.write(buf, 0, n);
+                if (n > 0) {
+                    baos.write(buf, 0, n);
+                }
             }
             if (is.available() > 0) {
                 LOG.info("content too large: " + contentLength.intValue()  + " bytes");
@@ -366,8 +372,9 @@ public class IndexingTask implements Runnable {
     }
 
     private List<SiteMapURL> fetchSiteLinks(String siteUrl, BaseRobotRules rules)
-        throws UnknownFormatException, IOException {
+        throws UnknownFormatException, IOException, InterruptedException {
 
+        List<SiteMapURL> links = new ArrayList<>();
         List<SiteMap> siteMaps = new ArrayList<>();
         SiteMapParser sitemapParser = new SiteMapParser();
         for (String sitemapUrl : rules.getSitemaps()) {
@@ -380,34 +387,57 @@ public class IndexingTask implements Runnable {
                 SiteMapIndex siteMapIndex = (SiteMapIndex) siteMapCandidate;
                 for (AbstractSiteMap aSiteMap : siteMapIndex.getSitemaps()) {
                     if (aSiteMap instanceof SiteMap) {
-                        siteMaps.add((SiteMap) aSiteMap);
+                        if (siteMaps.size() < MAX_SITEMAPS_PER_WEBSITE) {
+                            siteMaps.add((SiteMap) aSiteMap);
+                        }
                     } else {
                         LOG.warn("ignoring site map index inside site map index: " + aSiteMap.getUrl());
                     }
                 }
             } else {
-                siteMaps.add((SiteMap) siteMapCandidate);
-            }
-        }
-        LOG.info(siteMaps.size() + " site maps found for " + siteUrl);
-        List<SiteMapURL> links = new ArrayList<>();
-        for (SiteMap siteMap : siteMaps) {
-            LOG.info("" + siteMap.getUrl());
-            for (SiteMapURL url : siteMap.getSiteMapUrls()) {
-                LOG.info("link: " + url);
-                String urlString = IndexingUtils.sanitizeUrl(url.getUrl().toExternalForm());
-                if (urlString == null) {
-                    continue;
-                }
-                url.setUrl(urlString);
-                links.add(url);
-                if (links.size() == MAX_PAGES_PER_WEBSITE) {
+                if (!addLinks((SiteMap) siteMapCandidate, links)) {
+                    LOG.info(String.format("%d links found in sitemap for %s", links.size(), siteUrl));
                     return links;
                 }
             }
+            if (shutdownLatch.await(1, TimeUnit.SECONDS)) {
+                return links;
+            }
         }
+        LOG.info(siteMaps.size() + " site maps found for " + siteUrl);
+        for (SiteMap siteMap : siteMaps) {
+            AbstractSiteMap siteMapCandidate = sitemapParser.parseSiteMap(siteMap.getUrl());
+            if (siteMapCandidate instanceof SiteMapIndex) {
+                // ignoring 2nd-level sitemap index
+                continue;
+            }
+            if (!addLinks((SiteMap) siteMapCandidate, links)) {
+                LOG.info(String.format("%d links found in sitemap for %s", links.size(), siteUrl));
+                return links;
+            }
+            if (shutdownLatch.await(1, TimeUnit.SECONDS)) {
+                return links;
+            }
+        }
+        
         LOG.info(String.format("%d links found in sitemap for %s", links.size(), siteUrl));
         return links;
+    }
+    
+    private boolean addLinks(SiteMap siteMap, List<SiteMapURL> links) {
+        LOG.info("" + siteMap.getUrl());
+        for (SiteMapURL url : siteMap.getSiteMapUrls()) {
+            String urlString = IndexingUtils.sanitizeUrl(url.getUrl().toExternalForm());
+            if (urlString == null) {
+                continue;
+            }
+            url.setUrl(urlString);
+            links.add(url);
+            if (links.size() >= MAX_PAGES_PER_WEBSITE) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public boolean hasAccess(BaseRobotRules rules, String urlString) throws MalformedURLException {

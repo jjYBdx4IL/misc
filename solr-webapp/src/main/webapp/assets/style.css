@@ -310,4 +310,9 @@ footer .impressum a {
 	font-weight: bold;
 }
 
+.searchResult em {
+	text-decoration: underline;
+	font-weight: bold;
+}
+
 /* radial-gradient(ellipse at center, #604060 0%, #1d1d2b 100%) */

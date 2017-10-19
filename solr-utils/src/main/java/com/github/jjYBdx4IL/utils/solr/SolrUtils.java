@@ -16,10 +16,13 @@
 package com.github.jjYBdx4IL.utils.solr;
 
 import com.github.jjYBdx4IL.utils.solr.beans.FieldConfig;
+import com.github.jjYBdx4IL.utils.text.QuoteTokenizer;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.apache.commons.lang3.text.StrMatcher;
+import org.apache.commons.lang3.text.StrTokenizer;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.beans.Field;
@@ -194,6 +197,36 @@ public class SolrUtils {
 
     private static boolean cmp(boolean one, Object two) {
         return Boolean.compare(one, two == null ? false : (boolean) two) == 0;
+    }
+
+    public static String xformQuery(String input, String... prefixes) {
+        if (prefixes.length == 0) {
+            throw new IllegalArgumentException();
+        }
+        input = input.replaceAll("[^a-zA-Z0-9*\"'-]", " ");
+        QuoteTokenizer tokenizer = new QuoteTokenizer(); 
+        List<String> tokens = tokenizer.tokenize(input);
+        StringBuilder sb = new StringBuilder(2*input.length());
+        for (String token : tokens) {
+            boolean negated = false;
+            if (token.startsWith("-")) {
+                negated = true;
+            }
+            token = token.replace("-", "");
+            for (String prefix : prefixes) {
+                if (negated) {
+                    sb.append("NOT ");
+                }
+                sb.append(prefix);
+                sb.append(":");
+                sb.append(token.contains(" ") ? "\"" + token + "\"" : token);
+                sb.append(" ");
+            }
+        }
+        if (sb.length() > 0) {
+            sb.setLength(sb.length()-1);
+        }
+        return sb.toString();
     }
 
 }
