@@ -112,7 +112,8 @@ public class Home {
                             li("independent,"),
                             li("trustworthy,"),
                             li("European jurisdiction.")
-                        )
+                        ),
+                        a("More...").withHref("https://gruust.stream/byTag/site-geegee-about")
                     ).withClass("col-12 banner")
                 ).withClass("row")
             );

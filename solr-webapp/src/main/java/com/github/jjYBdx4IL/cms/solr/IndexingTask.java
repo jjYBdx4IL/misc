@@ -61,6 +61,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.DataFormatException;
 
 import javax.annotation.PostConstruct;
@@ -94,6 +95,8 @@ public class IndexingTask implements Runnable {
         .setConnectionRequestTimeout(30000)
         .setSocketTimeout(30000).build();
 
+    public static final AtomicLong ping = new AtomicLong(0);
+    
     @Resource
     ManagedThreadFactory threadFactory;
     @Inject
@@ -145,8 +148,11 @@ public class IndexingTask implements Runnable {
                 } finally {
                     lockService.release(lock);
                 }
+                
+                ping.set(System.currentTimeMillis());
             }
         } catch (Exception ex) {
+            ping.set(0);
             LOG.warn("", ex);
         }
         LOG.info("stopped");
@@ -197,7 +203,7 @@ public class IndexingTask implements Runnable {
                     }
                 }
             } catch (FileTooLargeException | IndexingNotAllowedException
-                | UnsupportedContentTypeException ex) {
+                | UnsupportedContentTypeException | IllegalArgumentException ex) {
                 LOG.info("", ex);
                 dbService.block(meta);
                 return;

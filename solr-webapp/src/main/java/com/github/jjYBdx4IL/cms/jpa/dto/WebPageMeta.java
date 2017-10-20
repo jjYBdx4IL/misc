@@ -18,11 +18,13 @@ package com.github.jjYBdx4IL.cms.jpa.dto;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.ejb.BeforeCompletion;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -145,5 +147,19 @@ public class WebPageMeta implements Serializable {
 
     public void setBlocked(Date blocked) {
         this.blocked = blocked == null ? null : (Date) blocked.clone();
+    }
+    
+    @PrePersist
+    public void fixDates() {
+        if (getLastModified() == null && getExpires() == null) {
+            return;
+        }
+        final Date now = new Date();
+        if (getLastModified() != null) {
+            setLastModified(getLastModified().after(now) ? null : getLastModified());
+        }
+        if (getExpires() != null) {
+            setExpires(getExpires().before(now) ? null : getExpires());
+        }
     }
 }
