@@ -52,6 +52,8 @@ public class WebPageMeta implements Serializable {
     @Basic(optional = false)
     private int consecutiveErrorCount;
     @Basic
+    private Date blocked;
+    @Basic
     private String etag;
     @Basic
     private Date lastModified;
@@ -134,5 +136,14 @@ public class WebPageMeta implements Serializable {
         dest.setScheduledUpdate(getScheduledUpdate());
         dest.setUrl(getUrl());
         dest.setLastProcessed(getLastProcessed());
+        dest.setBlocked(getBlocked());
+    }
+
+    public Date getBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(Date blocked) {
+        this.blocked = blocked == null ? null : (Date) blocked.clone();
     }
 }

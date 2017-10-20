@@ -26,7 +26,8 @@ import java.net.UnknownHostException;
 
 public class IndexingUtils {
 
-    public static final BasicURLNormalizer urlNormalizer = new BasicURLNormalizer();
+    public static final int MAX_URL_LEN = 255;
+    public static final BasicURLNormalizer urlNormalizer = new URLNoQueryNormalizer();
 
     private IndexingUtils() {
     }
@@ -61,6 +62,12 @@ public class IndexingUtils {
     
     public static String sanitizeUrl(String url) {
         String urlString = normalizeUrl(url);
+        if (urlString == null) {
+            return null;
+        }
+        if (urlString.length() > MAX_URL_LEN) {
+            return null;
+        }
         if (!isValidDomainName(urlString)) {
             return null;
         }

@@ -17,8 +17,6 @@ package com.github.jjYBdx4IL.cms.tika;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
 public class MetaReply {
     @SerializedName("Content-Type")
     private String contentType;
@@ -26,20 +24,14 @@ public class MetaReply {
     private String contentEncoding;
     private String keywords;
     @SerializedName("X-Parsed-By")
-    private List<String> parsedBy;
+    private String parsedBy;
     private String title;
     private String language;
+    private String description;
     private String robots;
     
     private String parsedContent;
 
-    public String getLastParsedBy() {
-        if (parsedBy == null || parsedBy.isEmpty()) {
-            return "";
-        }
-        return parsedBy.get(parsedBy.size()-1);
-    }
-    
     public String getRobots() {
         return (robots == null ? "" : robots).toLowerCase();
     }
@@ -72,11 +64,11 @@ public class MetaReply {
         this.keywords = keywords;
     }
 
-    public List<String> getParsedBy() {
+    public String getParsedBy() {
         return parsedBy;
     }
 
-    public void setParsedBy(List<String> parsedBy) {
+    public void setParsedBy(String parsedBy) {
         this.parsedBy = parsedBy;
     }
 
@@ -103,4 +95,39 @@ public class MetaReply {
     public void setParsedContent(String parsedContent) {
         this.parsedContent = parsedContent;
     }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("MetaReply [contentType=");
+        builder.append(contentType);
+        builder.append(", contentEncoding=");
+        builder.append(contentEncoding);
+        builder.append(", keywords=");
+        builder.append(keywords);
+        builder.append(", parsedBy=");
+        builder.append(parsedBy);
+        builder.append(", title=");
+        builder.append(title);
+        builder.append(", language=");
+        builder.append(language);
+        builder.append(", description=");
+        builder.append(description);
+        builder.append(", robots=");
+        builder.append(robots);
+        builder.append(", parsedContent=");
+        builder.append(parsedContent);
+        builder.append("]");
+        return builder.toString();
+    }
+    
+    
 }

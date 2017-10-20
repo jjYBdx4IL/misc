@@ -18,10 +18,14 @@ package com.github.jjYBdx4IL.cms.solr;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.github.jjYBdx4IL.cms.Env;
-import com.github.jjYBdx4IL.cms.jpa.dto.Domain;
 import com.github.jjYBdx4IL.cms.jpa.dto.WebPageMeta;
 import com.github.jjYBdx4IL.cms.tika.MetaReply;
 import com.github.jjYBdx4IL.cms.tika.TikaClient;
+import com.github.jjYBdx4IL.utils.io.CompressionUtils;
+import com.github.jjYBdx4IL.utils.net.DownloadUtils;
+import com.github.jjYBdx4IL.utils.net.URLUtils;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import crawlercommons.robots.BaseRobotRules;
 import crawlercommons.robots.SimpleRobotRulesParser;
 import crawlercommons.sitemaps.AbstractSiteMap;
@@ -31,15 +35,15 @@ import crawlercommons.sitemaps.SiteMapParser;
 import crawlercommons.sitemaps.SiteMapURL;
 import crawlercommons.sitemaps.SiteMapURL.ChangeFrequency;
 import crawlercommons.sitemaps.UnknownFormatException;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.cache.HeaderConstants;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.DateUtils;
-import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.solr.client.solrj.SolrClient;
@@ -47,16 +51,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.DataFormatException;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -72,13 +77,11 @@ public class IndexingTask implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexingTask.class);
 
-    public static final String INDEXER_NAME = "Indexer";
+    public static final String INDEXER_NAME = "GeeGee";
     public static final String COLLECTION = "WebSearchCollection";
     public static final String SOLR_COLLECTION_URL = "http://127.0.0.1:8983/solr/" + COLLECTION;
     public static final int MAX_PAGES_PER_WEBSITE = 100;
     public static final int MAX_SITEMAPS_PER_WEBSITE = 10;
-    public static final long DEF_WEBPAGE_REINDEX_IVAL_MS = 30 * 24 * 3600L * 1000L;
-    public static final long ERR_WEBPAGE_REINDEX_IVAL_MS = 1 * 24 * 3600L * 1000L;
     public static final SiteMapURL.ChangeFrequency MAX_CHANGE_FREQUENCY = ChangeFrequency.MONTHLY;
     public static final long SPAM_DELAY_MS = Env.isDevel() ? 0L : 900L * 1000L;
     public static final long MAX_DOC_SIZE = 10 * 1024 * 1024L;
@@ -86,11 +89,19 @@ public class IndexingTask implements Runnable {
     private Thread taskThread = null;
     private final CountDownLatch shutdownLatch = new CountDownLatch(1);
     private SolrClient solrClient;
+    private final UrlLockService lockService;
+    private final RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(30000)
+        .setConnectionRequestTimeout(30000)
+        .setSocketTimeout(30000).build();
 
     @Resource
     ManagedThreadFactory threadFactory;
     @Inject
     IndexingDbService dbService;
+
+    public IndexingTask() {
+        lockService = new UrlLockService();
+    }
 
     @PostConstruct
     public void postConstruct() {
@@ -116,19 +127,23 @@ public class IndexingTask implements Runnable {
 
         try (SolrClient client = SolrConfig.getClient()) {
             solrClient = client;
-            while (!shutdownLatch.await(3000, TimeUnit.MILLISECONDS)) {
-                Domain domain = dbService.getNextDomain4Processing();
-                if (domain == null) {
+            while (!shutdownLatch.await(0, TimeUnit.MILLISECONDS)) {
+                WebPageMeta meta = dbService.getNextUrl4Processing();
+                if (meta == null) {
+                    shutdownLatch.await(3000, TimeUnit.MILLISECONDS);
                     continue;
                 }
-                LOG.info("processing domain: " + domain.getUrl());
 
+                UrlLockService.Lock lock = lockService.acquire(meta);
+                if (lock == null) {
+                    LOG.info("url has process lock: " + meta.getUrl());
+                    dbService.rescheduleLocked(meta);
+                    continue;
+                }
                 try {
-                    processWebSite(domain);
-                    dbService.updateDomain(domain, true);
-                } catch (IOException | UnknownFormatException | URISyntaxException ex) {
-                    LOG.info("", ex);
-                    dbService.updateDomain(domain, false);
+                    processUrl(meta);
+                } finally {
+                    lockService.release(lock);
                 }
             }
         } catch (Exception ex) {
@@ -137,145 +152,196 @@ public class IndexingTask implements Runnable {
         LOG.info("stopped");
     }
 
-    private void processWebSite(Domain domain)
-        throws UnknownFormatException, IOException, URISyntaxException, InterruptedException {
+    private void processUrl(WebPageMeta meta) {
 
-        BaseRobotRules rules = getRobots(domain.getUrl());
-        List<SiteMapURL> pageLinks = fetchSiteLinks(domain.getUrl(), rules);
-
-        if (shutdownLatch.await(1, TimeUnit.MICROSECONDS)) {
-            return;
-        }
-        
-        RequestConfig requestConfig = RequestConfig.custom().
-            setConnectTimeout(30000).
-            setConnectionRequestTimeout(30000).
-            setSocketTimeout(30000).
-            build();
-        
-        for (SiteMapURL url : pageLinks) {
-            String urlString = IndexingUtils.normalizeUrl(url.getUrl().toExternalForm());
-            if (!hasAccess(rules, urlString)) {
-                LOG.info("disallowed by robots.txt: " + urlString);
-                continue;
-            }
-
-            WebPageMeta pageMeta = dbService.getWebPageMeta(urlString);
-
-            if (!needsUpdate(url, pageMeta)) {
-                LOG.info("skipping (no processing required yet): " + urlString);
-                continue;
-            }
-            
-            LOG.info("processing: " + urlString);
-            Date now = new Date();
-
-            // https://stackoverflow.com/questions/33395342/how-does-an-etag-token-works-in-conditional-get-in-http
-            try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
-                HttpGet httpGet = new HttpGet(url.getUrl().toURI());
-                httpGet.setConfig(requestConfig);
-                setPageFetchHeaders(httpGet, pageMeta);
-
-                if (pageMeta == null) {
-                    pageMeta = new WebPageMeta();
-                    pageMeta.setUrl(urlString);
-                }
-                pageMeta.setScheduledUpdate(new Date(now.getTime() + DEF_WEBPAGE_REINDEX_IVAL_MS));
-                
-                try {
-                    try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
-                        if (handleResponse(response, pageMeta)) {
-                            pageMeta.setConsecutiveErrorCount(0);
-                        } else {
-                            pageMeta.setScheduledUpdate(new Date(now.getTime() + ERR_WEBPAGE_REINDEX_IVAL_MS));
-                            pageMeta.setConsecutiveErrorCount(pageMeta.getConsecutiveErrorCount() + 1);
-                        }
-                    }
-                } catch (ConnectTimeoutException ex) {
-                    LOG.info("", ex);
-                    pageMeta.setScheduledUpdate(new Date(now.getTime() + ERR_WEBPAGE_REINDEX_IVAL_MS));
-                    pageMeta.setConsecutiveErrorCount(pageMeta.getConsecutiveErrorCount() + 1);
-                }
-
-                pageMeta.setLastProcessed(new Date());
-                dbService.updateWebPageMeta(pageMeta);
-            }
-            if (shutdownLatch.await(1, TimeUnit.SECONDS)) {
+        try {
+            if (!hasAccess(meta)) {
+                LOG.info("disallowed by robots.txt: " + meta.getUrl());
+                dbService.block(meta);
                 return;
             }
+        } catch (IOException ex) {
+            dbService.reschedule(meta, 30, TimeUnit.MINUTES);
+            return;
+        }
+
+        if (!needsUpdate(meta)) {
+            LOG.info("update not required: " + meta.getUrl());
+            dbService.reschedule(meta, 30, TimeUnit.MINUTES);
+            return;
+        }
+
+        LOG.info("processing: " + meta.getUrl());
+        final Date now = new Date();
+
+        boolean updated = false;
+        try {
+            try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+                HttpHead httpHead = new HttpHead(meta.getUrl());
+                httpHead.setConfig(requestConfig);
+                setPageFetchHeaders(httpHead, meta);
+
+                boolean needUpdate = true;
+                try (CloseableHttpResponse response = httpclient.execute(httpHead)) {
+                    needUpdate = checkResponseHeader(response, meta);
+                } catch (BadHttpStatusCodeException ex) {
+                }
+
+                if (needUpdate) {
+                    HttpGet httpGet = new HttpGet(meta.getUrl());
+                    httpGet.setConfig(requestConfig);
+                    setPageFetchHeaders(httpGet, meta);
+    
+                    try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
+                        updated = handleResponse(response, meta);
+                    }
+                }
+            } catch (FileTooLargeException | IndexingNotAllowedException
+                | UnsupportedContentTypeException ex) {
+                LOG.info("", ex);
+                dbService.block(meta);
+                return;
+            }
+        } catch (IOException ex) {
+            LOG.info("", ex);
+            dbService.error(meta);
+            return;
+        }
+
+        if (updated) {
+            LOG.info("updated: " + meta.getUrl());
+            dbService.updated(meta);
+        } else {
+            LOG.info("not modified: " + meta.getUrl());
+            dbService.notModified(meta);
         }
     }
 
-    private boolean handleResponse(CloseableHttpResponse response, WebPageMeta pageMeta) {
-        checkNotNull(pageMeta);
+    /**
+     * 
+     * @param response
+     * @param meta
+     * @return true if the resource needs to be updated
+     * @throws IOException
+     */
+    private boolean checkResponseHeader(CloseableHttpResponse response, WebPageMeta meta) throws IOException {
+        checkNotNull(response);
+        checkNotNull(meta);
 
         LOG.info("" + response.getStatusLine());
 
         int status = response.getStatusLine().getStatusCode();
+
+        // if (LOG.isDebugEnabled()) {
         for (Header h : response.getAllHeaders()) {
             LOG.info("" + h);
         }
+        // }
+
         if (status == HttpStatus.SC_NOT_MODIFIED) {
-            LOG.info("not modified");
-            return true;
-        }
-        if (status >= 300 || status < 200) {
-            LOG.info("error status: " + status + " for " + pageMeta.getUrl());
             return false;
         }
-        
-        Header etagHeader = response.getFirstHeader(HeaderConstants.ETAG);
-        String etagValue = etagHeader == null ? null : etagHeader.getValue();
-        pageMeta.setEtag(etagValue != null && !etagValue.isEmpty() ? etagValue : null);
-        
-        Header expiresHeader = response.getFirstHeader(HeaderConstants.EXPIRES);
-        pageMeta.setExpires(expiresHeader == null ? null : DateUtils.parseDate(expiresHeader.getValue()));
-        Header lastmodHeader = response.getFirstHeader(HeaderConstants.LAST_MODIFIED);
-        pageMeta.setLastModified(lastmodHeader == null ? null : DateUtils.parseDate(lastmodHeader.getValue()));
-        
-//        Header contentTypeHeader = response.getFirstHeader("Content-Type");
-//        String contentType = contentTypeHeader == null ? "" : contentTypeHeader.getValue().toLowerCase().trim();
-//        if (!contentType.contains("text/html")) {
-//            LOG.info("content type not supported yet: " + contentType);
-//            return true;
-//        }
-        
+
+        if (status == HttpStatus.SC_NOT_FOUND) {
+            throw new FileNotFoundException(meta.getUrl());
+        }
+
+        if (status >= 300 || status < 200) {
+            LOG.info("error status: " + status + " for " + meta.getUrl());
+            throw new BadHttpStatusCodeException(String.format("received status %d for %s", status, meta.getUrl()));
+        }
+
+        Header contentTypeHeader = response.getFirstHeader("Content-Type");
+        String contentType = contentTypeHeader == null ? "" : contentTypeHeader.getValue().toLowerCase().trim();
+        if (!contentType.contains("text/html")) {
+            LOG.info("content type not supported yet: " + contentType);
+            throw new UnsupportedContentTypeException(meta.getUrl());
+        }
+
         Header contentLengthHeader = response.getFirstHeader("Content-Length");
         Long contentLength = contentLengthHeader == null ? null : Long.parseLong(contentLengthHeader.getValue());
         if (contentLength != null && contentLength > MAX_DOC_SIZE) {
-            LOG.info("content too large: " + contentLength.intValue()  + " bytes");
-            return true;
+            LOG.info("content too large: " + contentLength.intValue() + " bytes");
+            throw new FileTooLargeException(meta.getUrl());
         }
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buf = new byte[4096];
-        try (InputStream is = response.getEntity().getContent()){
-            while(baos.size() < MAX_DOC_SIZE && is.available() > 0) {
-                int n = is.read(buf);
-                if (n > 0) {
-                    baos.write(buf, 0, n);
-                }
-            }
-            if (is.available() > 0) {
-                LOG.info("content too large: " + contentLength.intValue()  + " bytes");
-                return true;
-            }
-        } catch (IOException ex) {
-            LOG.info("", ex);
+        if (status == HttpStatus.SC_NO_CONTENT) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 
+     * @param response
+     * @param meta
+     * @return true if updated, false if unchanged
+     * @throws IOException
+     */
+    private boolean handleResponse(CloseableHttpResponse response, WebPageMeta meta) throws IOException {
+        if (!checkResponseHeader(response, meta)) {
             return false;
         }
         
+        if (response.getEntity() == null || response.getEntity().getContent() == null) {
+            return false;
+        }
+
+        Header etagHeader = response.getFirstHeader(HeaderConstants.ETAG);
+        String etagValue = etagHeader == null ? null : etagHeader.getValue();
+        meta.setEtag(etagValue != null && !etagValue.isEmpty() ? etagValue : null);
+
+        Header expiresHeader = response.getFirstHeader(HeaderConstants.EXPIRES);
+        meta.setExpires(expiresHeader == null ? null : DateUtils.parseDate(expiresHeader.getValue()));
+        Header lastmodHeader = response.getFirstHeader(HeaderConstants.LAST_MODIFIED);
+        meta.setLastModified(lastmodHeader == null ? null : DateUtils.parseDate(lastmodHeader.getValue()));
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buf = new byte[4096];
+        int nTotal = 0;
+        try (InputStream is = response.getEntity().getContent()) {
+            int n;
+            do {
+                n = is.read(buf);
+                if (n > 0) {
+                    baos.write(buf, 0, n);
+                    nTotal += n;
+                }
+            } while (baos.size() < MAX_DOC_SIZE && n > 0);
+            if (n > 0) {
+                LOG.info("content too large: " + nTotal + " bytes");
+                throw new FileTooLargeException(meta.getUrl());
+            }
+        }
+        LOG.info(String.format("retrieved %d bytes", nTotal));
+
         byte[] data = baos.toByteArray();
         baos = null;
         MetaReply reply = TikaClient.parse(data);
-        data = null;
 
         if (reply.getRobots().contains("noindex")) {
-            return true;
+            throw new IndexingNotAllowedException(meta.getUrl());
         }
-        
-        WebPageBean pageBean = new WebPageBean(pageMeta.getUrl(), reply.getTitle(), reply.getParsedContent(),
-            reply.getKeywords(), reply.getContentType(), reply.getLastParsedBy());
+
+        if (reply.getContentType() == null || !reply.getContentType().toLowerCase().contains("text/html")) {
+            throw new UnsupportedContentTypeException(meta.getUrl());
+        }
+
+        Charset charset = Charset.forName("UTF-8");
+        try {
+            charset = Charset.forName(reply.getContentEncoding());
+        } catch (Exception ex) {
+            LOG.info(reply.getContentEncoding(), ex);
+        }
+        String pageContent = new String(data, charset);
+        List<String> extractedUrls = URLUtils.hyperlinkUrls(pageContent);
+        LOG.info(String.format("extracted %d urls", extractedUrls.size()));
+        dbService.addUrls(extractedUrls);
+
+        WebPageBean pageBean = new WebPageBean(meta.getUrl(), reply.getTitle(), reply.getParsedContent(),
+            reply.getKeywords(), reply.getContentType(), reply.getParsedBy(), reply.getLanguage(),
+            reply.getDescription());
 
         try {
             solrClient.addBean(pageBean);
@@ -291,18 +357,20 @@ public class IndexingTask implements Runnable {
         return true;
     }
 
-    private void setPageFetchHeaders(HttpGet httpGet, WebPageMeta pageMeta) {
-        httpGet.setHeader("User-Agent", INDEXER_NAME);
-        
+    private void setPageFetchHeaders(HttpRequestBase httpReq, WebPageMeta pageMeta) {
+        httpReq.setHeader("User-Agent", INDEXER_NAME);
+
         if (pageMeta == null) {
             return;
         }
 
-        if (pageMeta.getEtag() != null) {
-            httpGet.setHeader(HeaderConstants.IF_NONE_MATCH, pageMeta.getEtag());
-        }
-        if (pageMeta.getLastModified() != null) {
-            httpGet.setHeader(HeaderConstants.IF_MODIFIED_SINCE, DateUtils.formatDate(pageMeta.getLastModified()));
+        if (httpReq instanceof HttpHead) {
+            if (pageMeta.getEtag() != null) {
+                httpReq.setHeader(HeaderConstants.IF_NONE_MATCH, pageMeta.getEtag());
+            }
+            if (pageMeta.getLastModified() != null) {
+                httpReq.setHeader(HeaderConstants.IF_MODIFIED_SINCE, DateUtils.formatDate(pageMeta.getLastModified()));
+            }
         }
     }
 
@@ -310,62 +378,21 @@ public class IndexingTask implements Runnable {
      * Use sitemap and db information to determine if some link needs to be
      * updated.
      */
-    private boolean needsUpdate(SiteMapURL url, WebPageMeta pageMeta) {
-        checkNotNull(url);
-
+    private boolean needsUpdate(WebPageMeta pageMeta) {
         // page not indexed yet?
         if (pageMeta == null) {
             return true;
         }
 
-        Date now = new Date();
+        final Date now = new Date();
 
         if (pageMeta.getLastProcessed().after(new Date(now.getTime() - SPAM_DELAY_MS))) {
             return false;
         }
-        
+
         // not expired yet?
         if (pageMeta.getExpires() != null && pageMeta.getExpires().after(now)) {
             return false;
-        }
-
-        // not modified since last update?
-        if (url.getLastModified() != null && pageMeta.getLastModified() != null
-            &&!pageMeta.getLastModified().before(url.getLastModified())) {
-            return false;
-        }
-
-        // not expired according to update frequency setting?
-        if (url.getChangeFrequency() != null) {
-            ChangeFrequency freq = url.getChangeFrequency();
-            if (freq.compareTo(MAX_CHANGE_FREQUENCY) > 0) {
-                freq = MAX_CHANGE_FREQUENCY;
-            }
-            long delta;
-            switch (freq) {
-                case HOURLY:
-                    delta = 1 * 3600L * 1000L;
-                    break;
-                case DAILY:
-                    delta = 24 * 3600L * 1000L;
-                    break;
-                case WEEKLY:
-                    delta = 7 * 24 * 3600L * 1000L;
-                    break;
-                case MONTHLY:
-                    delta = 30 * 24 * 3600L * 1000L;
-                    break;
-                case YEARLY:
-                case NEVER:
-                    delta = 365 * 24 * 3600L * 1000L;
-                    break;
-                case ALWAYS:
-                default:
-                    delta = 0L;
-            }
-            if (pageMeta.getLastModified().getTime() + delta > now.getTime()) {
-                return false;
-            }
         }
 
         return true;
@@ -419,11 +446,11 @@ public class IndexingTask implements Runnable {
                 return links;
             }
         }
-        
+
         LOG.info(String.format("%d links found in sitemap for %s", links.size(), siteUrl));
         return links;
     }
-    
+
     private boolean addLinks(SiteMap siteMap, List<SiteMapURL> links) {
         LOG.info("" + siteMap.getUrl());
         for (SiteMapURL url : siteMap.getSiteMapUrls()) {
@@ -440,21 +467,78 @@ public class IndexingTask implements Runnable {
         return true;
     }
 
-    public boolean hasAccess(BaseRobotRules rules, String urlString) throws MalformedURLException {
-        URL url = new URL(urlString);
-        String urlFile = url.getFile();
-        return rules.isAllowed(urlFile);
+    public boolean hasAccess(WebPageMeta meta) throws IOException {
+        BaseRobotRules rules = getRobots(meta);
+        if (rules == null) {
+            return false;
+        }
+        return rules.isAllowed(meta.getUrl());
     }
 
-    public BaseRobotRules getRobots(String urlString) throws IOException {
-        URL url = new URL(urlString);
-        url = new URL(url.getProtocol().toLowerCase(), url.getHost().toLowerCase(), url.getPort(), "");
-        String urlNoPath = url.toExternalForm();
-        URL robotsTxtUrl = new URL(urlNoPath + "/robots.txt");
-        byte[] robotsTxtContent = IOUtils.toByteArray(robotsTxtUrl);
+    private static final int MAX_ROBOTSTXT_FILESIZE = 65536;
+    private final Cache<String, byte[]> robotsTxtCache = CacheBuilder.<String, byte[]>newBuilder()
+        .expireAfterAccess(50, TimeUnit.MINUTES).expireAfterWrite(12, TimeUnit.HOURS).build();
+    private final Cache<String, String> invalidRobotsTxtCache = CacheBuilder.newBuilder()
+        .expireAfterWrite(3, TimeUnit.DAYS).build();
+
+    public BaseRobotRules getRobots(WebPageMeta meta) throws IOException {
+        URL url = new URL(meta.getUrl());
+        String urlString = new URL(url.getProtocol().toLowerCase(), url.getHost().toLowerCase(), url.getPort(),
+            "/robots.txt").toExternalForm();
+
+        if (invalidRobotsTxtCache.getIfPresent(urlString) != null) {
+            return null;
+        }
+
+        byte[] robotsTxt = robotsTxtCache.getIfPresent(urlString);
+        if (robotsTxt == null) {
+            try {
+                LOG.info("retrieving: " + urlString);
+                robotsTxt = DownloadUtils.get(urlString, MAX_ROBOTSTXT_FILESIZE);
+            } catch (FileNotFoundException ex) {
+                robotsTxt = new byte[0];
+            }
+            if (robotsTxt == null) {
+                invalidRobotsTxtCache.put(urlString, "");
+                return null;
+            }
+            robotsTxtCache.put(urlString, CompressionUtils.compress(robotsTxt));
+        } else if (robotsTxt.length > 0) {
+            try {
+                robotsTxt = CompressionUtils.decompress(robotsTxt);
+            } catch (DataFormatException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         SimpleRobotRulesParser robotParser = new SimpleRobotRulesParser();
         BaseRobotRules rules = robotParser.parseContent(
-            robotsTxtUrl.toExternalForm(), robotsTxtContent, "text/plain", INDEXER_NAME);
+            urlString, robotsTxt, "text/plain", INDEXER_NAME);
         return rules;
     }
+
+    public static class FileTooLargeException extends IOException {
+        public FileTooLargeException(String reason) {
+            super(reason);
+        }
+    }
+
+    public static class IndexingNotAllowedException extends IOException {
+        public IndexingNotAllowedException(String reason) {
+            super(reason);
+        }
+    }
+
+    public static class UnsupportedContentTypeException extends IOException {
+        public UnsupportedContentTypeException(String reason) {
+            super(reason);
+        }
+    }
+
+    public static class BadHttpStatusCodeException extends IOException {
+        public BadHttpStatusCodeException(String reason) {
+            super(reason);
+        }
+    }
+
 }

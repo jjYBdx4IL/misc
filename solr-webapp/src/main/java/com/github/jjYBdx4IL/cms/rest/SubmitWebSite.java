@@ -21,13 +21,10 @@ import static j2html.TagCreator.input;
 
 import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
-import com.github.jjYBdx4IL.cms.jpa.dto.Domain;
+import com.github.jjYBdx4IL.cms.jpa.dto.WebPageMeta;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
 import com.github.jjYBdx4IL.cms.solr.IndexingUtils;
-import com.github.jjYBdx4IL.cms.solr.ProtoHostURLNormalizer;
 import j2html.tags.ContainerTag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
@@ -51,10 +48,6 @@ import javax.ws.rs.core.UriInfo;
 @Transactional
 public class SubmitWebSite {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SubmitWebSite.class);
-
-    private static final ProtoHostURLNormalizer hostNormalizer = new ProtoHostURLNormalizer();
-    
     @Context
     UriInfo uriInfo;
     @Inject
@@ -73,7 +66,7 @@ public class SubmitWebSite {
 
         ContainerTag container = div().withClass("container");
 
-        site = hostNormalizer.filter(site);
+        site = IndexingUtils.urlNormalizer.filter(site);
         
         if (site != null) {
             if (!IndexingUtils.isValidDomainName(site)) {
@@ -90,33 +83,35 @@ public class SubmitWebSite {
                             .withClass("col-12 success")
                     ).withClass("row")
                 );
-                Domain domain = qf.getDomainByUrl(site);
-                if (domain == null) {
-                    domain = new Domain();
-                    domain.setUrl(site);
-                    domain.setScheduledUpdate(new Date());
-                    domain.setLastProcessed(new Date(0));
+                WebPageMeta meta = qf.getWebPageMetaByUrl(site);
+                if (meta == null) {
+                    meta = new WebPageMeta();
+                    meta.setUrl(site);
+                    meta.setScheduledUpdate(new Date());
+                    meta.setLastProcessed(new Date(0));
                 } else {
-                    // do not allow refresh of already scheduled update
-                    Date now = new Date();
-                    if (domain.getScheduledUpdate() == null || domain.getScheduledUpdate().after(now)) {
-                        domain.setScheduledUpdate(now);
+                    if (meta.getBlocked() == null) {
+                        // do not allow refresh of already scheduled update
+                        Date now = new Date();
+                        if (meta.getScheduledUpdate() == null || meta.getScheduledUpdate().after(now)) {
+                            meta.setScheduledUpdate(now);
+                        }
                     }
                 }
-                em.persist(domain);
+                em.persist(meta);
                 site = null;
             }
         }
         
         container.with(
             div(
-                div("Indexing websites currently works via site-maps located via sitemap entries in robots.txt.")
+                div("Enter the URL address for the web page to include in the search index.")
                     .withClass("col-12")
             ).withClass("row")
         ).with(
             form().withMethod("GET").attr("accept-charset", "utf-8").with(
                 input().withName("site")
-                    .withPlaceholder("https://your.website.com (only domain, no pages/query parts, no port)")
+                    .withPlaceholder("https://your.website.com")
                     .isRequired()
                     .attr("autofocus")
                     .withClass("col-12")

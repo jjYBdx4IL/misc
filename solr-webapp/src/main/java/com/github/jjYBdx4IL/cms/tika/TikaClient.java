@@ -18,14 +18,18 @@ package com.github.jjYBdx4IL.cms.tika;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -35,6 +39,8 @@ import java.io.InputStreamReader;
 import javax.servlet.http.HttpServletResponse;
 
 public class TikaClient {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TikaClient.class);
 
     public static final int TIKA_SERVER_PORT = 9998;
     public static final String TIKA_SERVER_URL = "http://localhost:" + TIKA_SERVER_PORT;
@@ -60,7 +66,14 @@ public class TikaClient {
                         try (InputStreamReader reader = new InputStreamReader(is2)) {
                             JsonParser parser = new JsonParser();
                             JsonElement root = parser.parse(reader);
-                            reply = new Gson().fromJson(root, MetaReply.class);
+                            try {
+                                reply = new GsonBuilder()
+                                    .registerTypeAdapter(String.class, new StringArrayDeserializer()).create()
+                                    .fromJson(root, MetaReply.class);
+                            } catch (JsonSyntaxException ex) {
+                                LOG.info("bad json: " + root.toString());
+                                throw ex;
+                            }
                             checkNotNull(reply);
                         }
                     }

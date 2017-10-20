@@ -1,2 +1,5 @@
-solr schema generation from beans,
-html parsing (solr providing something for doing that?)
+* introduce conecpt of printable characters in the search term transformer to support
+  searching for words with non-ASCII characters lik öäüß
+* monitoring api (crawler ping)
+* pause on low disk?
+

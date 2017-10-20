@@ -18,7 +18,12 @@ package com.github.jjYBdx4IL.cms.rest;
 import static j2html.TagCreator.a;
 import static j2html.TagCreator.div;
 import static j2html.TagCreator.form;
+import static j2html.TagCreator.h1;
+import static j2html.TagCreator.h3;
 import static j2html.TagCreator.input;
+import static j2html.TagCreator.li;
+import static j2html.TagCreator.p;
+import static j2html.TagCreator.ul;
 
 import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
@@ -98,6 +103,21 @@ public class Home {
 
         appendSearchResults(container, searchTerm, 0);
 
+        if (searchTerm == null || searchTerm.isEmpty()) {
+            container.with(
+                div(
+                    div(
+                        h1("The alternative search engine."),
+                        ul(
+                            li("independent,"),
+                            li("trustworthy,"),
+                            li("European jurisdiction.")
+                        )
+                    ).withClass("col-12 banner")
+                ).withClass("row")
+            );
+        }
+
         htmlBuilder.mainAdd(container);
 
         return Response.ok(htmlBuilder.toString()).build();
@@ -116,37 +136,46 @@ public class Home {
             return;
         }
 
-        String queryString = SolrUtils.xformQuery(searchTerm, "title", "content", "keywords");
+        String queryString = SolrUtils.xformQuery(searchTerm, "title", "content", "keywords", "description");
 
         List<WebPageBean> pages = null;
         Map<String, Map<String, List<String>>> hl = null;
 
         QueryResponse response = null;
+        long nResults = 0;
         try (SolrClient client = SolrConfig.getClient()) {
             SolrQuery query = new SolrQuery();
             query.set("q", queryString);
             query.set("rows", SolrConfig.MAX_RESULTS_PER_REQUEST);
             query.set("start", pageIndex * SolrConfig.MAX_RESULTS_PER_REQUEST);
             query.set("hl", true);
-            query.set("hl.fl", "content,title,keywords");
+            query.set("hl.fl", "content,title,keywords,description");
             response = client.query(query);
             hl = response.getHighlighting();
             pages = response.getBeans(WebPageBean.class);
+            nResults = response.getResults().getNumFound();
+        } catch (Exception ex) {
+            LOG.warn("", ex);
         }
 
         container.with(
             div(
                 div(
-                    String.format("%d results found", response.getResults().getNumFound())
+                    String.format("%d results found", nResults)
                 ).withClass("col-12")
             ).withClass("row")
         );
+        
+        if (response == null) {
+            return;
+        }
 
         for (WebPageBean page : pages) {
             ContainerTag resultContainer = div().with(
                 div(
                     div(
-                        a(page.getTitle()).withHref(page.getUrl())
+                        h3(page.getTitle()),
+                        a(page.getUrl()).withHref(page.getUrl())
                     ).withClass("col-12")
                 ).withClass("row")
             ).withClass("searchResult");

@@ -315,4 +315,8 @@ footer .impressum a {
 	font-weight: bold;
 }
 
+.banner ul {
+	font-size: 125%;
+}
+
 /* radial-gradient(ellipse at center, #604060 0%, #1d1d2b 100%) */
