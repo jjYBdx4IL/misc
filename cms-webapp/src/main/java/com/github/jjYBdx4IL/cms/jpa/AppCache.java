@@ -35,7 +35,7 @@ public class AppCache {
     private static final Logger LOG = LoggerFactory.getLogger(AppCache.class);
     
     public static final String DEVEL_ADMIN = "devel-1";
-    public static final String PROPNAME_CMS_DEVEL = "cms.devel";
+    public static final String PROPNAME_ENV_DEVEL = "env.devel";
     
     private Map<ConfigKey, String> values = new ConcurrentHashMap<>();;
     private Map<String, String> admins = new ConcurrentHashMap<>();
@@ -85,7 +85,7 @@ public class AppCache {
     }
     
     public boolean isDevel() {
-        return Boolean.getBoolean(PROPNAME_CMS_DEVEL);
+        return Boolean.getBoolean(PROPNAME_ENV_DEVEL);
     }
     
 }

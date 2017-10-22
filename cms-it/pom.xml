@@ -40,13 +40,37 @@
                         <phase>pre-integration-test</phase>
                         <configuration>
                             <javaOpts>
-                                <javaOpt>-Dcms.devel=true</javaOpt>
+                                <javaOpt>-Denv.devel=true</javaOpt>
                                 <javaOpt>-Djboss.socket.binding.port-offset=1</javaOpt>
                                 <javaOpt>-Dhibernate.hbm2ddl.auto=update</javaOpt>
                                 <!-- persistence.xml defines lucene index storage relative to user.home -->
                                 <javaOpt>-Duser.home=${project.build.directory}</javaOpt>
                             </javaOpts>
                         </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-datasource</id>
+                        <phase>pre-integration-test</phase>
+                        <configuration>
+                            <address>subsystem=datasources,data-source=java:jboss/datasources/CmsWebAppDS</address>
+                            <resources>
+                                <resource>
+                                    <addIfAbsent>true</addIfAbsent>
+                                    <properties>
+                                        <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1</connection-url>
+                                        <jndi-name>java:jboss/datasources/CmsWebAppDS</jndi-name>
+                                        <enabled>true</enabled>
+                                        <enable>true</enable>
+                                        <user-name>sa</user-name>
+                                        <password>sa</password>
+                                        <driver-name>h2</driver-name>
+                                    </properties>
+                                </resource>
+                            </resources>
+                        </configuration>
+                        <goals>
+                            <goal>add-resource</goal>
+                        </goals>
                     </execution>
                     <execution>
                         <id>deploy-war</id>
