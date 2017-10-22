@@ -124,8 +124,6 @@ public class IndexingTask implements Runnable {
 
     @PostConstruct
     public void postConstruct() {
-        SolrConfig.init(); // fail startup if init goes wrong
-
         List<Header> defaultHeaders = new ArrayList<>();
         defaultHeaders.add(new BasicHeader(HttpHeaders.REFERER, INDEXER_REFERER));
         httpClient = HttpClients.custom()
@@ -223,6 +221,13 @@ public class IndexingTask implements Runnable {
     public void run() {
         LOG.info("started");
 
+        try {
+            SolrConfig.init();
+        } catch (Exception ex) {
+            LOG.error("terminated", ex);
+            return;
+        }
+        
         // verifyIdnJob();
         // syncItJob();
 
@@ -251,7 +256,15 @@ public class IndexingTask implements Runnable {
             ping.set(0);
             LOG.warn("", ex);
         }
-        LOG.info("stopped");
+        
+        try {
+            if (shutdownLatch.await(0, TimeUnit.SECONDS)) {
+                LOG.info("stopped");
+            } else {
+                LOG.error("terminated");
+            }
+        } catch (InterruptedException ex) {
+        }
     }
 
     private void processUrl(WebPageMeta meta) {

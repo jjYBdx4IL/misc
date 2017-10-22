@@ -24,6 +24,7 @@ import java.nio.file.FileStore;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.HEAD;
@@ -39,6 +40,7 @@ public class Status {
 
     public static final String[] MNTPTS = new String[] { "/", "/data" };
     public static final long minFreeMB = 1024;
+    public static final AtomicLong ERROR_COUNTER = new AtomicLong(0);
 
     // use the following nagios checks to monitor crawler and disk space:
     //
@@ -51,20 +53,24 @@ public class Status {
     @HEAD
     public Response statusPage() throws IOException {
 
-        boolean diskSpaceOK = true;
+        boolean allOk = true;
         for (String mntpt : MNTPTS) {
             java.nio.file.Path root = FileSystems.getDefault().getPath(mntpt);
             FileStore store = Files.getFileStore(root);
             long freeMB = store.getUsableSpace() / 1048576L;
             if (freeMB < minFreeMB) {
-                diskSpaceOK = false;
+                allOk = false;
                 LOG.error(String.format("free disk space on %s: %.3f GB", mntpt, freeMB / 1024f));
             }
         }
+        
+        if (ERROR_COUNTER.longValue() > 0L) {
+            allOk = false;
+        }
 
-        return Response.status(diskSpaceOK ? 200 : 501)
+        return Response.status(allOk ? 200 : 501)
             .lastModified(new Date(IndexingTask.ping.get()))
-            .header("X-Monitoring-Status-DiskSpace", diskSpaceOK ? "OK" : "CRITICAL")
+            .header("X-Monitoring-Status-DiskSpace", allOk ? "OK" : "CRITICAL")
             .build();
     }
 
