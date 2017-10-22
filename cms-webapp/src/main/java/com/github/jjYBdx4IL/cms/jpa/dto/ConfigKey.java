@@ -35,7 +35,8 @@ public enum ConfigKey {
     COOKIE_CONSENT_MESSAGE,
     @Description("enter comma-separated list of admin users, ie 'google-$subject,...' "+
         "where $subject is Google's unique used identifier")
-    ADMINS;
+    ADMINS,
+    FEEDBACK_MAILTO_ADDR;
     //@formatter:on
 
     public String getDesc() {

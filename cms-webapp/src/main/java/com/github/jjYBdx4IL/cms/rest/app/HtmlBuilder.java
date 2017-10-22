@@ -42,6 +42,7 @@ import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
 import com.github.jjYBdx4IL.cms.jpa.dto.Tag;
 import com.github.jjYBdx4IL.cms.rest.Administration;
 import com.github.jjYBdx4IL.cms.rest.ArticleManager;
+import com.github.jjYBdx4IL.cms.rest.Feedback;
 import com.github.jjYBdx4IL.cms.rest.Gallery;
 import com.github.jjYBdx4IL.cms.rest.Home;
 import com.github.jjYBdx4IL.cms.rest.LoginSelect;
@@ -266,6 +267,7 @@ public class HtmlBuilder {
             menuRow.with(iconTextLink("col-6", "settings_applications", "Administration", Administration.class));
         }
 
+        menuRow.with(iconTextLink("col-6", "info", "Feedback", Feedback.class));
         menuRow.with(iconTextLink("col-6", "info", "About", aboutLink));
         menuRow.with(iconTextLink("col-6", "info", "Privacy Policy", privacyPolicyLink));
         menuRow.with(iconTextLink("col-6", "info", "Impressum", impressumLink));
