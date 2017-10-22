@@ -44,10 +44,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 //CHECKSTYLE:OFF
-@Path("submitWebSite")
+@Path("submitUrl")
 @PermitAll
 @Transactional
-public class SubmitWebSite {
+public class SubmitUrl {
 
     @Context
     UriInfo uriInfo;
@@ -64,7 +64,7 @@ public class SubmitWebSite {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public Response submit(@QueryParam("site") String site) {
+    public Response submit(@QueryParam("url") String site) {
         htmlBuilder.setPageTitle("Submit URL");
 
         ContainerTag container = div().withClass("container");
@@ -116,7 +116,7 @@ public class SubmitWebSite {
             ).withClass("row")
         ).with(
             form().withMethod("GET").attr("accept-charset", "utf-8").with(
-                input().withName("site")
+                input().withName("url")
                     .withPlaceholder("https://your.website.com")
                     .isRequired()
                     .attr("autofocus")

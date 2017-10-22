@@ -15,6 +15,7 @@
  */
 package com.github.jjYBdx4IL.cms.rest.app;
 
+import com.github.jjYBdx4IL.cms.Env;
 import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +64,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     
     private boolean isAllowed(Method method) {
         if (method.isAnnotationPresent(DenyAll.class)) {
-            return appCache.isDevel();
+            return Env.isDevel();
         }
         if (method.isAnnotationPresent(PermitAll.class)) {
             return true;
@@ -75,7 +76,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         Class<?> klazz = method.getDeclaringClass();
 
         if (klazz.isAnnotationPresent(DenyAll.class)) {
-            return appCache.isDevel();
+            return Env.isDevel();
         }
         if (klazz.isAnnotationPresent(PermitAll.class)) {
             return true;

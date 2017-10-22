@@ -80,6 +80,9 @@ public class AppCache {
     }
     
     public boolean isAdmin(String uid) {
+        if (uid == null || uid.isEmpty()) {
+            return false;
+        }
         return admins.containsKey(uid);
     }
     

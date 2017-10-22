@@ -17,6 +17,7 @@ package com.github.jjYBdx4IL.cms.rest;
 
 import static j2html.TagCreator.div;
 
+import com.github.jjYBdx4IL.cms.Env;
 import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.MediaFile;
@@ -111,7 +112,7 @@ public class Gallery {
         }
         
         CacheControl cacheControl = new CacheControl();
-        if (appCache.isDevel()) {
+        if (Env.isDevel()) {
             cacheControl.setNoCache(true);
         } else {
             cacheControl.setMaxAge(86400); // seconds

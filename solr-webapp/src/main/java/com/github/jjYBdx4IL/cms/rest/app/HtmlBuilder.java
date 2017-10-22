@@ -192,7 +192,8 @@ public class HtmlBuilder {
 
         setJsValue("assetsUri", baseUri + "assets/");
         setJsValue("privacyPolicyUri", "https://gruust.stream/byTag/site-privacy-policy");
-        if (Boolean.parseBoolean(appCache.get(ConfigKey.ENABLE_ADBLOCK_BLOCKER))) {
+        if (Boolean.parseBoolean(appCache.get(ConfigKey.ENABLE_ADBLOCK_BLOCKER))
+            && !appCache.isAdmin(session.getUid())) {
             setJsValue("enableAdblockBlocker", "true");
         }
         if (Env.isDevel()) {

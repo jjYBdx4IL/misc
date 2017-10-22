@@ -88,7 +88,7 @@ public class Home {
             htmlBuilder.enableNoIndex();
         }
 
-        htmlBuilder.addPageTitleSubItem("add_to_queue", "Submit URL/web page/web site", SubmitWebSite.class);
+        htmlBuilder.addPageTitleSubItem("add_to_queue", "Submit URL", SubmitUrl.class);
 
         ContainerTag container = div().withClass("container");
 

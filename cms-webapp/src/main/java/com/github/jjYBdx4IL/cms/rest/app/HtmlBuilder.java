@@ -35,6 +35,7 @@ import static j2html.TagCreator.span;
 import static j2html.TagCreator.style;
 import static j2html.TagCreator.title;
 
+import com.github.jjYBdx4IL.cms.Env;
 import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
@@ -212,10 +213,11 @@ public class HtmlBuilder {
             .build("site-privacy-policy").toString());
         setJsValue("fileGetEndpoint",
             uriInfo.getBaseUriBuilder().path(Gallery.class).path(Gallery.class, "getFile").toTemplate());
-        if (Boolean.parseBoolean(appCache.get(ConfigKey.ENABLE_ADBLOCK_BLOCKER))) {
+        if (Boolean.parseBoolean(appCache.get(ConfigKey.ENABLE_ADBLOCK_BLOCKER))
+            && !appCache.isAdmin(session.getUid())) {
             setJsValue("enableAdblockBlocker", "true");
         }
-        if (appCache.isDevel()) {
+        if (Env.isDevel()) {
             setJsValue("isDevel", "true");
         }
         String cookieConsentMessage = appCache.get(ConfigKey.COOKIE_CONSENT_MESSAGE);
@@ -224,7 +226,7 @@ public class HtmlBuilder {
             addCssUrl("//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.4/cookieconsent.min.css");
         }
         
-        if (appCache.isDevel()) {
+        if (Env.isDevel()) {
             addCssUrl(baseUri + "assets/simplegrid.css");
             addCssUrl(baseUri + "assets/style.css");
         } else {
