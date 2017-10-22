@@ -21,9 +21,14 @@ import static com.google.common.base.Preconditions.checkState;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.WebPageMeta;
 import com.github.jjYBdx4IL.utils.text.MimeType;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -58,9 +63,10 @@ public class IndexingDbService {
     static {
         TYPES_WHITELIST.add("text/html");
         TYPES_WHITELIST.add("application/x-php");
-        TYPES_WHITELIST.add("application/octet-stream"); // default if URL has no file suffix
+        TYPES_WHITELIST.add("application/octet-stream"); // default if URL has
+                                                         // no file suffix
     }
-    
+
     @PersistenceContext
     EntityManager em;
     @Inject
@@ -81,18 +87,25 @@ public class IndexingDbService {
     }
 
     @Transactional
-    public void updateWebPageMeta(WebPageMeta pageMeta) {
-        try {
-            if (pageMeta.getId() == null) {
-                em.persist(pageMeta);
-            } else {
-                WebPageMeta pageMeta2 = em.find(WebPageMeta.class, pageMeta.getId());
-                pageMeta.copyValuesTo(pageMeta2);
-                em.persist(pageMeta2);
+    public List<String> addLastAddedToSearchIndexDates(List<WebPageBean> wps) {
+        int n = 0;
+        List<String> notFoundUrls = new ArrayList<>();
+        for (WebPageBean wp : wps) {
+            WebPageMeta m = qf.getWebPageMetaByUrl(wp.getUrl());
+            if (m == null) {
+                LOG.warn("not found in DB: " + wp.getUrl());
+                notFoundUrls.add(wp.getUrl());
+                continue;
             }
-        } catch (SecurityException | IllegalStateException ex) {
-            throw new RuntimeException(ex);
+            if (m.getLastAddedToSearchIndex() != null) {
+                continue;
+            }
+            m.setLastAddedToSearchIndex(new Date());
+            em.persist(m);
+            n++;
         }
+        LOG.info("updated " + n + " lastadded");
+        return notFoundUrls;
     }
 
     @Transactional
@@ -115,6 +128,15 @@ public class IndexingDbService {
         WebPageMeta pageMeta = em.find(WebPageMeta.class, meta.getId());
         pageMeta.setScheduledUpdate(new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(duration)));
         pageMeta.setLastProcessed(new Date());
+        em.persist(pageMeta);
+    }
+
+    @Transactional
+    public void addedToSearchIndex(WebPageMeta meta) {
+        checkNotNull(meta);
+        checkNotNull(meta.getId());
+        WebPageMeta pageMeta = em.find(WebPageMeta.class, meta.getId());
+        pageMeta.setLastAddedToSearchIndex(meta.getLastAddedToSearchIndex());
         em.persist(pageMeta);
     }
 
@@ -185,7 +207,7 @@ public class IndexingDbService {
         if (meta.getExpires() == null) {
             return;
         }
-        
+
         Date now = new Date();
         long backlogMs = Math.abs(now.getTime() - backlog.getTime());
         Date minExpires = new Date((long) (now.getTime() + backlogMs * 1.2));
@@ -193,12 +215,12 @@ public class IndexingDbService {
             meta.setExpires(minExpires);
         }
     }
-    
+
     private void updateScheduledUpdate(WebPageMeta meta) {
         final Date now = new Date();
         Date nextUpdate = new Date(now.getTime() + TimeUnit.HOURS.toMillis(DEF_WEBPAGE_REINDEX_IVAL_HOURS));
         Date maxUpdate = new Date(now.getTime() + TimeUnit.DAYS.toMillis(MAX_RECHECK_DAYS));
-        
+
         if (meta.getExpires() != null && meta.getExpires().before(nextUpdate)) {
             nextUpdate = meta.getExpires();
         }
@@ -212,9 +234,9 @@ public class IndexingDbService {
     @Transactional
     public void block(WebPageMeta meta) {
         checkNotNull(meta);
-        
+
         LOG.info("blocking: " + meta.getUrl());
-        
+
         final Date now = new Date();
         WebPageMeta pageMeta = em.find(WebPageMeta.class, meta.getId());
         pageMeta.setConsecutiveErrorCount(0);
@@ -241,7 +263,7 @@ public class IndexingDbService {
                 nSkipped++;
                 continue;
             }
-            
+
             String newUrl = IndexingUtils.sanitizeUrl(url);
             if (newUrl == null) {
                 LOG.debug("dropping url: " + url);
@@ -256,7 +278,7 @@ public class IndexingDbService {
                 nDuplicates++;
                 continue;
             }
-            
+
             WebPageMeta meta = new WebPageMeta();
             meta.setUrl(newUrl);
             meta.setScheduledUpdate(new Date());
@@ -270,7 +292,7 @@ public class IndexingDbService {
         LOG.info(String.format("%d urls: %d added, %d bad url, %d bad file type, %d dupes, %d skipped",
             extractedUrls.size(), nAdded, nBadUrlFormat, nBadGuessedFileType, nDuplicates, nSkipped));
     }
-    
+
     public static boolean isTypeWhitelisted(String url) {
         checkNotNull(url);
         String type = MimeType.get(url);

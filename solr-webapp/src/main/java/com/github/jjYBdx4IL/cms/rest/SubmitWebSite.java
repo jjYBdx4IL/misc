@@ -23,6 +23,7 @@ import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.WebPageMeta;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
+import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 import com.github.jjYBdx4IL.cms.solr.IndexingUtils;
 import j2html.tags.ContainerTag;
 
@@ -58,6 +59,8 @@ public class SubmitWebSite {
     AppCache appCache;
     @PersistenceContext
     EntityManager em;
+    @Inject
+    private SessionData session;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -67,7 +70,7 @@ public class SubmitWebSite {
         ContainerTag container = div().withClass("container");
 
         site = IndexingUtils.urlNormalizer.filter(site);
-        
+
         if (site != null) {
             if (!IndexingUtils.isValidDomainName(site)) {
                 container.with(
@@ -98,11 +101,14 @@ public class SubmitWebSite {
                         }
                     }
                 }
+                if (meta.getManuallyAddedBy() == null) {
+                    meta.setManuallyAddedBy(session.isAuthenticated() ? session.getUid() : WebPageMeta.ANON_ADDEDBY_ID);
+                }
                 em.persist(meta);
                 site = null;
             }
         }
-        
+
         container.with(
             div(
                 div("Enter the URL address for the web page to include in the search index.")

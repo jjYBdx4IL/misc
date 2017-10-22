@@ -18,6 +18,7 @@ package com.github.jjYBdx4IL.cms.solr;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.github.jjYBdx4IL.cms.Env;
+import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.WebPageMeta;
 import com.github.jjYBdx4IL.cms.tika.MetaReply;
 import com.github.jjYBdx4IL.cms.tika.TikaClient;
@@ -51,6 +52,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,6 +78,8 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.enterprise.concurrent.ManagedThreadFactory;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 @Startup
 @Singleton
@@ -82,6 +88,7 @@ public class IndexingTask implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(IndexingTask.class);
 
     public static final String INDEXER_NAME = "GeeGee";
+    public static final String INDEXER_REFERER = "https://geegee.online/";
     public static final String COLLECTION = "WebSearchCollection";
     public static final String SOLR_COLLECTION_URL = "http://127.0.0.1:8983/solr/" + COLLECTION;
     public static final int MAX_PAGES_PER_WEBSITE = 100;
@@ -119,15 +126,15 @@ public class IndexingTask implements Runnable {
     @PostConstruct
     public void postConstruct() {
         SolrConfig.init(); // fail startup if init goes wrong
-        
+
         List<Header> defaultHeaders = new ArrayList<>();
-        defaultHeaders.add(new BasicHeader(HttpHeaders.REFERER, "https://geegee.online/"));
+        defaultHeaders.add(new BasicHeader(HttpHeaders.REFERER, INDEXER_REFERER));
         httpClient = HttpClients.custom()
             .setDefaultRequestConfig(requestConfig)
             .setDefaultHeaders(defaultHeaders)
             .disableCookieManagement()
             .build();
-        
+
         taskThread = threadFactory.newThread(this);
         taskThread.setName("IdxTask");
         taskThread.start();
@@ -147,9 +154,43 @@ public class IndexingTask implements Runnable {
         }
     }
 
+    private void syncItJob() {
+        try (SolrClient solr = SolrConfig.getClient()) {
+
+            boolean done = false;
+            int page = 0;
+            while (!done) {
+                SolrQuery query = new SolrQuery();
+                query.set("q", "id:*");
+                query.set("rows", 100);
+                query.set("start", page * 100);
+                QueryResponse response = solr.query(query);
+                if (response.getResults().isEmpty()) {
+                    done = true;
+                    break;
+                }
+                List<String> notFoundInDb = dbService
+                    .addLastAddedToSearchIndexDates(response.getBeans(WebPageBean.class));
+                for (String urlId : notFoundInDb) {
+                    solr.deleteById(urlId);
+                }
+                SolrConfig.commit(solr);
+                page++;
+            }
+        } catch (SolrServerException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void run() {
         LOG.info("started");
+
+        // syncItJob();
 
         try (SolrClient client = SolrConfig.getClient()) {
             solrClient = client;
@@ -381,6 +422,9 @@ public class IndexingTask implements Runnable {
             // instead shut down the indexer
             throw new RuntimeException(ex);
         }
+
+        meta.setLastAddedToSearchIndex(new Date());
+        dbService.addedToSearchIndex(meta);
 
         return true;
     }

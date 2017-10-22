@@ -45,6 +45,8 @@ public class WebPageMeta implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebPageMeta.class);
 
+    public static final String ANON_ADDEDBY_ID = "anon";
+    
     public WebPageMeta() {
     }
 
@@ -67,6 +69,10 @@ public class WebPageMeta implements Serializable {
     private Date expires;
     @Basic(optional = false)
     private Date lastProcessed;
+    @Basic
+    private Date lastAddedToSearchIndex;
+    @Basic
+    private String manuallyAddedBy;
     @Version
     private int version;
 
@@ -134,17 +140,6 @@ public class WebPageMeta implements Serializable {
         this.lastProcessed = lastProcessed == null ? null : (Date) lastProcessed.clone();
     }
 
-    public void copyValuesTo(WebPageMeta dest) {
-        dest.setConsecutiveErrorCount(getConsecutiveErrorCount());
-        dest.setEtag(getEtag());
-        dest.setExpires(getExpires());
-        dest.setLastModified(getLastModified());
-        dest.setScheduledUpdate(getScheduledUpdate());
-        dest.setUrl(getUrl());
-        dest.setLastProcessed(getLastProcessed());
-        dest.setBlocked(getBlocked());
-    }
-
     public Date getBlocked() {
         return blocked;
     }
@@ -172,6 +167,22 @@ public class WebPageMeta implements Serializable {
         }
     }
 
+    public Date getLastAddedToSearchIndex() {
+        return lastAddedToSearchIndex;
+    }
+
+    public void setLastAddedToSearchIndex(Date lastAddedToSearchIndex) {
+        this.lastAddedToSearchIndex = lastAddedToSearchIndex == null ? null : (Date) lastAddedToSearchIndex.clone();
+    }
+
+    public String getManuallyAddedBy() {
+        return manuallyAddedBy;
+    }
+
+    public void setManuallyAddedBy(String manuallyAddedBy) {
+        this.manuallyAddedBy = manuallyAddedBy;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -193,6 +204,10 @@ public class WebPageMeta implements Serializable {
         builder.append(expires);
         builder.append(", lastProcessed=");
         builder.append(lastProcessed);
+        builder.append(", lastAddedToSearchIndex=");
+        builder.append(lastAddedToSearchIndex);
+        builder.append(", manuallyAddedBy=");
+        builder.append(manuallyAddedBy);
         builder.append(", version=");
         builder.append(version);
         builder.append("]");

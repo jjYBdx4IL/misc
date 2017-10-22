@@ -17,6 +17,7 @@ package com.github.jjYBdx4IL.cms.solr;
 
 import crawlercommons.filters.basic.BasicURLNormalizer;
 
+import java.net.IDN;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -28,15 +29,7 @@ public class URLNoQueryNormalizer extends BasicURLNormalizer {
         if (urlString == null) {
             return null;
         }
-        
-        // feeding the url string to the URL constructor is not enough to make sure
-        // it is compatible with httpclient
-        try {
-            URI.create(urlString);
-        } catch (IllegalArgumentException ex) {
-            return null;
-        }
-        
+
         try {
             if (!urlString.toLowerCase().startsWith("http://") && !urlString.toLowerCase().startsWith("https://")) {
                 urlString = "https://" + urlString;
@@ -54,8 +47,12 @@ public class URLNoQueryNormalizer extends BasicURLNormalizer {
             if (path == null) {
                 path = "";
             }
-            return super.filter(protocol + "://" + hostname + path);
-        } catch (MalformedURLException ex) {
+            String result = super.filter(protocol + "://" + IDN.toASCII(hostname) + path);
+            // feeding the url string to the URL constructor is not enough to
+            // make sure it is compatible with httpclient
+            URI.create(result);
+            return result;
+        } catch (MalformedURLException | IllegalArgumentException ex) {
             LOG.warn("", ex);
             return null;
         }
