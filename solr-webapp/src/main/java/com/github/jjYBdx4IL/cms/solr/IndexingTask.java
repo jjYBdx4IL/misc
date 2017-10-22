@@ -60,6 +60,7 @@ import org.slf4j.LoggerFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.IDN;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -184,10 +185,45 @@ public class IndexingTask implements Runnable {
         }
     }
 
+    private void verifyIdnJob() {
+        long n = 0;
+        try (SolrClient solr = SolrConfig.getClient()) {
+            boolean done = false;
+            int page = 0;
+            while (!done) {
+                SolrQuery query = new SolrQuery();
+                query.set("q", "id:*");
+                query.set("rows", 100);
+                query.set("start", page * 100);
+                QueryResponse response = solr.query(query);
+                if (response.getResults().isEmpty()) {
+                    done = true;
+                    break;
+                }
+                for (WebPageBean b : response.getBeans(WebPageBean.class)) {
+                    String hn = new URL(b.getUrl()).getHost();
+                    if (!hn.equals(IDN.toASCII(hn))) {
+                        LOG.warn("not in ascii: " + b.getUrl());
+                    }
+                    n++;
+                }
+                page++;
+            }
+        } catch (SolrServerException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        LOG.warn("checked: " + n);
+    }
+
     @Override
     public void run() {
         LOG.info("started");
 
+        // verifyIdnJob();
         // syncItJob();
 
         try (SolrClient client = SolrConfig.getClient()) {

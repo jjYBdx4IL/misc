@@ -1,5 +1,17 @@
-* introduce conecpt of printable characters in the search term transformer to support
+* introduce concept of printable characters in the search term transformer to support
   searching for words with non-ASCII characters lik öäüß
-* monitoring api (crawler ping)
 * pause on low disk?
+
+* 75% of crawler time is currently spent on tasks of which some could be reduced to almost 0 time:
+** waiting for remote servers (> 50%) -> parallel async requests
+** parsing using tika server: need to check if jsoup parsing is considerably faster
+** adding new URLs to the database (quite massive db index maintenance overhead!) -> switch to cloud tech,
+   ie some sort of merge sort and stream-processing of json-encoded structured data. (json serialization is
+   much faster than Java object serialization)
+
+* some AI/algorithm is needed to calculate a processing priority that is not only based on scheduledUpdate, ie.
+prioritizes manually added URLs etc.
+
+* (maybe) support HTTP redirects. currently disabled because we need to intercept them to validate them 
+and to remove/block/change the original url.
 
