@@ -29,12 +29,13 @@ public class WebPageBean {
     private String parsedBy;
     private String language;
     private String description;
+    private String category;
 
     public WebPageBean() {
     }
 
     public WebPageBean(String url, String title, String content, String keywords, String contentType,
-        String parsedBy, String language, String description) {
+        String parsedBy, String language, String description, String category) {
 
         this.url = url;
         this.title = title;
@@ -44,6 +45,7 @@ public class WebPageBean {
         this.parsedBy = parsedBy;
         this.language = language;
         this.description = description;
+        this.category = category;
     }
 
     public String getUrl() {
@@ -124,5 +126,15 @@ public class WebPageBean {
     @FieldConfig(indexed = true, type = FieldType.text_general, stored = true)
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    @Field("category")
+    @FieldConfig(indexed = true, type = FieldType.string, stored = true)
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

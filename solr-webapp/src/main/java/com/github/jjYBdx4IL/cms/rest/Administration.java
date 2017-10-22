@@ -17,15 +17,13 @@ package com.github.jjYBdx4IL.cms.rest;
 
 import static j2html.TagCreator.a;
 import static j2html.TagCreator.div;
-import static j2html.TagCreator.form;
 import static j2html.TagCreator.hr;
-import static j2html.TagCreator.input;
-import static j2html.TagCreator.li;
-import static j2html.TagCreator.ul;
+import static j2html.TagCreator.span;
 
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
 import com.github.jjYBdx4IL.cms.rest.app.Role;
+import com.github.jjYBdx4IL.cms.solr.IndexingTask;
 import j2html.tags.ContainerTag;
 
 import java.io.File;
@@ -46,6 +44,7 @@ import javax.transaction.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -77,33 +76,61 @@ public class Administration {
         row.with(hr().withClass("col-12"));
 
         // DB snapshot dump download
-        String dbDumpLink = uriInfo.getBaseUriBuilder().path(Administration.class)
-            .path(Administration.class, "dbDump").build().toString();
+        String dbSnapshotLink = uriInfo.getBaseUriBuilder().path(Administration.class)
+            .path(Administration.class, "createDbSnapshot").build().toString();
         row.with(div(
-            a("download database snapshot dump (includes all data except SSL key/cert)").withHref(dbDumpLink)
+            a("create database snapshot").withHref(dbSnapshotLink)
         ).withClass("col-12"));
 
         row.with(hr().withClass("col-12"));
 
-        // Submit sitemap to BING
-        String siteMapLink = uriInfo.getBaseUriBuilder().path(SiteMap.class).build().toString();
-        String bingSiteMapSubLink = "http://www.bing.com/ping?sitemap=" + URLEncoder.encode(siteMapLink, "UTF-8");        
+        String pauseLink = uriInfo.getBaseUriBuilder().path(Administration.class)
+            .path(Administration.class, "pauseIndexer").build().toString();
+        ContainerTag statusTag;
+        ContainerTag pauseLinkTag = null;
+        if (IndexingTask.isTerminated.get()) {
+            statusTag = span("terminated").withClass("error");
+        } else if (IndexingTask.isPaused.get()) {
+            statusTag = span("paused").withClass("warning");
+            pauseLinkTag = a("unpause").withHref(pauseLink + "?pause=false");
+        } else {
+            statusTag = span(String.format("running (last activity: %d seconds ago)",
+                (System.currentTimeMillis() - IndexingTask.ping.get()) / 1000l)).withClass("success");
+            pauseLinkTag = a("pause").withHref(pauseLink + "?pause=true");
+        }
         row.with(div(
-            a("submit sitemap to BING").withHref(bingSiteMapSubLink)
+            span("Indexer status: "),
+            statusTag
+        ).withClass("col-12"));
+        row.with(div(
+            pauseLinkTag
         ).withClass("col-12"));
 
         row.with(hr().withClass("col-12"));
-        
+
         htmlBuilder.mainAdd(div(row).withClass("container"));
         return Response.ok().entity(htmlBuilder.toString()).build();
     }
 
-    @Path("dbDump.zip")
+    @Path("pauseIndexer")
     @GET
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response dbDump() {
+    public Response pauseIndexer(@QueryParam("pause") boolean pause) {
+        IndexingTask.pauseRequested.set(pause);
 
-        File file = new File("backup.zip");
+        String adminLink = uriInfo.getBaseUriBuilder().path(Administration.class).build().toString();
+        htmlBuilder.mainAdd(div(div(div(
+            a("back to admin page").withHref(adminLink)
+        ).withClass("col-12")).withClass("row")).withClass("container"));
+        return Response.ok().entity(htmlBuilder.toString()).build();
+    }
+
+    @Path("createDbSnapshot")
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public Response createDbSnapshot() {
+        htmlBuilder.setPageTitle("Create DB Snapshot");
+
+        File file = new File("backupws.zip");
         Query q = em.createNativeQuery(
             String.format(Locale.ROOT, "backup to '%s'", file.getAbsolutePath().replace("'", "''")));
         q.executeUpdate();
@@ -112,7 +139,10 @@ public class Administration {
             return Response.serverError().build();
         }
 
-        return Response.ok().entity(file).build();
+        ContainerTag row = div().withClass("row");
+        row.with(div("Snapshot created.").withClass("col-12 success"));
+        htmlBuilder.mainAdd(div(row).withClass("container"));
+        return Response.ok().entity(htmlBuilder.toString()).build();
     }
 
     public static boolean testZipFile(File file) {

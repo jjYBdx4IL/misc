@@ -38,18 +38,14 @@ import crawlercommons.sitemaps.SiteMapURL;
 import crawlercommons.sitemaps.SiteMapURL.ChangeFrequency;
 import crawlercommons.sitemaps.UnknownFormatException;
 import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.cache.HeaderConstants;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.DateUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -68,6 +64,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.DataFormatException;
 
@@ -86,7 +83,6 @@ public class IndexingTask implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(IndexingTask.class);
 
     public static final String INDEXER_NAME = "GeeGee";
-    public static final String INDEXER_REFERER = "https://geegee.online/";
     public static final String COLLECTION = "WebSearchCollection";
     public static final String SOLR_COLLECTION_URL = "http://127.0.0.1:8983/solr/" + COLLECTION;
     public static final int MAX_PAGES_PER_WEBSITE = 100;
@@ -99,18 +95,12 @@ public class IndexingTask implements Runnable {
     private final CountDownLatch shutdownLatch = new CountDownLatch(1);
     private SolrClient solrClient;
     private final UrlLockService lockService;
-    private final RequestConfig requestConfig = RequestConfig.custom()
-        .setConnectTimeout(30000)
-        .setConnectionRequestTimeout(30000)
-        .setSocketTimeout(30000)
-        .setAuthenticationEnabled(false)
-        .setContentCompressionEnabled(true)
-        .setCircularRedirectsAllowed(false)
-        .setRedirectsEnabled(false)
-        .build();
     private CloseableHttpClient httpClient = null;
 
     public static final AtomicLong ping = new AtomicLong(0);
+    public static final AtomicBoolean pauseRequested = new AtomicBoolean(false);
+    public static final AtomicBoolean isPaused = new AtomicBoolean(false);
+    public static final AtomicBoolean isTerminated = new AtomicBoolean(false);
     private final TimeUsage timeUsage = new TimeUsage();
 
     @Resource
@@ -124,14 +114,6 @@ public class IndexingTask implements Runnable {
 
     @PostConstruct
     public void postConstruct() {
-        List<Header> defaultHeaders = new ArrayList<>();
-        defaultHeaders.add(new BasicHeader(HttpHeaders.REFERER, INDEXER_REFERER));
-        httpClient = HttpClients.custom()
-            .setDefaultRequestConfig(requestConfig)
-            .setDefaultHeaders(defaultHeaders)
-            .disableCookieManagement()
-            .build();
-
         taskThread = threadFactory.newThread(this);
         taskThread.setName("IdxTask");
         taskThread.start();
@@ -222,9 +204,11 @@ public class IndexingTask implements Runnable {
         LOG.info("started");
 
         try {
+            httpClient = IndexingUtils.createHttpClient();
             SolrConfig.init();
         } catch (Exception ex) {
             LOG.error("terminated", ex);
+            isTerminated.set(true);
             return;
         }
         
@@ -234,6 +218,16 @@ public class IndexingTask implements Runnable {
         try (SolrClient client = SolrConfig.getClient()) {
             solrClient = client;
             while (!shutdownLatch.await(0, TimeUnit.MILLISECONDS)) {
+                
+                if (pauseRequested.get()) {
+                    LOG.warn("pause requested, pausing...");
+                    isPaused.set(true);
+                    while (pauseRequested.get() && !shutdownLatch.await(1, TimeUnit.SECONDS)) {
+                    }
+                    isPaused.set(false);
+                    LOG.warn("unpausing...");
+                }
+                
                 WebPageMeta meta = dbService.getNextUrl4Processing();
                 if (meta == null) {
                     shutdownLatch.await(3000, TimeUnit.MILLISECONDS);
@@ -256,6 +250,8 @@ public class IndexingTask implements Runnable {
             ping.set(0);
             LOG.warn("", ex);
         }
+        
+        isTerminated.set(true);
         
         try {
             if (shutdownLatch.await(0, TimeUnit.SECONDS)) {
@@ -293,7 +289,6 @@ public class IndexingTask implements Runnable {
         try {
             try {
                 HttpHead httpHead = new HttpHead(meta.getUrl());
-                httpHead.setConfig(requestConfig);
                 setPageFetchHeaders(httpHead, meta);
 
                 boolean needUpdate = true;
@@ -307,7 +302,6 @@ public class IndexingTask implements Runnable {
 
                 if (needUpdate) {
                     HttpGet httpGet = new HttpGet(meta.getUrl());
-                    httpGet.setConfig(requestConfig);
                     setPageFetchHeaders(httpGet, meta);
 
                     try (TimeUsage httpTimeUsage = timeUsage.startSub("http")) {
@@ -457,7 +451,7 @@ public class IndexingTask implements Runnable {
 
         WebPageBean pageBean = new WebPageBean(meta.getUrl(), reply.getTitle(), reply.getParsedContent(),
             reply.getKeywords(), reply.getContentType(), reply.getParsedBy(), reply.getLanguage(),
-            reply.getDescription());
+            reply.getDescription(), meta.getCategory());
 
         try (TimeUsage solrTimeUsage = timeUsage.startSub("solr")) {
             solrClient.addBean(pageBean);

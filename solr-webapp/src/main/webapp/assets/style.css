@@ -306,8 +306,13 @@ footer .impressum a {
 }
 
 .success {
-	color: green;
-	font-weight: bold;
+    color: green;
+    font-weight: bold;
+}
+
+.warning {
+    color: orange;
+    font-weight: bold;
 }
 
 .searchResult em {

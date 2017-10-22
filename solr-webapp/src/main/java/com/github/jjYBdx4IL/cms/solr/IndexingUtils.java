@@ -19,13 +19,22 @@ import com.github.jjYBdx4IL.utils.net.AddressUtils;
 import com.google.common.net.InetAddresses;
 import com.google.common.net.InternetDomainName;
 import crawlercommons.filters.basic.BasicURLNormalizer;
+import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class IndexingUtils {
 
+    public static final String INDEXER_REFERER = "https://geegee.online/";
     public static final int MAX_URL_LEN = 255;
     public static final BasicURLNormalizer urlNormalizer = new URLNoQueryNormalizer();
 
@@ -73,4 +82,24 @@ public class IndexingUtils {
         }
         return urlString;
     }
+    
+    public static CloseableHttpClient createHttpClient() {
+        RequestConfig requestConfig = RequestConfig.custom()
+            .setConnectTimeout(30000)
+            .setConnectionRequestTimeout(30000)
+            .setSocketTimeout(30000)
+            .setAuthenticationEnabled(false)
+            .setContentCompressionEnabled(true)
+            .setCircularRedirectsAllowed(false)
+            .setRedirectsEnabled(false)
+            .build();
+        List<Header> defaultHeaders = new ArrayList<>();
+        defaultHeaders.add(new BasicHeader(HttpHeaders.REFERER, INDEXER_REFERER));
+        return HttpClients.custom()
+            .setDefaultRequestConfig(requestConfig)
+            .setDefaultHeaders(defaultHeaders)
+            .disableCookieManagement()
+            .build();
+    }
+    
 }

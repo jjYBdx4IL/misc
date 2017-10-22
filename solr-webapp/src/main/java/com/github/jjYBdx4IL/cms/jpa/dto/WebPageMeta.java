@@ -73,6 +73,8 @@ public class WebPageMeta implements Serializable {
     private Date lastAddedToSearchIndex;
     @Basic
     private String manuallyAddedBy;
+    @Basic
+    private String category;
     @Version
     private int version;
 
@@ -183,6 +185,14 @@ public class WebPageMeta implements Serializable {
         this.manuallyAddedBy = manuallyAddedBy;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -208,6 +218,8 @@ public class WebPageMeta implements Serializable {
         builder.append(lastAddedToSearchIndex);
         builder.append(", manuallyAddedBy=");
         builder.append(manuallyAddedBy);
+        builder.append(", category=");
+        builder.append(category);
         builder.append(", version=");
         builder.append(version);
         builder.append("]");
