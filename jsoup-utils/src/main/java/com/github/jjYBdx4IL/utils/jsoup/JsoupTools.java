@@ -20,6 +20,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 //CHECKSTYLE:OFF
 /**
  *
@@ -30,6 +36,9 @@ public class JsoupTools {
     public static final int MAX_DATASRC_ATTR_LENGTH = 30;
     public static final String OVERLENGTH_INDICATOR = "...";
 
+    private JsoupTools() {
+    }
+    
     /**
      *
      * @param html the html
@@ -64,6 +73,22 @@ public class JsoupTools {
         return doc.toString();
     }
 
-    private JsoupTools() {
+    public static List<String> extractLinks(byte[] htmldata, String charsetName, String baseUri) throws IOException {
+        List<String> links = new ArrayList<>();
+        Document doc;
+        try (InputStream is = new ByteArrayInputStream(htmldata)){
+            doc = Jsoup.parse(is, charsetName, baseUri);
+        }
+        for (Element aHref : doc.select("a[href]")) {
+            String link = aHref.absUrl("href");
+            if (link == null) {
+                continue;
+            }
+            if (!link.toLowerCase().startsWith("http://") && !link.toLowerCase().startsWith("https://")) {
+                continue;
+            }
+            links.add(link);
+        }
+        return links;
     }
 }

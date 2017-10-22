@@ -134,6 +134,18 @@ public class QueryFactory {
         return em.createQuery(cq);
     }
 
+    public TypedQuery<Long> getCountWebPageMetaQuery() {
+        final CriteriaBuilder cb = em.getCriteriaBuilder();
+        final CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        final Root<WebPageMeta> root = cq.from(WebPageMeta.class);
+        cq.select(cb.count(root));
+        Predicate predicateKey = cb.equal(
+            root.get(WebPageMeta_.url),
+            cb.parameter(WebPageMeta_.url.getJavaType(), "url"));
+        cq.where(predicateKey);
+        return em.createQuery(cq);
+    }
+
     public WebPageMeta getUrl4Processing() {
         final CriteriaBuilder cb = em.getCriteriaBuilder();
         final CriteriaQuery<WebPageMeta> cq = cb.createQuery(WebPageMeta.class);

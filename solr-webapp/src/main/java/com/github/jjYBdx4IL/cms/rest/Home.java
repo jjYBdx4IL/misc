@@ -88,7 +88,7 @@ public class Home {
             htmlBuilder.enableNoIndex();
         }
 
-        htmlBuilder.addPageTitleSubItem("add_to_queue", "Submit website", SubmitWebSite.class);
+        htmlBuilder.addPageTitleSubItem("add_to_queue", "Submit URL/web page/web site", SubmitWebSite.class);
 
         ContainerTag container = div().withClass("container");
 
@@ -162,7 +162,7 @@ public class Home {
         container.with(
             div(
                 div(
-                    String.format("%d results found", nResults)
+                    String.format("%,d results found", nResults)
                 ).withClass("col-12")
             ).withClass("row")
         );

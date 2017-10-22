@@ -62,7 +62,7 @@ public class SubmitWebSite {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response submit(@QueryParam("site") String site) {
-        htmlBuilder.setPageTitle("Submit Website");
+        htmlBuilder.setPageTitle("Submit URL");
 
         ContainerTag container = div().withClass("container");
 
@@ -72,14 +72,14 @@ public class SubmitWebSite {
             if (!IndexingUtils.isValidDomainName(site)) {
                 container.with(
                     div(
-                        div("Failed to submit website: " + site)
+                        div("Failed to submit URL: " + site)
                             .withClass("col-12 error")
                     ).withClass("row")
                 );
             } else {
                 container.with(
                     div(
-                        div("Successfully submitted website: " + site)
+                        div("Successfully submitted URL: " + site)
                             .withClass("col-12 success")
                     ).withClass("row")
                 );

@@ -16,6 +16,7 @@
 package com.github.jjYBdx4IL.cms.solr;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.WebPageMeta;
@@ -98,9 +99,11 @@ public class IndexingDbService {
     public void reschedule(WebPageMeta meta, int duration, TimeUnit timeUnit) {
         checkNotNull(meta);
         checkNotNull(timeUnit);
+        checkState(duration >= 0);
         duration = duration / 4 + r.nextInt(duration - duration / 4);
         WebPageMeta pageMeta = em.find(WebPageMeta.class, meta.getId());
         pageMeta.setScheduledUpdate(new Date(System.currentTimeMillis() + timeUnit.toMillis(duration)));
+        pageMeta.setLastProcessed(new Date());
         em.persist(pageMeta);
     }
 
@@ -111,6 +114,7 @@ public class IndexingDbService {
         duration = duration / 4 + r.nextInt(duration - duration / 4);
         WebPageMeta pageMeta = em.find(WebPageMeta.class, meta.getId());
         pageMeta.setScheduledUpdate(new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(duration)));
+        pageMeta.setLastProcessed(new Date());
         em.persist(pageMeta);
     }
 
@@ -132,6 +136,7 @@ public class IndexingDbService {
         pageMeta.setExpires(meta.getExpires());
         pageMeta.setLastProcessed(new Date());
 
+        fixExpires(pageMeta, meta.getScheduledUpdate());
         updateScheduledUpdate(pageMeta);
 
         em.persist(pageMeta);
@@ -154,6 +159,7 @@ public class IndexingDbService {
         int duration = ERR_WEBPAGE_RETRY_BACKOFF_IVAL_MINUTES * errors;
         duration = duration / 2 + r.nextInt(duration - duration / 2);
         pageMeta.setScheduledUpdate(new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(duration)));
+        pageMeta.setLastProcessed(new Date());
 
         em.persist(pageMeta);
     }
@@ -168,15 +174,31 @@ public class IndexingDbService {
         pageMeta.setExpires(meta.getExpires());
         pageMeta.setLastProcessed(new Date());
 
+        fixExpires(pageMeta, meta.getScheduledUpdate());
         updateScheduledUpdate(pageMeta);
 
         em.persist(pageMeta);
     }
 
+    // fix expires first, delay it according to current backlog
+    private void fixExpires(WebPageMeta meta, Date backlog) {
+        if (meta.getExpires() == null) {
+            return;
+        }
+        
+        Date now = new Date();
+        long backlogMs = Math.abs(now.getTime() - backlog.getTime());
+        Date minExpires = new Date((long) (now.getTime() + backlogMs * 1.2));
+        if (meta.getExpires().before(minExpires)) {
+            meta.setExpires(minExpires);
+        }
+    }
+    
     private void updateScheduledUpdate(WebPageMeta meta) {
         final Date now = new Date();
         Date nextUpdate = new Date(now.getTime() + TimeUnit.HOURS.toMillis(DEF_WEBPAGE_REINDEX_IVAL_HOURS));
         Date maxUpdate = new Date(now.getTime() + TimeUnit.DAYS.toMillis(MAX_RECHECK_DAYS));
+        
         if (meta.getExpires() != null && meta.getExpires().before(nextUpdate)) {
             nextUpdate = meta.getExpires();
         }
@@ -190,6 +212,9 @@ public class IndexingDbService {
     @Transactional
     public void block(WebPageMeta meta) {
         checkNotNull(meta);
+        
+        LOG.info("blocking: " + meta.getUrl());
+        
         final Date now = new Date();
         WebPageMeta pageMeta = em.find(WebPageMeta.class, meta.getId());
         pageMeta.setConsecutiveErrorCount(0);
@@ -205,35 +230,45 @@ public class IndexingDbService {
 
     @Transactional
     public void addUrls(List<String> extractedUrls) {
-        int n = 0;
+        int nAdded = 0;
+        int nBadUrlFormat = 0;
+        int nBadGuessedFileType = 0;
+        int nDuplicates = 0;
+        int nSkipped = 0;
+        TypedQuery<Long> countQuery = qf.getCountWebPageMetaQuery();
         for (String url : extractedUrls) {
+            if (nAdded == MAX_ADD_URLS_PER_PAGE) {
+                nSkipped++;
+                continue;
+            }
+            
             String newUrl = IndexingUtils.sanitizeUrl(url);
             if (newUrl == null) {
-                LOG.info("dropping url: " + url);
+                LOG.debug("dropping url: " + url);
+                nBadUrlFormat++;
                 continue;
             }
             if (!isTypeWhitelisted(newUrl)) {
+                nBadGuessedFileType++;
                 continue;
             }
-            WebPageMeta existing = getWebPageMeta(newUrl);
-            if (existing != null) {
+            if (countQuery.setParameter("url", newUrl).getSingleResult().longValue() > 0) {
+                nDuplicates++;
                 continue;
             }
+            
             WebPageMeta meta = new WebPageMeta();
             meta.setUrl(newUrl);
             meta.setScheduledUpdate(new Date());
             meta.setLastProcessed(new Date(0));
             em.persist(meta);
-            n++;
-            if (n % FLUSH_AFTER_N_ADDS == 0) {
+            nAdded++;
+            if (nAdded % FLUSH_AFTER_N_ADDS == 0) {
                 em.flush();
             }
-            if (n == MAX_ADD_URLS_PER_PAGE) {
-                LOG.info("limit of urls per page reached");
-                break;
-            }
         }
-        LOG.info(String.format("added %d urls", n));
+        LOG.info(String.format("%d urls: %d added, %d bad url, %d bad file type, %d dupes, %d skipped",
+            extractedUrls.size(), nAdded, nBadUrlFormat, nBadGuessedFileType, nDuplicates, nSkipped));
     }
     
     public static boolean isTypeWhitelisted(String url) {
@@ -248,7 +283,7 @@ public class IndexingDbService {
                 return true;
             }
         }
-        LOG.info(String.format("dropping %s url %s", type, url));
+        LOG.debug(String.format("dropping %s url %s", type, url));
         return false;
     }
 

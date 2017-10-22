@@ -226,7 +226,6 @@
         <dependency>
             <groupId>com.github.jjYBdx4IL.utils</groupId>
             <artifactId>text-utils</artifactId>
-            <version>1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -272,6 +271,11 @@
             <groupId>com.j2html</groupId>
             <artifactId>j2html</artifactId>
             <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jjYBdx4IL.utils</groupId>
+            <artifactId>jsoup-utils</artifactId>
+            <version>1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
@@ -369,6 +373,11 @@
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-rs-client</artifactId>
                 <version>3.0.12</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.jjYBdx4IL.utils</groupId>
+                <artifactId>text-utils</artifactId>
+                <version>1.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.tika</groupId>

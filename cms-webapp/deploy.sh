@@ -2,4 +2,4 @@
 
 scriptdir=$(readlink -f "$(dirname "$0")")
 
-rsync --progress $scriptdir/target/cms-webapp-1.0-SNAPSHOT.war web@gruust.stream:wildfly/standalone/deployments/ROOT.war
+rsync --progress $scriptdir/target/cms-webapp-*-SNAPSHOT.war web@gruust.stream:wildfly/standalone/deployments/cms-webapp.war

@@ -22,8 +22,10 @@ import com.github.jjYBdx4IL.cms.jpa.dto.WebPageMeta;
 import com.github.jjYBdx4IL.cms.tika.MetaReply;
 import com.github.jjYBdx4IL.cms.tika.TikaClient;
 import com.github.jjYBdx4IL.utils.io.CompressionUtils;
+import com.github.jjYBdx4IL.utils.io.IoUtils;
+import com.github.jjYBdx4IL.utils.jsoup.JsoupTools;
 import com.github.jjYBdx4IL.utils.net.DownloadUtils;
-import com.github.jjYBdx4IL.utils.net.URLUtils;
+import com.github.jjYBdx4IL.utils.time.TimeUsage;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import crawlercommons.robots.BaseRobotRules;
@@ -36,6 +38,7 @@ import crawlercommons.sitemaps.SiteMapURL;
 import crawlercommons.sitemaps.SiteMapURL.ChangeFrequency;
 import crawlercommons.sitemaps.UnknownFormatException;
 import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.cache.HeaderConstants;
 import org.apache.http.client.config.RequestConfig;
@@ -46,11 +49,11 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.DateUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
 import org.apache.solr.client.solrj.SolrClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -91,12 +94,19 @@ public class IndexingTask implements Runnable {
     private final CountDownLatch shutdownLatch = new CountDownLatch(1);
     private SolrClient solrClient;
     private final UrlLockService lockService;
-    private final RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(30000)
+    private final RequestConfig requestConfig = RequestConfig.custom()
+        .setConnectTimeout(30000)
         .setConnectionRequestTimeout(30000)
-        .setSocketTimeout(30000).build();
+        .setSocketTimeout(30000)
+        .setAuthenticationEnabled(false)
+        .setContentCompressionEnabled(true)
+        .setCircularRedirectsAllowed(false)
+        .build();
+    private CloseableHttpClient httpClient = null;
 
     public static final AtomicLong ping = new AtomicLong(0);
-    
+    private final TimeUsage timeUsage = new TimeUsage();
+
     @Resource
     ManagedThreadFactory threadFactory;
     @Inject
@@ -109,6 +119,15 @@ public class IndexingTask implements Runnable {
     @PostConstruct
     public void postConstruct() {
         SolrConfig.init(); // fail startup if init goes wrong
+        
+        List<Header> defaultHeaders = new ArrayList<>();
+        defaultHeaders.add(new BasicHeader(HttpHeaders.REFERER, "https://geegee.online/"));
+        httpClient = HttpClients.custom()
+            .setDefaultRequestConfig(requestConfig)
+            .setDefaultHeaders(defaultHeaders)
+            .disableCookieManagement()
+            .build();
+        
         taskThread = threadFactory.newThread(this);
         taskThread.setName("IdxTask");
         taskThread.start();
@@ -121,6 +140,10 @@ public class IndexingTask implements Runnable {
             taskThread.join();
         } catch (InterruptedException ex) {
             LOG.warn("interrupted while waiting for " + taskThread + " to shut down", ex);
+        }
+        try {
+            httpClient.close();
+        } catch (Exception ex) {
         }
     }
 
@@ -137,19 +160,17 @@ public class IndexingTask implements Runnable {
                     continue;
                 }
 
-                UrlLockService.Lock lock = lockService.acquire(meta);
-                if (lock == null) {
-                    LOG.info("url has process lock: " + meta.getUrl());
-                    dbService.rescheduleLocked(meta);
-                    continue;
-                }
-                try {
+                try (UrlLockService.Lock lock = lockService.acquire(meta)) {
+                    if (lock == null) {
+                        LOG.info("url has process lock: " + meta.getUrl());
+                        dbService.rescheduleLocked(meta);
+                        continue;
+                    }
                     processUrl(meta);
-                } finally {
-                    lockService.release(lock);
                 }
-                
+
                 ping.set(System.currentTimeMillis());
+                timeUsage.ivalDump();
             }
         } catch (Exception ex) {
             ping.set(0);
@@ -182,24 +203,30 @@ public class IndexingTask implements Runnable {
 
         boolean updated = false;
         try {
-            try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            try {
                 HttpHead httpHead = new HttpHead(meta.getUrl());
                 httpHead.setConfig(requestConfig);
                 setPageFetchHeaders(httpHead, meta);
 
                 boolean needUpdate = true;
-                try (CloseableHttpResponse response = httpclient.execute(httpHead)) {
-                    needUpdate = checkResponseHeader(response, meta);
-                } catch (BadHttpStatusCodeException ex) {
+                try (TimeUsage httpTimeUsage = timeUsage.startSub("http")) {
+                    try (CloseableHttpResponse response = httpClient.execute(httpHead)) {
+                        httpTimeUsage.stop();
+                        needUpdate = checkResponseHeader(response, meta);
+                    } catch (BadHttpStatusCodeException ex) {
+                    }
                 }
 
                 if (needUpdate) {
                     HttpGet httpGet = new HttpGet(meta.getUrl());
                     httpGet.setConfig(requestConfig);
                     setPageFetchHeaders(httpGet, meta);
-    
-                    try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
-                        updated = handleResponse(response, meta);
+
+                    try (TimeUsage httpTimeUsage = timeUsage.startSub("http")) {
+                        try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                            httpTimeUsage.stop();
+                            updated = handleResponse(response, meta);
+                        }
                     }
                 }
             } catch (FileTooLargeException | IndexingNotAllowedException
@@ -238,11 +265,11 @@ public class IndexingTask implements Runnable {
 
         int status = response.getStatusLine().getStatusCode();
 
-        // if (LOG.isDebugEnabled()) {
-        for (Header h : response.getAllHeaders()) {
-            LOG.info("" + h);
+        if (LOG.isDebugEnabled()) {
+            for (Header h : response.getAllHeaders()) {
+                LOG.debug("" + h);
+            }
         }
-        // }
 
         if (status == HttpStatus.SC_NOT_MODIFIED) {
             return false;
@@ -289,7 +316,7 @@ public class IndexingTask implements Runnable {
         if (!checkResponseHeader(response, meta)) {
             return false;
         }
-        
+
         if (response.getEntity() == null || response.getEntity().getContent() == null) {
             return false;
         }
@@ -303,28 +330,20 @@ public class IndexingTask implements Runnable {
         Header lastmodHeader = response.getFirstHeader(HeaderConstants.LAST_MODIFIED);
         meta.setLastModified(lastmodHeader == null ? null : DateUtils.parseDate(lastmodHeader.getValue()));
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buf = new byte[4096];
-        int nTotal = 0;
-        try (InputStream is = response.getEntity().getContent()) {
-            int n;
-            do {
-                n = is.read(buf);
-                if (n > 0) {
-                    baos.write(buf, 0, n);
-                    nTotal += n;
-                }
-            } while (baos.size() < MAX_DOC_SIZE && n > 0);
-            if (n > 0) {
-                LOG.info("content too large: " + nTotal + " bytes");
-                throw new FileTooLargeException(meta.getUrl());
-            }
+        byte[] data;
+        try (TimeUsage httpTimeUsage = timeUsage.startSub("http");
+            InputStream is = response.getEntity().getContent()) {
+            data = IoUtils.toByteArray(is, MAX_DOC_SIZE);
         }
-        LOG.info(String.format("retrieved %d bytes", nTotal));
+        if (data == null) {
+            throw new FileTooLargeException(meta.getUrl());
+        }
+        LOG.info(String.format("retrieved %d bytes", data.length));
 
-        byte[] data = baos.toByteArray();
-        baos = null;
-        MetaReply reply = TikaClient.parse(data);
+        MetaReply reply;
+        try (TimeUsage tikaTimeUsage = timeUsage.startSub("tika")) {
+            reply = TikaClient.parse(data);
+        }
 
         if (reply.getRobots().contains("noindex")) {
             throw new IndexingNotAllowedException(meta.getUrl());
@@ -340,16 +359,19 @@ public class IndexingTask implements Runnable {
         } catch (Exception ex) {
             LOG.info(reply.getContentEncoding(), ex);
         }
-        String pageContent = new String(data, charset);
-        List<String> extractedUrls = URLUtils.hyperlinkUrls(pageContent);
+        // String pageContent = new String(data, charset);
+        // List<String> extractedUrls = URLUtils.hyperlinkUrls(pageContent);
+        List<String> extractedUrls = JsoupTools.extractLinks(data, charset.name(), meta.getUrl());
         LOG.info(String.format("extracted %d urls", extractedUrls.size()));
-        dbService.addUrls(extractedUrls);
+        try (TimeUsage addUrlTimeUsage = timeUsage.startSub("addUrls")) {
+            dbService.addUrls(extractedUrls);
+        }
 
         WebPageBean pageBean = new WebPageBean(meta.getUrl(), reply.getTitle(), reply.getParsedContent(),
             reply.getKeywords(), reply.getContentType(), reply.getParsedBy(), reply.getLanguage(),
             reply.getDescription());
 
-        try {
+        try (TimeUsage solrTimeUsage = timeUsage.startSub("solr")) {
             solrClient.addBean(pageBean);
             SolrConfig.commit(solrClient);
         } catch (Exception ex) {
@@ -404,6 +426,7 @@ public class IndexingTask implements Runnable {
         return true;
     }
 
+    @SuppressWarnings("unused")
     private List<SiteMapURL> fetchSiteLinks(String siteUrl, BaseRobotRules rules)
         throws UnknownFormatException, IOException, InterruptedException {
 
@@ -474,7 +497,10 @@ public class IndexingTask implements Runnable {
     }
 
     public boolean hasAccess(WebPageMeta meta) throws IOException {
-        BaseRobotRules rules = getRobots(meta);
+        BaseRobotRules rules;
+        try (TimeUsage robotsTimeUsage = timeUsage.startSub("robotsTxt")) {
+            rules = getRobots(meta);
+        }
         if (rules == null) {
             return false;
         }
@@ -482,6 +508,7 @@ public class IndexingTask implements Runnable {
     }
 
     private static final int MAX_ROBOTSTXT_FILESIZE = 65536;
+    @SuppressWarnings("unused")
     private final Cache<String, byte[]> robotsTxtCache = CacheBuilder.<String, byte[]>newBuilder()
         .expireAfterAccess(50, TimeUnit.MINUTES).expireAfterWrite(12, TimeUnit.HOURS).build();
     private final Cache<String, String> invalidRobotsTxtCache = CacheBuilder.newBuilder()
@@ -523,24 +550,28 @@ public class IndexingTask implements Runnable {
         return rules;
     }
 
+    @SuppressWarnings("serial")
     public static class FileTooLargeException extends IOException {
         public FileTooLargeException(String reason) {
             super(reason);
         }
     }
 
+    @SuppressWarnings("serial")
     public static class IndexingNotAllowedException extends IOException {
         public IndexingNotAllowedException(String reason) {
             super(reason);
         }
     }
 
+    @SuppressWarnings("serial")
     public static class UnsupportedContentTypeException extends IOException {
         public UnsupportedContentTypeException(String reason) {
             super(reason);
         }
     }
 
+    @SuppressWarnings("serial")
     public static class BadHttpStatusCodeException extends IOException {
         public BadHttpStatusCodeException(String reason) {
             super(reason);

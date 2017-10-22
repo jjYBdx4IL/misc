@@ -36,7 +36,7 @@ public class DownloadUtils {
     public static byte[] get(String url, long maxSize) throws IOException {
         RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(30000).setConnectionRequestTimeout(30000)
             .setSocketTimeout(30000).build();
-        
+
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
             HttpGet httpGet = new HttpGet(url);
             httpGet.setConfig(requestConfig);
@@ -48,6 +48,10 @@ public class DownloadUtils {
                 if (status < 200 || status >= 300) {
                     throw new IOException(
                         "invalid status code " + status + " received for " + url);
+                }
+                if (status == HttpStatus.SC_NO_CONTENT || response.getEntity() == null
+                    || response.getEntity().getContent() == null) {
+                    return new byte[] {};
                 }
                 try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                     byte[] buf = new byte[4096];

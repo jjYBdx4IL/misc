@@ -15,10 +15,12 @@
  */
 package com.github.jjYBdx4IL.cms.jpa.dto;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.ejb.BeforeCompletion;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -40,6 +42,8 @@ import javax.persistence.Version;
     @Index(name = "WEBPAGE_SCHEDUPD_IDX", columnList = "scheduledUpdate")
 })
 public class WebPageMeta implements Serializable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(WebPageMeta.class);
 
     public WebPageMeta() {
     }
@@ -129,7 +133,7 @@ public class WebPageMeta implements Serializable {
     public void setLastProcessed(Date lastProcessed) {
         this.lastProcessed = lastProcessed == null ? null : (Date) lastProcessed.clone();
     }
-    
+
     public void copyValuesTo(WebPageMeta dest) {
         dest.setConsecutiveErrorCount(getConsecutiveErrorCount());
         dest.setEtag(getEtag());
@@ -148,9 +152,14 @@ public class WebPageMeta implements Serializable {
     public void setBlocked(Date blocked) {
         this.blocked = blocked == null ? null : (Date) blocked.clone();
     }
-    
+
     @PrePersist
     public void fixDates() {
+        if (getScheduledUpdate() != null
+            && getScheduledUpdate().before(new Date(System.currentTimeMillis() - 120L * 1000L))) {
+            LOG.warn("scheduled update is in the past: " + toString());
+        }
+
         if (getLastModified() == null && getExpires() == null) {
             return;
         }
@@ -162,4 +171,32 @@ public class WebPageMeta implements Serializable {
             setExpires(getExpires().before(now) ? null : getExpires());
         }
     }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("WebPageMeta [id=");
+        builder.append(id);
+        builder.append(", url=");
+        builder.append(url);
+        builder.append(", scheduledUpdate=");
+        builder.append(scheduledUpdate);
+        builder.append(", consecutiveErrorCount=");
+        builder.append(consecutiveErrorCount);
+        builder.append(", blocked=");
+        builder.append(blocked);
+        builder.append(", etag=");
+        builder.append(etag);
+        builder.append(", lastModified=");
+        builder.append(lastModified);
+        builder.append(", expires=");
+        builder.append(expires);
+        builder.append(", lastProcessed=");
+        builder.append(lastProcessed);
+        builder.append(", version=");
+        builder.append(version);
+        builder.append("]");
+        return builder.toString();
+    }
+
 }

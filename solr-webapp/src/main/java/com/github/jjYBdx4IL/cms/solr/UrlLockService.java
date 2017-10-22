@@ -47,7 +47,7 @@ public class UrlLockService {
     
     public Lock acquire(WebPageMeta meta) {
         String host = getHost(meta.getUrl());
-        Lock lock = new Lock(host);
+        Lock lock = new Lock(host, this);
         try {
             for (InetAddress addr : InetAddress.getAllByName(host)) {
                 lock.addAddr(addr.getHostAddress());
@@ -101,13 +101,16 @@ public class UrlLockService {
         }
     }
     
-    public static class Lock {
+    public static class Lock implements AutoCloseable {
         private final List<String> addrs = new ArrayList<>();
         private final String hostname;
-        public Lock(String hostname) {
+        private final UrlLockService lockService;
+        public Lock(String hostname, UrlLockService lockService) {
             checkNotNull(hostname);
+            checkNotNull(lockService);
             checkState(!hostname.isEmpty());
             this.hostname = hostname;
+            this.lockService = lockService;
         }
         public void addAddr(String addr) {
             addrs.add(addr);
@@ -117,6 +120,10 @@ public class UrlLockService {
         }
         public String getHostname() {
             return hostname;
+        }
+        @Override
+        public void close() throws Exception {
+            lockService.release(this);
         }
     }
 }
