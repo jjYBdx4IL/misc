@@ -40,6 +40,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -75,7 +76,6 @@ public class Administration {
 
         row.with(hr().withClass("col-12"));
 
-        // DB snapshot dump download
         String dbSnapshotLink = uriInfo.getBaseUriBuilder().path(Administration.class)
             .path(Administration.class, "createDbSnapshot").build().toString();
         row.with(div(
@@ -84,26 +84,13 @@ public class Administration {
 
         row.with(hr().withClass("col-12"));
 
-        String pauseLink = uriInfo.getBaseUriBuilder().path(Administration.class)
-            .path(Administration.class, "pauseIndexer").build().toString();
-        ContainerTag statusTag;
-        ContainerTag pauseLinkTag = null;
-        if (IndexingTask.isTerminated.get()) {
-            statusTag = span("terminated").withClass("error");
-        } else if (IndexingTask.isPaused.get()) {
-            statusTag = span("paused").withClass("warning");
-            pauseLinkTag = a("unpause").withHref(pauseLink + "?pause=false");
-        } else {
-            statusTag = span(String.format("running (last activity: %d seconds ago)",
-                (System.currentTimeMillis() - IndexingTask.ping.get()) / 1000l)).withClass("success");
-            pauseLinkTag = a("pause").withHref(pauseLink + "?pause=true");
-        }
+        String indexerStatusEndpoint = uriInfo.getBaseUriBuilder().path(Administration.class)
+            .path(Administration.class, "indexerStatus").build().toString();
+        htmlBuilder.setJsValue("indexerStatusEndpoint", indexerStatusEndpoint);
+
         row.with(div(
             span("Indexer status: "),
-            statusTag
-        ).withClass("col-12"));
-        row.with(div(
-            pauseLinkTag
+            span().attr("id", "indexerStatus")
         ).withClass("col-12"));
 
         row.with(hr().withClass("col-12"));
@@ -117,11 +104,54 @@ public class Administration {
     public Response pauseIndexer(@QueryParam("pause") boolean pause) {
         IndexingTask.pauseRequested.set(pause);
 
-        String adminLink = uriInfo.getBaseUriBuilder().path(Administration.class).build().toString();
-        htmlBuilder.mainAdd(div(div(div(
-            a("back to admin page").withHref(adminLink)
-        ).withClass("col-12")).withClass("row")).withClass("container"));
-        return Response.ok().entity(htmlBuilder.toString()).build();
+        return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path(Administration.class).build())
+            .status(HttpServletResponse.SC_FOUND)
+            .build();
+    }
+
+    @Path("indexerStatus")
+    @Produces(MediaType.TEXT_PLAIN)
+    @GET
+    public Response indexerStatus() {
+        String pauseLink = uriInfo.getBaseUriBuilder().path(Administration.class)
+            .path(Administration.class, "pauseIndexer").build().toString();
+
+        ContainerTag container = span();
+
+        String status = "terminated";
+        String statusClass = "error";
+        if (!IndexingTask.isTerminated.get()) {
+            if (IndexingTask.isPaused.get()) {
+                if (!IndexingTask.pauseRequested.get()) {
+                    status = "resuming operation...";
+                    statusClass = "warning";
+
+                } else {
+                    status = "suspended";
+                    statusClass = "warning";
+                }
+            } else {
+                if (IndexingTask.pauseRequested.get()) {
+                    status = "suspending operation...";
+                    statusClass = "success";
+                } else {
+                    status = "running";
+                    statusClass = "success";
+                }
+            }
+        }
+        container.with(
+            span(String.format("%s (last activity: %d seconds ago)", status,
+                (System.currentTimeMillis() - IndexingTask.ping.get()) / 1000l)).withClass(statusClass)
+        ).with(span(" "));
+
+        if (IndexingTask.isPaused.get()) {
+            container.with(a("unpause").withHref(pauseLink + "?pause=false"));
+        } else if (!IndexingTask.pauseRequested.get()) {
+            container.with(a("pause").withHref(pauseLink + "?pause=true"));
+        }
+
+        return Response.ok().entity(container.toString()).build();
     }
 
     @Path("createDbSnapshot")
