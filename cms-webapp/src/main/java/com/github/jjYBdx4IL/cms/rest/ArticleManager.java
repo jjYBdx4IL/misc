@@ -55,6 +55,7 @@ import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -95,13 +96,16 @@ public class ArticleManager {
     HtmlBuilder htmlBuilder;
     @Inject
     QueryFactory qf;
+    @Inject
+    @Named("subdomain")
+    String subdomain;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response get() {
         LOG.trace("get()");
 
-        List<Article> articles = qf.getArticleDisplayList(null, session.getUid(), false).getResultList();
+        List<Article> articles = qf.getArticleDisplayList(null, session.getUid(), false, subdomain).getResultList();
 
         UriBuilder urlTpl = uriInfo.getAbsolutePathBuilder().path(ArticleManager.class, "edit");
 
@@ -166,7 +170,9 @@ public class ArticleManager {
 
         boolean published = "on".equalsIgnoreCase(_published);
 
-        if (title == null || title.isEmpty()) { // no sanitization of the title needed, j2html will do that on output
+        if (title == null || title.isEmpty()) { // no sanitization of the title
+                                                // needed, j2html will do that
+                                                // on output
             return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("title required").build();
         }
         if (pathId == null || pathId.isEmpty() || !Article.PATHID_PATTERN.matcher(pathId).find()) {
@@ -197,6 +203,7 @@ public class ArticleManager {
         article.setLastModified(now);
         article.setTags(tags);
         article.setPublished(published);
+        article.setSubdomain(subdomain);
         article.setFirstPublishedAt(published ? now : null);
         em.persist(article);
 
@@ -324,7 +331,7 @@ public class ArticleManager {
     public Response exportDump() throws JAXBException {
         LOG.trace("export()");
 
-        List<Article> articles = qf.getArticleDisplayList(null, session.getUid(), false).getResultList();
+        List<Article> articles = qf.getArticleDisplayList(null, session.getUid(), false, subdomain).getResultList();
         List<ConfigValue> configValues = qf.getAllConfigValues().getResultList();
 
         return Response.ok().header("Content-Disposition",
@@ -358,6 +365,7 @@ public class ArticleManager {
             article.setLastModified(dto.getLastModified());
             article.setOwner(user);
             article.setPublished(dto.isPublished());
+            article.setSubdomain(subdomain);
             article.setFirstPublishedAt(dto.getFirstPublishedAt());
             List<Tag> tags = new ArrayList<>();
             for (String tagName : dto.getTags()) {

@@ -95,7 +95,6 @@ public class IndexingTask implements Runnable {
     private final CountDownLatch shutdownLatch = new CountDownLatch(1);
     private SolrClient solrClient;
     private final UrlLockService lockService;
-    private CloseableHttpClient httpClient = null;
 
     public static final AtomicLong ping = new AtomicLong(0);
     public static final AtomicBoolean pauseRequested = new AtomicBoolean(false);
@@ -126,10 +125,6 @@ public class IndexingTask implements Runnable {
             taskThread.join();
         } catch (InterruptedException ex) {
             LOG.warn("interrupted while waiting for " + taskThread + " to shut down", ex);
-        }
-        try {
-            httpClient.close();
-        } catch (Exception ex) {
         }
     }
 
@@ -204,7 +199,6 @@ public class IndexingTask implements Runnable {
         LOG.info("started");
 
         try {
-            httpClient = IndexingUtils.createHttpClient();
             SolrConfig.init();
         } catch (Exception ex) {
             LOG.error("terminated", ex);
@@ -287,7 +281,7 @@ public class IndexingTask implements Runnable {
 
         boolean updated = false;
         try {
-            try {
+            try (CloseableHttpClient httpClient = IndexingUtils.createHttpClient()) {
                 HttpHead httpHead = new HttpHead(meta.getUrl());
                 setPageFetchHeaders(httpHead, meta);
 

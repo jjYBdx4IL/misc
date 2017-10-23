@@ -62,6 +62,8 @@ public class Home {
     QueryFactory qf;
     @Inject
     AppCache appCache;
+    @Inject @Named("subdomain")
+    String subdomain;
     
     @Path("")
     @GET
@@ -73,7 +75,7 @@ public class Home {
             uriInfo.getBaseUriBuilder().path(Home.class).path(Home.class, "cont").toTemplate());
         htmlBuilder.enableShareButtons();
 
-        List<Article> articles = qf.getArticleDisplayList(null, null, true)
+        List<Article> articles = qf.getArticleDisplayList(null, null, true, subdomain)
             .setMaxResults(MAX_ARTICLES_PER_REQUEST).getResultList();
 
         htmlBuilder.mainAdd(
@@ -90,7 +92,7 @@ public class Home {
     public Response cont(@PathParam("skip") int skip) {
         LOG.trace("cont()");
 
-        List<Article> articles = qf.getArticleDisplayList(null, null, true)
+        List<Article> articles = qf.getArticleDisplayList(null, null, true, subdomain)
             .setMaxResults(MAX_ARTICLES_PER_REQUEST).setFirstResult(skip).getResultList();
 
         return Response.ok(htmlBuilder.createArticleListRowInner(articles, false, false).toString()).build();
@@ -121,7 +123,7 @@ public class Home {
             htmlBuilder.enableNoIndex();
         }
 
-        List<Article> articles = qf.getArticleDisplayList(selectedTag, null, true)
+        List<Article> articles = qf.getArticleDisplayList(selectedTag, null, true, subdomain)
             .setMaxResults(MAX_ARTICLES_PER_REQUEST).getResultList();
 
         htmlBuilder.mainAdd(
@@ -138,7 +140,7 @@ public class Home {
     public Response byTagCont(@PathParam("tag") String selectedTag, @PathParam("skip") int skip) {
         LOG.trace("byTagCont()");
 
-        List<Article> articles = qf.getArticleDisplayList(selectedTag, null, true)
+        List<Article> articles = qf.getArticleDisplayList(selectedTag, null, true, subdomain)
             .setMaxResults(MAX_ARTICLES_PER_REQUEST).setFirstResult(skip).getResultList();
 
         return Response.ok(htmlBuilder.createArticleListRowInner(articles, false, false).toString()).build();

@@ -29,6 +29,7 @@ import java.util.Date;
 
 import javax.annotation.security.DenyAll;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
@@ -59,6 +60,8 @@ public class Devel {
     QueryFactory qf;
     @Inject
     private AppCache appCache;
+    @Inject @Named("subdomain")
+    String subdomain;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -92,7 +95,7 @@ public class Devel {
     public Response clean() {
         LOG.warn("clean()");
 
-        for (Article article : qf.getArticleDisplayList(null, TEST_UID, false).getResultList()) {
+        for (Article article : qf.getArticleDisplayList(null, TEST_UID, false, subdomain).getResultList()) {
             if (TEST_UID.equals(article.getOwner().getUid())) {
                 LOG.warn("DELETE: " + article);
                 em.remove(article);

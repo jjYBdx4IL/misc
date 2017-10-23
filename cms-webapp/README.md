@@ -25,6 +25,8 @@ Add your personal Google Oauth2 API credentials as follows:
 You can use the h2-frontend war package to access the SQL database directly.
 It denies connections from anything else than localhost. 
 
+https://console.developers.google.com/apis/credentials
+
 
 
 ## Other DB config values

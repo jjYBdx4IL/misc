@@ -27,6 +27,7 @@ import java.util.List;
 
 import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.transaction.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -51,15 +52,18 @@ public class SiteMap {
     HtmlBuilder htmlBuilder;
     @Inject
     QueryFactory qf;
+    @Inject
+    @Named("subdomain")
+    String subdomain;
 
     @GET
     @Produces(MediaType.APPLICATION_XML)
     public Response sitemap() throws MalformedURLException, IllegalArgumentException, UriBuilderException {
         LOG.trace("sitemap()");
-        
+
         WebSitemapGenerator wsg = new WebSitemapGenerator(uriInfo.getBaseUriBuilder().build().toString());
-        
-        qf.getArticleDisplayList(null, null, true).getResultList()
+
+        qf.getArticleDisplayList(null, null, true, subdomain).getResultList()
             .forEach(article -> {
                 try {
                     wsg.addUrl(new WebSitemapUrl.Options(htmlBuilder.constructArticleLink(article))
@@ -70,7 +74,7 @@ public class SiteMap {
             });
 
         List<String> result = wsg.writeAsStrings();
-        
+
         if (result.size() > 1) {
             LOG.error("limit reached");
         }

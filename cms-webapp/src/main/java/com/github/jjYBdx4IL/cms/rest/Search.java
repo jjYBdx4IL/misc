@@ -34,6 +34,7 @@ import java.util.List;
 
 import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -59,6 +60,8 @@ public class Search {
     private EntityManager em;
     @Inject
     private HtmlBuilder htmlBuilder;
+    @Inject @Named("subdomain")
+    String subdomain;
 
     private boolean revertedToFuzzyMatching = false;
 
@@ -146,7 +149,7 @@ public class Search {
 
         List<Article> articlesPublished = new ArrayList<>();
         articles.forEach(article -> {
-            if (article.isPublished()) {
+            if (article.isPublished() && article.getSubdomain().equals(subdomain)) {
                 articlesPublished.add(article);
             }
         });

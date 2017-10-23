@@ -36,6 +36,7 @@ import java.util.List;
 
 import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.transaction.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -65,6 +66,9 @@ public class RssFeed {
     QueryFactory qf;
     @Inject
     private AppCache appCache;
+    @Inject
+    @Named("subdomain")
+    String subdomain;
 
     @Path("rss.xml")
     @GET
@@ -83,9 +87,10 @@ public class RssFeed {
 
         return Response.ok().entity(generateAtomFeed(selectedTag)).build();
     }
-    
+
     private String generateAtomFeed(String tag) {
-        List<Article> articles = qf.getArticleDisplayList(tag, null, true).setMaxResults(MAX_ENTRIES).getResultList();
+        List<Article> articles = qf.getArticleDisplayList(tag, null, true, subdomain)
+            .setMaxResults(MAX_ENTRIES).getResultList();
 
         SyndFeed feed = new SyndFeedImpl();
         feed.setFeedType("rss_2.0");
@@ -111,7 +116,7 @@ public class RssFeed {
             description.setType("text/plain");
             String desc = article.getContent();
             if (desc.length() > MAX_DESC_LENGTH) {
-                desc = desc.substring(0, MAX_DESC_LENGTH-3) + "...";
+                desc = desc.substring(0, MAX_DESC_LENGTH - 3) + "...";
             }
             description.setValue(desc);
             entry.setDescription(description);

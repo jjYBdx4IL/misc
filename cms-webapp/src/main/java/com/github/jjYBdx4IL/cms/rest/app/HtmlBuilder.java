@@ -57,11 +57,14 @@ import j2html.tags.DomContent;
 import j2html.tags.UnescapedText;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.text.StringEscapeUtils;
+import org.jboss.resteasy.spi.ResteasyUriInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -74,6 +77,7 @@ import java.util.Map;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -96,6 +100,9 @@ public class HtmlBuilder {
     QueryFactory qf;
     @Inject
     AppCache appCache;
+    @Inject
+    @Named("subdomain")
+    String subdomain;
 
     private String pageTitle = ""; // shown on top of html -> body -> main
     private String headTitlePrefix = ""; // prefix for html -> head -> title
@@ -225,7 +232,7 @@ public class HtmlBuilder {
             setJsValue("cookieConsentMessage", cookieConsentMessage);
             addCssUrl("//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.4/cookieconsent.min.css");
         }
-        
+
         if (Env.isDevel()) {
             addCssUrl(baseUri + "assets/simplegrid.css");
             addCssUrl(baseUri + "assets/style.css");
@@ -235,8 +242,8 @@ public class HtmlBuilder {
         addCssUrl("//fonts.googleapis.com/icon?family=Material+Icons");
         addCssUrl("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.min.css");
         addHeadContent(style(new UnescapedText(
-            "@import url('https://fonts.googleapis.com/css?family=Montserrat');" + 
-            "font-family:'Montserrat',Georgia,\"Times New Roman\",Times,serif;"
+            "@import url('https://fonts.googleapis.com/css?family=Montserrat');" +
+                "font-family:'Montserrat',Georgia,\"Times New Roman\",Times,serif;"
         )));
 
         if (session.isAuthenticated()) {
@@ -251,12 +258,16 @@ public class HtmlBuilder {
             (session.isAuthenticated() ? "\nCurrently signed in as:\n" + qf.getUserByUid(session.getUid()).getEmail()
                 : "");
 
-        String poweredByLink = uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("site-software").toString();
-        String aboutLink = uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("site-about").toString();
-        String privacyPolicyLink = uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("site-privacy-policy")
-            .toString();
-        String impressumLink = uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("impressum").toString();
+        URI poweredByLink = uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("site-software");
+        URI aboutLink = uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("site-about");
+        URI privacyPolicyLink = uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("site-privacy-policy");
+        URI impressumLink = uriInfo.getBaseUriBuilder().path(Home.class, "byTag").build("impressum");
 
+        poweredByLink = removeSubDomain(poweredByLink);
+        aboutLink = removeSubDomain(aboutLink);
+        privacyPolicyLink = removeSubDomain(privacyPolicyLink);
+        impressumLink = removeSubDomain(impressumLink);
+        
         /* build the menu */
         ContainerTag menuRow = div().withClass("row");
         ContainerTag menu = div(menuRow).withClass("container menu");
@@ -270,9 +281,10 @@ public class HtmlBuilder {
         }
 
         menuRow.with(iconTextLink("col-6", "info", "Feedback", Feedback.class));
-        menuRow.with(iconTextLink("col-6", "info", "About", aboutLink));
-        menuRow.with(iconTextLink("col-6", "info", "Privacy Policy", privacyPolicyLink));
-        menuRow.with(iconTextLink("col-6", "info", "Impressum", impressumLink));
+        menuRow.with(iconTextLink("col-6", "info", "Powered By", poweredByLink.toString()));
+        menuRow.with(iconTextLink("col-6", "info", "About", aboutLink.toString()));
+        menuRow.with(iconTextLink("col-6", "info", "Privacy Policy", privacyPolicyLink.toString()));
+        menuRow.with(iconTextLink("col-6", "info", "Impressum", impressumLink.toString()));
 
         ContainerTag _main = constructMainSection();
 
@@ -286,13 +298,13 @@ public class HtmlBuilder {
         _footer.with(div(
             div(
                 div(
-                    a("Powered By").withHref(poweredByLink),
+                    a("Powered By").withHref(poweredByLink.toString()),
                     span(" - "),
-                    a("About").withHref(aboutLink),
+                    a("About").withHref(aboutLink.toString()),
                     span(" - "),
-                    a("Privacy Policy").withHref(privacyPolicyLink),
+                    a("Privacy Policy").withHref(privacyPolicyLink.toString()),
                     span(" - "),
-                    a("Impressum").withHref(impressumLink)
+                    a("Impressum").withHref(impressumLink.toString())
                 ).withClass("col-12 impressum")
             ).withClass("row")
         ).withClass("container")
@@ -301,7 +313,7 @@ public class HtmlBuilder {
         String doc = document(
             html(
                 head(
-                    title(getHeadTitlePrefix()  + title),
+                    title(getHeadTitlePrefix() + title),
                     description != null ? meta().attr("description", description) : null,
                     author != null ? meta().attr("author", author) : null,
                     noIndex ? meta().attr("name", "robots").attr("content", "noindex,noarchive")
@@ -559,6 +571,19 @@ public class HtmlBuilder {
 
     public void setHeadTitlePrefix(String headTitlePrefix) {
         this.headTitlePrefix = headTitlePrefix + " - ";
+    }
+
+    public URI removeSubDomain(URI input) {
+        if (subdomain.isEmpty()) {
+            return input;
+        }
+        try {
+            return new URI(input.getScheme(),
+                uriInfo.getBaseUri().getHost().toLowerCase().substring(subdomain.length() + 1),
+                input.getPath(), input.getFragment());
+        } catch (URISyntaxException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
 }

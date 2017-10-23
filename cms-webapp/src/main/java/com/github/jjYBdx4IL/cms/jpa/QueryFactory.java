@@ -108,7 +108,7 @@ public class QueryFactory {
         return articles.get(0);
     }
 
-    public TypedQuery<Article> getArticleDisplayList(String tag, String uid, boolean publishedOnly) {
+    public TypedQuery<Article> getArticleDisplayList(String tag, String uid, boolean publishedOnly, String subdomain) {
         final CriteriaBuilder cb = em.getCriteriaBuilder();
         final CriteriaQuery<Article> cq = cb.createQuery(Article.class);
         final Root<Article> root = cq.from(Article.class);
@@ -132,6 +132,10 @@ public class QueryFactory {
 
         if (publishedOnly) {
             restrictions.add(cb.equal(root.get(Article_.published), true));
+        }
+        
+        if (subdomain != null) {
+            restrictions.add(cb.equal(root.get(Article_.subdomain), subdomain));
         }
         
         if (!restrictions.isEmpty() ) {

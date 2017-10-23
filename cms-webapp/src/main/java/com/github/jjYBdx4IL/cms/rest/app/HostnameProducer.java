@@ -15,11 +15,15 @@
  */
 package com.github.jjYBdx4IL.cms.rest.app;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
 
 @Provider
@@ -27,6 +31,8 @@ import javax.ws.rs.ext.Provider;
 // CHECKSTYLE:OFF
 public class HostnameProducer {
 
+    public static final Pattern SUBDOMAIN_PATTERN = Pattern.compile("^(.+)\\.[^.]+\\.[^.]+$");
+    
     // inject like:
     // @Inject @Named("hostname")
     // String hostname;
@@ -38,4 +44,15 @@ public class HostnameProducer {
         int idxOf = host.indexOf(':');
         return idxOf == -1 ? host : host.substring(0, host.indexOf(':'));
     }
+    
+    @Context
+    UriInfo uriInfo;
+    @Produces
+    @Named("subdomain")
+    public String getSubDomain() {
+        String host = uriInfo.getBaseUri().getHost().toLowerCase();
+        Matcher m = SUBDOMAIN_PATTERN.matcher(host);
+        return m.find() ? m.group(1) : "";
+    }
+    
 }

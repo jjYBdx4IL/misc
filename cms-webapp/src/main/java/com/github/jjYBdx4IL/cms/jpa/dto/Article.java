@@ -46,7 +46,7 @@ import javax.persistence.Version;
 @SuppressWarnings("serial")
 @Entity
 @Table(indexes = {
-    @Index(name = "CREATEDAT_INDEX", unique = false, columnList = "createdAt")
+    @Index(name = "CREATEDAT_INDEX", unique = false, columnList = "subdomain,createdAt")
 })
 @Indexed
 public class Article implements Serializable {
@@ -98,6 +98,9 @@ public class Article implements Serializable {
     @Column(length = 255, unique = true)
     private String pathId;
 
+    @Basic(optional = false)
+    private String subdomain;
+    
     @Version
     private int version;
 
@@ -189,6 +192,14 @@ public class Article implements Serializable {
         this.published = published;
     }
 
+    public String getSubdomain() {
+        return subdomain;
+    }
+
+    public void setSubdomain(String subdomain) {
+        this.subdomain = subdomain;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -214,6 +225,8 @@ public class Article implements Serializable {
         builder.append(lastModified);
         builder.append(", pathId=");
         builder.append(pathId);
+        builder.append(", subdomain=");
+        builder.append(subdomain);
         builder.append(", version=");
         builder.append(version);
         builder.append("]");
