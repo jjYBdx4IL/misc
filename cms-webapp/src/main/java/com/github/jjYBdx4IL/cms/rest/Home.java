@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.security.PermitAll;
@@ -62,15 +63,16 @@ public class Home {
     QueryFactory qf;
     @Inject
     AppCache appCache;
-    @Inject @Named("subdomain")
+    @Inject
+    @Named("subdomain")
     String subdomain;
-    
+
     @Path("")
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response get() {
         LOG.trace("get()");
-        
+
         htmlBuilder.setJsValue("articleDisplayContinuationEndpoint",
             uriInfo.getBaseUriBuilder().path(Home.class).path(Home.class, "cont").toTemplate());
         htmlBuilder.enableShareButtons();
@@ -83,7 +85,9 @@ public class Home {
                 htmlBuilder.createArticleListRow(articles, false, false)
             ).withClass("container")
         );
-        return Response.ok(htmlBuilder.toString()).build();
+        return Response.ok(htmlBuilder.toString()).lastModified(
+            articles.isEmpty() ? new Date() : articles.get(0).getLastModified()
+        ).build();
     }
 
     @Path("continue/{skip}")
@@ -109,7 +113,7 @@ public class Home {
         EmptyTag tagRssFeedLink = link().withRel("alternate").withType("application/rss+xml")
             .withTitle(appCache.get(ConfigKey.WEBSITE_TITLE) + " - " + selectedTag)
             .withHref(tagRssFeedUrl);
-        
+
         htmlBuilder.setHeadTitlePrefix(selectedTag);
         htmlBuilder.setPageTitle("Tag: " + selectedTag);
         htmlBuilder.addPageTitleSubItem("room_service", "Rss feed for this tag", tagRssFeedUrl);
@@ -118,7 +122,7 @@ public class Home {
             uriInfo.getBaseUriBuilder().path(Home.class).path(Home.class, "byTagCont")
                 .resolveTemplate("tag", selectedTag).toTemplate());
         htmlBuilder.enableShareButtons();
-        
+
         if ("impressum".equalsIgnoreCase(selectedTag)) {
             htmlBuilder.enableNoIndex();
         }
@@ -131,7 +135,9 @@ public class Home {
                 htmlBuilder.createArticleListRow(articles, false, false)
             ).withClass("container")
         );
-        return Response.ok(htmlBuilder.toString()).build();
+        return Response.ok(htmlBuilder.toString()).lastModified(
+            articles.isEmpty() ? new Date() : articles.get(0).getLastModified()
+        ).build();
     }
 
     @Path("continueByTag/{tag}/{skip}")
@@ -172,7 +178,7 @@ public class Home {
                 htmlBuilder.createArticleListRow(articles, true, true)
             ).withClass("container")
         );
-        return Response.ok(htmlBuilder.toString()).build();
+        return Response.ok(htmlBuilder.toString()).lastModified(article.getLastModified()).build();
     }
 
 }
