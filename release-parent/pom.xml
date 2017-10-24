@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.jjYBdx4IL</groupId>
     <artifactId>release-parent</artifactId>
-    <version>1.3</version>
+    <version>1.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Maven Central Release Parent Package</name>
     <description>parent package for jjYBdx4IL projects</description>
@@ -57,7 +57,7 @@
         <connection>scm:git:git://github.com/jjYBdx4IL/misc.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/jjYBdx4IL/misc.git</developerConnection>
         <url>https://github.com/jjYBdx4IL/misc</url>
-        <tag>release-parent-1.3</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
