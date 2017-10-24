@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.github.jjYBdx4IL</groupId>
         <artifactId>release-parent</artifactId>
-        <version>1.3-SNAPSHOT</version>
+        <version>1.4-SNAPSHOT</version>
         <relativePath>../release-parent</relativePath>
     </parent>
 
@@ -216,7 +216,7 @@
         <dependency>
             <groupId>com.github.jjYBdx4IL.utils</groupId>
             <artifactId>net-utils</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.jjYBdx4IL.utils</groupId>
@@ -271,7 +271,7 @@
         <dependency>
             <groupId>com.github.jjYBdx4IL.utils</groupId>
             <artifactId>io-utils</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>com.j2html</groupId>
@@ -383,7 +383,7 @@
             <dependency>
                 <groupId>com.github.jjYBdx4IL.utils</groupId>
                 <artifactId>text-utils</artifactId>
-                <version>1.1-SNAPSHOT</version>
+                <version>1.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.tika</groupId>
