@@ -11,7 +11,7 @@
 
 	<groupId>com.github.jjYBdx4IL.utils</groupId>
 	<artifactId>jna-utils</artifactId>
-	<version>1.0</version>
+	<version>1.1-SNAPSHOT</version>
 	<name>JNA Utils</name>
 	<description>JNA helpers</description>
 	<inceptionYear>2017</inceptionYear>
@@ -169,9 +169,4 @@
 			</build>
 		</profile>
 	</profiles>
-
-
-  <scm>
-    <tag>jna-utils-1.0</tag>
-  </scm>
 </project>
