@@ -11,7 +11,7 @@
 
     <groupId>com.github.jjYBdx4IL.utils</groupId>
     <artifactId>net-utils</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1</version>
     <name>Network Utils</name>
     <description>Network/HTTP/HTML etc helpers</description>
     <inceptionYear>2017</inceptionYear>
@@ -74,4 +74,8 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+  <scm>
+    <tag>net-utils-1.1</tag>
+  </scm>
 </project>
