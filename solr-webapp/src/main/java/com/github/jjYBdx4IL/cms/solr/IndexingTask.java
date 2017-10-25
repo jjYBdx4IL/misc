@@ -437,7 +437,10 @@ public class IndexingTask implements Runnable {
         }
         // String pageContent = new String(data, charset);
         // List<String> extractedUrls = URLUtils.hyperlinkUrls(pageContent);
-        List<String> extractedUrls = JsoupTools.extractLinks(data, charset.name(), meta.getUrl());
+        List<String> extractedUrls;
+        try (TimeUsage addUrlTimeUsage = timeUsage.startSub("extractUrls")) {
+            extractedUrls = JsoupTools.extractLinks(data, charset.name(), meta.getUrl());
+        }
         LOG.info(String.format("extracted %d urls", extractedUrls.size()));
         try (TimeUsage addUrlTimeUsage = timeUsage.startSub("addUrls")) {
             dbService.addUrls(extractedUrls);
