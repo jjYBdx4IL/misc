@@ -18,17 +18,18 @@ package com.github.jjYBdx4IL.cms.rest;
 import static j2html.TagCreator.div;
 import static j2html.TagCreator.link;
 
+import com.github.jjYBdx4IL.cms.Env;
 import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
 import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
+import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 import j2html.tags.EmptyTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.security.PermitAll;
@@ -40,6 +41,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -54,7 +56,11 @@ public class Home {
     private static final Logger LOG = LoggerFactory.getLogger(Home.class);
 
     public static final int MAX_ARTICLES_PER_REQUEST = 10;
-
+    public static final CacheControl NO_CACHE = new CacheControl();
+    static {
+        NO_CACHE.setNoCache(true);
+    }
+    
     @Context
     UriInfo uriInfo;
     @Inject
@@ -66,6 +72,8 @@ public class Home {
     @Inject
     @Named("subdomain")
     String subdomain;
+    @Inject
+    SessionData session;
 
     @Path("")
     @GET
@@ -86,8 +94,8 @@ public class Home {
             ).withClass("container")
         );
         return Response.ok(htmlBuilder.toString()).lastModified(
-            articles.isEmpty() ? new Date() : articles.get(0).getLastModified()
-        ).build();
+            articles.isEmpty() || session.isAuthenticated() ? null : articles.get(0).getLastModified()
+        ).cacheControl(NO_CACHE).build();
     }
 
     @Path("continue/{skip}")
@@ -136,8 +144,8 @@ public class Home {
             ).withClass("container")
         );
         return Response.ok(htmlBuilder.toString()).lastModified(
-            articles.isEmpty() ? new Date() : articles.get(0).getLastModified()
-        ).build();
+            articles.isEmpty() || session.isAuthenticated() ? null : articles.get(0).getLastModified()
+        ).cacheControl(NO_CACHE).build();
     }
 
     @Path("continueByTag/{tag}/{skip}")
@@ -178,7 +186,9 @@ public class Home {
                 htmlBuilder.createArticleListRow(articles, true, true)
             ).withClass("container")
         );
-        return Response.ok(htmlBuilder.toString()).lastModified(article.getLastModified()).build();
+        return Response.ok(htmlBuilder.toString()).lastModified(
+            session.isAuthenticated() ? null : article.getLastModified()
+        ).cacheControl(NO_CACHE).build();
     }
 
 }

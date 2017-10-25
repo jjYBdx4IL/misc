@@ -136,6 +136,10 @@ form textarea {
 	border: solid #ddd;
 }
 
+.articleContent blockquote p:first-of-type {
+    text-indent: 55px;
+}
+
 .articleContent blockquote * {
 	font-family: inherit;
 	font-style: inherit;
@@ -150,7 +154,6 @@ form textarea {
 	background-size: 55px;
 	background-position: 0 -0.5em;
 	min-height: 40px;
-	text-indent: 55px;
 }
 
 .articleContent code {
