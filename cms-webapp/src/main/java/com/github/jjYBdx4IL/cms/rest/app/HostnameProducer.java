@@ -15,6 +15,8 @@
  */
 package com.github.jjYBdx4IL.cms.rest.app;
 
+import com.github.jjYBdx4IL.cms.Env;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +34,7 @@ import javax.ws.rs.ext.Provider;
 public class HostnameProducer {
 
     public static final Pattern SUBDOMAIN_PATTERN = Pattern.compile("^(.+)\\.[^.]+\\.[^.]+$");
+    public static final Pattern SUBDOMAIN_DEVEL_PATTERN = Pattern.compile("^(.+)\\.localhost$");
     
     // inject like:
     // @Inject @Named("hostname")
@@ -52,6 +55,9 @@ public class HostnameProducer {
     public String getSubDomain() {
         String host = uriInfo.getBaseUri().getHost().toLowerCase();
         Matcher m = SUBDOMAIN_PATTERN.matcher(host);
+        if (Env.isDevel()) {
+            m = SUBDOMAIN_DEVEL_PATTERN.matcher(host);
+        }
         return m.find() ? m.group(1) : "";
     }
     

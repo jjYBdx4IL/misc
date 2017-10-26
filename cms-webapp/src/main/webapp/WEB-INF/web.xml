@@ -5,5 +5,5 @@
     <distributable />
     <session-config>
         <session-timeout>15</session-timeout>
-    </session-config> 
+    </session-config>
 </web-app>

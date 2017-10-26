@@ -23,24 +23,23 @@ import static j2html.TagCreator.img;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 import j2html.tags.ContainerTag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 //CHECKSTYLE:OFF
 @Path("loginSelect")
 @PermitAll
 public class LoginSelect {
-
-    private static final Logger LOG = LoggerFactory.getLogger(LoginSelect.class);
 
     private static final String SIGNIN_IMG_LOC = "assets/google_signin_buttons/web/1x/btn_google_signin_light_normal_web.png";
 
@@ -50,14 +49,22 @@ public class LoginSelect {
     private SessionData session;
     @Inject
     private HtmlBuilder htmlBuilder;
+    @Inject
+    @Named("subdomain")
+    String subdomain;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public String get() {
-        LOG.trace("get()");
+    public Response get() {
 
         session.logout();
 
+        if (!subdomain.isEmpty()) {
+            return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path(CrossDomainLogin.class).build())
+                .status(HttpServletResponse.SC_FOUND)
+                .build();
+        }
+        
         ContainerTag googleSignInButton = a(img().withSrc(SIGNIN_IMG_LOC))
             .withHref(uriInfo.getBaseUriBuilder().path(GoogleLogin.class).build().toString());
 
@@ -68,7 +75,7 @@ public class LoginSelect {
             ).withClass("container")
         );
 
-        return htmlBuilder.toString();
+        return Response.ok(htmlBuilder.toString()).build();
     }
 
 }

@@ -19,7 +19,6 @@ import static j2html.TagCreator.a;
 import static j2html.TagCreator.div;
 import static j2html.TagCreator.each;
 import static j2html.TagCreator.form;
-import static j2html.TagCreator.i;
 import static j2html.TagCreator.input;
 import static j2html.TagCreator.label;
 import static j2html.TagCreator.text;

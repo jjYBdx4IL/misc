@@ -166,7 +166,7 @@ public class GoogleLogin {
 
         session.setUid(uid);
         req.getSession().setMaxInactiveInterval(86400);
-
+        
         return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path(Home.class).build())
             .status(HttpServletResponse.SC_FOUND).build();
     }
