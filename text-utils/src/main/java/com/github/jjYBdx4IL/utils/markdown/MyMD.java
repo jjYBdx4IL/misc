@@ -42,6 +42,13 @@ public class MyMD {
                         startLine = lineNum;
                         buf.setLength(0);
                         buf.append(l.substring(4));
+                    } else if (l.startsWith("* ")) {
+                        state = State.UL;
+                        startLine = lineNum;
+                        buf.setLength(0);
+                        buf.append("<li>");
+                        buf.append(StringEscapeUtils.escapeHtml4(l.substring(2).trim()));
+                        buf.append("</li>");
                     } else if (l.startsWith("> ")) {
                         sb.append(String.format("<blockquote srcLines=\"%d-%d\">", lineNum, lineNum));
                         sb.append(format(l.substring(2).trim()));
@@ -99,8 +106,18 @@ public class MyMD {
                             StringEscapeUtils.escapeHtml4(buf.toString())));
                     }
                     break;
+                case UL:
+                    if (l.startsWith("* ")) {
+                        buf.append("<li>");
+                        buf.append(StringEscapeUtils.escapeHtml4(l.substring(2).trim()));
+                        buf.append("</li>");
+                    } else {
+                        state = State.DEFAULT;
+                        lineNum--;
+                        sb.append(String.format("<ul srcLines=\"%d-%d\">%s</ul>", startLine, lineNum, buf.toString()));
+                    }
+                    break;
                 default:
-
             }
         }
         return sb.toString();
@@ -118,7 +135,7 @@ public class MyMD {
     }
 
     private static enum State {
-        DEFAULT, PRE, IPRE;
+        DEFAULT, PRE, IPRE, UL;
     }
 
 }

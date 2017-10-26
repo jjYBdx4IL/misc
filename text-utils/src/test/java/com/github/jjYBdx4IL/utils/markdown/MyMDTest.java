@@ -22,6 +22,12 @@ public class MyMDTest {
     }
 
     @Test
+    public void testList() {
+        assertEquals("<ul srcLines=\"0-0\"><li>one&lt;</li></ul>", MyMD.html("* one<"));
+        assertEquals("<ul srcLines=\"0-1\"><li>one</li><li>two</li></ul>", MyMD.html("* one\n* two"));
+    }
+
+    @Test
     public void testHeadlines() {
         assertEquals("<h1 srcLines=\"0-0\">one</h1>", MyMD.html("# one"));
         assertEquals("<h2 srcLines=\"0-0\">one</h2>", MyMD.html("## one"));
