@@ -24,6 +24,7 @@ import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.WebPageMeta;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
+import com.github.jjYBdx4IL.cms.solr.IndexingTask;
 import com.github.jjYBdx4IL.cms.solr.IndexingUtils;
 import j2html.tags.ContainerTag;
 
@@ -69,16 +70,27 @@ public class SubmitUrl {
 
         ContainerTag container = div().withClass("container");
 
+        Response.Status status = Response.Status.OK;
+        
         site = IndexingUtils.urlNormalizer.filter(site);
 
         if (site != null) {
-            if (!IndexingUtils.isValidDomainName(site)) {
+            if (IndexingTask.pauseRequested.get()) {
+                container.with(
+                    div(
+                        div("Currently under maintenance. Please come back later.")
+                            .withClass("col-12 error")
+                    ).withClass("row")
+                );
+                status = Response.Status.SERVICE_UNAVAILABLE;
+            } else if (!IndexingUtils.isValidDomainName(site)) {
                 container.with(
                     div(
                         div("Failed to submit URL: " + site)
                             .withClass("col-12 error")
                     ).withClass("row")
                 );
+                status = Response.Status.BAD_REQUEST;
             } else {
                 container.with(
                     div(
@@ -127,6 +139,6 @@ public class SubmitUrl {
 
         htmlBuilder.mainAdd(container);
 
-        return Response.ok(htmlBuilder.toString()).build();
+        return Response.status(status).entity(htmlBuilder.toString()).build();
     }
 }
