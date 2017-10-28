@@ -18,15 +18,12 @@ package com.github.jjYBdx4IL.cms.rest;
 import static j2html.TagCreator.a;
 import static j2html.TagCreator.div;
 import static j2html.TagCreator.form;
-import static j2html.TagCreator.h1;
 import static j2html.TagCreator.h3;
 import static j2html.TagCreator.input;
-import static j2html.TagCreator.li;
-import static j2html.TagCreator.p;
-import static j2html.TagCreator.ul;
 
 import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
+import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
 import com.github.jjYBdx4IL.cms.rest.app.HtmlBuilder;
 import com.github.jjYBdx4IL.cms.solr.SolrConfig;
 import com.github.jjYBdx4IL.cms.solr.WebPageBean;
@@ -107,13 +104,7 @@ public class Home {
             container.with(
                 div(
                     div(
-                        h1("The alternative search engine."),
-                        ul(
-                            li("independent,"),
-                            li("trustworthy,"),
-                            li("European jurisdiction.")
-                        ),
-                        a("More...").withHref("https://gruust.stream/byTag/site-geegee-about")
+                        new UnescapedText(appCache.get(ConfigKey.BANNER_HTML))
                     ).withClass("col-12 banner")
                 ).withClass("row")
             );
