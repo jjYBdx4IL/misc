@@ -36,7 +36,8 @@ public enum ConfigKey {
     @Description("enter comma-separated list of admin users, ie 'google-$subject,...' "+
         "where $subject is Google's unique used identifier")
     ADMINS,
-    FEEDBACK_MAILTO_ADDR;
+    FEEDBACK_MAILTO_ADDR,
+    TWITTER_SITE;
     //@formatter:on
 
     public String getDesc() {

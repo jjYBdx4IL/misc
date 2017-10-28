@@ -121,6 +121,8 @@ public class HtmlBuilder {
     private final Map<String, String> jsValues = new HashMap<>();
     private StringBuilder metaKeywords = null;
     private final List<String> headFragments = new ArrayList<>();
+    private String ogTitle = null;
+    private String ogDescription = null;
 
     public HtmlBuilder() {
     }
@@ -267,7 +269,7 @@ public class HtmlBuilder {
         aboutLink = removeSubDomain(aboutLink);
         privacyPolicyLink = removeSubDomain(privacyPolicyLink);
         impressumLink = removeSubDomain(impressumLink);
-        
+
         /* build the menu */
         ContainerTag menuRow = div().withClass("row");
         ContainerTag menu = div(menuRow).withClass("container menu");
@@ -322,6 +324,13 @@ public class HtmlBuilder {
                     meta().attr("name", "viewport").attr("content", "width=device-width, initial-scale=1"),
                     meta().attr("name", "keywords")
                         .attr("content", metaKeywords != null ? metaKeywords.toString() : ""),
+                    getOgTitle() != null ? meta().attr("name", "twitter:card").attr("content", "summary") : null,
+                    getOgTitle() != null
+                        ? meta().attr("name", "twitter:site").attr("content", appCache.get(ConfigKey.TWITTER_SITE))
+                        : null,
+                    getOgTitle() != null ? meta().attr("name", "twitter:title").attr("content", getOgTitle()) : null,
+                    getOgDescription() != null ? meta().attr("name", "twitter:description")
+                        .attr("content", getOgDescription()) : null,
                     createJsValuesScript(),
                     script().withSrc("//cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js")
                         .attr("async").attr("defer").attr("data-main", baseUri + "assets/app")
@@ -584,6 +593,22 @@ public class HtmlBuilder {
         } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    public void setOgTitle(String ogTitle) {
+        this.ogTitle = ogTitle;
+    }
+
+    public void setOgDescription(String ogDescription) {
+        this.ogDescription = ogDescription;
+    }
+
+    public String getOgTitle() {
+        return ogTitle;
+    }
+
+    public String getOgDescription() {
+        return ogDescription;
     }
 
 }

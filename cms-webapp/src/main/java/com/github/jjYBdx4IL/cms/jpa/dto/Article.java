@@ -108,6 +108,17 @@ public class Article implements Serializable {
         return title;
     }
 
+    public String getTitle(int maxLen) {
+        if (title.length() <= maxLen) {
+            return title;
+        }
+        if (title.substring(maxLen-3,maxLen-2).matches("\\W")) {
+            return title.substring(0, maxLen-3) + "...";
+        } else {
+            return title.substring(0, maxLen-3).replaceFirst("\\W+\\w+$", "") + "...";
+        }
+    }
+    
     public void setTitle(String title) {
         this.title = title;
     }
@@ -116,6 +127,17 @@ public class Article implements Serializable {
         return content;
     }
 
+    public String getContent(int maxLen) {
+        if (content.length() <= maxLen) {
+            return content;
+        }
+        if (content.substring(maxLen-3,maxLen-2).matches("\\W")) {
+            return content.substring(0, maxLen-3) + "...";
+        } else {
+            return content.substring(0, maxLen-3).replaceFirst("\\W+\\w+$", "") + "...";
+        }
+    }
+    
     public void setContent(String content) {
         this.content = content;
     }

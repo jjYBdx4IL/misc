@@ -180,6 +180,8 @@ public class Home {
         articles.add(article);
 
         htmlBuilder.setHeadTitlePrefix(article.getTitle());
+        htmlBuilder.setOgTitle(article.getTitle(70));
+        htmlBuilder.setOgDescription(article.getContent(200));
         htmlBuilder.enableShareButtons();
         htmlBuilder.mainAdd(
             div(
