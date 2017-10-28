@@ -659,5 +659,4 @@ public class IndexingTask implements Runnable {
             super(reason);
         }
     }
-
 }

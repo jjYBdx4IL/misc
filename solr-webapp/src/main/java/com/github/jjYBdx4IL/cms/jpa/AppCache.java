@@ -66,6 +66,19 @@ public class AppCache {
         }
     }
     
+    public int get(ConfigKey key, int defaultValue) {
+        String value = get(key);
+        if (value.isEmpty()) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException ex) {
+            LOG.error("", ex);
+            return defaultValue;
+        }
+    }
+    
     public String get(ConfigKey key) {
         String value = values.get(key);
         return value == null ? "" : value;

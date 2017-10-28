@@ -36,7 +36,8 @@ public enum ConfigKey {
         "where $subject is Google's unique used identifier")
     ADMINS,
     FEEDBACK_MAILTO_ADDR,
-    BANNER_HTML;
+    BANNER_HTML,
+    MAX_NEW_URLS_PER_DOC;
     //@formatter:on
 
     public String getDesc() {

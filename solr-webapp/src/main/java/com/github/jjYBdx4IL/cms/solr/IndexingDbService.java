@@ -18,7 +18,9 @@ package com.github.jjYBdx4IL.cms.solr;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
+import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
 import com.github.jjYBdx4IL.cms.jpa.dto.WebPageMeta;
 import com.github.jjYBdx4IL.utils.text.MimeType;
 import org.apache.solr.client.solrj.SolrClient;
@@ -56,7 +58,7 @@ public class IndexingDbService {
     public static final int ERR_WEBPAGE_RETRY_BACKOFF_IVAL_MINUTES = 1 * 24 * 60;
     public static final int BLOCK_RECHECK_DAYS = 300;
     public static final int LOCK_RESCHEDULE_MINUTES = 30;
-    public static final int MAX_ADD_URLS_PER_PAGE = 100;
+    public static final int MAX_ADD_URLS_PER_DOC = 100;
     public static final int FLUSH_AFTER_N_ADDS = 20;
 
     public static final List<String> TYPES_WHITELIST = new ArrayList<>();
@@ -73,6 +75,8 @@ public class IndexingDbService {
     QueryFactory qf;
     @Resource
     private SessionContext sessionContext;
+    @Inject
+    private AppCache appCache;
 
     private final Random r = new Random();
 
@@ -252,6 +256,7 @@ public class IndexingDbService {
 
     @Transactional
     public void addUrls(List<String> extractedUrls) {
+        final int maxAddUrlsPerDoc = appCache.get(ConfigKey.MAX_NEW_URLS_PER_DOC, MAX_ADD_URLS_PER_DOC);
         int nAdded = 0;
         int nBadUrlFormat = 0;
         int nBadGuessedFileType = 0;
@@ -259,7 +264,7 @@ public class IndexingDbService {
         int nSkipped = 0;
         TypedQuery<Long> countQuery = qf.getCountWebPageMetaQuery();
         for (String url : extractedUrls) {
-            if (nAdded == MAX_ADD_URLS_PER_PAGE) {
+            if (nAdded == maxAddUrlsPerDoc) {
                 nSkipped++;
                 continue;
             }
