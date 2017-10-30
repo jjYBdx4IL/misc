@@ -421,6 +421,10 @@ public class IndexingTask implements Runnable {
             reply = TikaClient.parse(data);
         }
 
+        if (reply == null) {
+            throw new IOException("regular tika client failure");
+        }
+        
         if (reply.getRobots().contains("noindex")) {
             throw new IndexingNotAllowedException(meta.getUrl());
         }

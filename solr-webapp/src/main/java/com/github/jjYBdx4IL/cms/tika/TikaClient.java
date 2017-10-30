@@ -58,6 +58,10 @@ public class TikaClient {
                 httpPut.setHeader("Accept", "application/json;charset=UTF-8");
                 try (CloseableHttpResponse response = httpclient.execute(httpPut)) {
                     int status = response.getStatusLine().getStatusCode();
+                    if (422 == status) {
+                        LOG.info(response.getStatusLine().getReasonPhrase());
+                        return null;
+                    }
                     if (HttpServletResponse.SC_OK != status) {
                         throw new IOException(
                             "invalid status code " + status + " received for " + httpPut.getURI().toString());
