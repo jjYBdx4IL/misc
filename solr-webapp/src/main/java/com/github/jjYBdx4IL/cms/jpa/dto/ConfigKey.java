@@ -37,7 +37,10 @@ public enum ConfigKey {
     ADMINS,
     FEEDBACK_MAILTO_ADDR,
     BANNER_HTML,
-    MAX_NEW_URLS_PER_DOC;
+    MAX_NEW_URLS_PER_DOC,
+    IMPRESSUM_URL,
+    PRIVACY_POLICY_URL,
+    ABOUT_URL;
     //@formatter:on
 
     public String getDesc() {

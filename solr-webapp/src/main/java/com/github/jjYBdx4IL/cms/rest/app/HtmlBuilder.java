@@ -228,9 +228,9 @@ public class HtmlBuilder {
             (session.isAuthenticated() ? "\nCurrently signed in as:\n" + qf.getUserByUid(session.getUid()).getEmail()
                 : "");
 
-        String aboutLink = "https://gruust.stream/byTag/site-geegee-about";
-        String privacyPolicyLink = "https://gruust.stream/byTag/site-privacy-policy";
-        String impressumLink = "https://gruust.stream/byTag/impressum";
+        String aboutLink = appCache.get(ConfigKey.ABOUT_URL);
+        String privacyPolicyLink = appCache.get(ConfigKey.PRIVACY_POLICY_URL);
+        String impressumLink = appCache.get(ConfigKey.IMPRESSUM_URL);
 
         /* build the menu */
         ContainerTag menuRow = div().withClass("row");

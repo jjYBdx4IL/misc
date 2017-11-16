@@ -277,7 +277,6 @@ public class IndexingTask implements Runnable {
         }
 
         LOG.info("processing: " + meta.getUrl());
-        final Date now = new Date();
 
         boolean updated = false;
         try {
