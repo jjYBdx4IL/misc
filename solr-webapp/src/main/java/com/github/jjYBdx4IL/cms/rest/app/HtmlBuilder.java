@@ -190,8 +190,12 @@ public class HtmlBuilder {
     public String toString() {
         String baseUri = uriInfo.getBaseUriBuilder().build().toString();
 
+        String aboutLink = appCache.get(ConfigKey.ABOUT_URL);
+        String privacyPolicyLink = appCache.get(ConfigKey.PRIVACY_POLICY_URL);
+        String impressumLink = appCache.get(ConfigKey.IMPRESSUM_URL);
+
         setJsValue("assetsUri", baseUri + "assets/");
-        setJsValue("privacyPolicyUri", "https://gruust.stream/byTag/site-privacy-policy");
+        setJsValue("privacyPolicyUri", privacyPolicyLink);
         if (Boolean.parseBoolean(appCache.get(ConfigKey.ENABLE_ADBLOCK_BLOCKER))
             && !appCache.isAdmin(session.getUid())) {
             setJsValue("enableAdblockBlocker", "true");
@@ -227,10 +231,6 @@ public class HtmlBuilder {
         String signoutTooltipText = "Sign out." +
             (session.isAuthenticated() ? "\nCurrently signed in as:\n" + qf.getUserByUid(session.getUid()).getEmail()
                 : "");
-
-        String aboutLink = appCache.get(ConfigKey.ABOUT_URL);
-        String privacyPolicyLink = appCache.get(ConfigKey.PRIVACY_POLICY_URL);
-        String impressumLink = appCache.get(ConfigKey.IMPRESSUM_URL);
 
         /* build the menu */
         ContainerTag menuRow = div().withClass("row");
