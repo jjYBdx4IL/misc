@@ -20,9 +20,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
@@ -41,6 +43,7 @@ public class ProcRunner {
     private static final long DEFAULT_TIMEOUT = 0L; // no timeout by default
 
     private ProcessBuilder mProcessBuilder;
+    private Charset consoleEncoding = Charset.defaultCharset();
 
     private final List<String> mOutput = new ArrayList<>();
 
@@ -51,13 +54,31 @@ public class ProcRunner {
     public ProcRunner(boolean includeErrorStream, String... command) {
         mProcessBuilder = new ProcessBuilder(escapeArgs(command)).redirectErrorStream(includeErrorStream);
     }
-    
+
     public ProcRunner(List<String> command) {
         this(true, command);
     }
 
     public ProcRunner(String... command) {
-    	this(true, command);
+        this(true, command);
+    }
+
+    public Charset getConsoleEncoding() {
+        return consoleEncoding;
+    }
+
+    /**
+     * Interpret program output in the given encoding. Default is the JVM's
+     * default charset as defined by environment and startup parameters.
+     * 
+     * @param consoleEncoding
+     *            the expected console encoding, not null
+     */
+    public void setConsoleEncoding(Charset consoleEncoding) {
+        if (consoleEncoding == null) {
+            throw new IllegalArgumentException();
+        }
+        this.consoleEncoding = consoleEncoding;
     }
 
     public void setWorkDir(File directory) {
@@ -75,7 +96,7 @@ public class ProcRunner {
         }
         return _args;
     }
-    
+
     protected List<String> escapeArgs(List<String> args) {
         List<String> _args = new ArrayList<>(args.size());
         if (SystemUtils.IS_OS_UNIX) {
@@ -87,12 +108,13 @@ public class ProcRunner {
         }
         return _args;
     }
-    
+
     /**
      * No timeout.
      * 
      * @return exit value of the process
-     * @throws IOException if there was an I/O problem
+     * @throws IOException
+     *             if there was an I/O problem
      */
     public int run() throws IOException {
         return run(DEFAULT_TIMEOUT);
@@ -100,9 +122,11 @@ public class ProcRunner {
 
     /**
      * 
-     * @param timeout in milliseconds
+     * @param timeout
+     *            in milliseconds
      * @return exit value of the process
-     * @throws IOException if there was an I/O problem
+     * @throws IOException
+     *             if there was an I/O problem
      */
     public int run(long timeout) throws IOException {
         final Process p = mProcessBuilder.start();
@@ -113,7 +137,7 @@ public class ProcRunner {
                 mOutput.clear();
                 try {
                     try (BufferedReader br = new BufferedReader(new InputStreamReader(
-                            p.getInputStream()))) {
+                        p.getInputStream(), consoleEncoding))) {
                         line = br.readLine();
                         while (line != null) {
                             mOutput.add(line);
@@ -153,6 +177,15 @@ public class ProcRunner {
             sb.append(System.getProperty("line.separator"));
         }
         return sb.toString();
+    }
+
+    /**
+     * 
+     * @return internal {@link ProcessBuilder}'s environment as returned by
+     *         {@link ProcessBuilder#environment()}.
+     */
+    public Map<String, String> environment() {
+        return mProcessBuilder.environment();
     }
 
 }
