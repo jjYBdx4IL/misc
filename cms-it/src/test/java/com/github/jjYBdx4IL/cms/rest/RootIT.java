@@ -26,6 +26,8 @@ import com.github.jjYBdx4IL.cms.jaxb.dto.ExportDump;
 import com.github.jjYBdx4IL.utils.jersey.JerseyClientUtils;
 import com.github.jjYBdx4IL.utils.text.PasswordGenerator;
 import com.github.jjYBdx4IL.wsverifier.WebsiteVerifier;
+
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -33,6 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -407,7 +412,7 @@ public class RootIT {
     }
 
     @Test
-    public void testExportImport() throws JAXBException {
+    public void testExportImport() throws JAXBException, IOException {
         Response response = (Response) getTarget("devel/login").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
 
@@ -430,7 +435,7 @@ public class RootIT {
 
         JAXBContext jaxbContext = JAXBContext.newInstance(ExportDump.class);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        ExportDump dump = (ExportDump) jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(export.getBytes()));
+        ExportDump dump = (ExportDump) jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(export.getBytes("UTF-8")));
 
         ArticleDTO article = null;
         for (ArticleDTO _article : dump.getArticles()) {

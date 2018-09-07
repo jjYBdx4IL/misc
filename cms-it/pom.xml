@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
@@ -43,7 +44,8 @@
                                 <javaOpt>-Denv.devel=true</javaOpt>
                                 <javaOpt>-Djboss.socket.binding.port-offset=1</javaOpt>
                                 <javaOpt>-Dhibernate.hbm2ddl.auto=update</javaOpt>
-                                <!-- persistence.xml defines lucene index storage relative to user.home -->
+                                <!-- persistence.xml defines lucene index 
+                                    storage relative to user.home -->
                                 <javaOpt>-Duser.home=${project.build.directory}</javaOpt>
                             </javaOpts>
                         </configuration>
@@ -94,7 +96,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <!-- needed to identify stray test instances because wildfly maven plugin is too stupid to clean up reliably -->
+                    <!-- needed to identify stray test instances because 
+                        wildfly maven plugin is too stupid to clean up reliably -->
                     <env>
                         <PROCIDTAG>${wildfly.server.process.tag}</PROCIDTAG>
                     </env>
@@ -145,20 +148,28 @@
                         </goals>
                         <configuration>
                             <target>
-                                <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+                                <taskdef
+                                    resource="net/sf/antcontrib/antcontrib.properties" />
                                 <if>
-                                    <socket server="localhost" port="${wildfly.port}" />
+                                    <socket server="localhost"
+                                        port="${wildfly.port}" />
                                     <then>
-                                        <exec executable="bash" spawn="false" failonerror="true">
-                                            <arg value="${project.basedir}/src/main/resources/clean.sh" />
-                                            <arg value="${wildfly.server.process.tag}" />
+                                        <exec executable="bash"
+                                            spawn="false"
+                                            failonerror="true">
+                                            <arg
+                                                value="${project.basedir}/src/main/resources/clean.sh" />
+                                            <arg
+                                                value="${wildfly.server.process.tag}" />
                                         </exec>
                                     </then>
                                     <else></else>
                                 </if>
                                 <fail>
                                     <condition>
-                                        <socket server="localhost" port="${wildfly.port}" />
+                                        <socket
+                                            server="localhost"
+                                            port="${wildfly.port}" />
                                     </condition>
                                 </fail>
                             </target>
