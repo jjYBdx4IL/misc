@@ -1,10 +1,8 @@
 language: java
 env:
-  - PUBLIC_CI=true
+  - PUBLIC_CI=true JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 jdk:
-  - oraclejdk8
-before_install:
-  - mvn install -f release-parent
+  - openjdk8
 install: true
-script: mvn -B clean install
+script: ./.travis.sh
 

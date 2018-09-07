@@ -12,6 +12,10 @@
     <url>https://github.com/jjYBdx4IL/misc</url>
     <inceptionYear>2017</inceptionYear>
 
+    <prerequisites>
+        <maven>3.1.1</maven>
+    </prerequisites>
+
     <properties>
         <default.encoding>UTF-8</default.encoding>
         <project.build.sourceEncoding>${default.encoding}</project.build.sourceEncoding>

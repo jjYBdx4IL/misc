@@ -26,13 +26,15 @@ import java.io.IOException;
 
 /**
  * GnuPG command line wrapper. Developed against GnuPG 1.4.22 on Windows
- * 10/cygwin/amd64.
+ * 10/cygwin/amd64 and GnuPG 2.2.4 on Linux/amd64.
  */
 public class GnuPgClWrapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(GnuPgClWrapper.class);
 
     private String gnuPgHomeDir = null;
+    private boolean logErrorOutput = false;
+    private ProcRunner proc = null;
 
     public GnuPgClWrapper() {
 
@@ -49,19 +51,20 @@ public class GnuPgClWrapper {
      *            the encrypted, ASCII-armored input string
      * 
      * @return the decrypted text
+     * @throws GnuPgClDecryptionException if there was a problem
      */
     public String decryptTextAa(String input) throws GnuPgClDecryptionException {
         File inputFile = null;
         try {
             inputFile = File.createTempFile("tmp", ".tmp");
             FileUtils.writeStringToFile(inputFile, input, "UTF-8");
-            ProcRunner proc = new ProcRunner(false, "gpg", "-d", inputFile.getName());
-            proc.setWorkDir(inputFile.getParentFile());
-            if (gnuPgHomeDir != null) {
-                proc.environment().put("GNUPGHOME", gnuPgHomeDir);
-            }
-            int exitCode = proc.run();
+            int exitCode = runGpg(inputFile, false);
             if (exitCode != 0) {
+                if (isLogErrorOutput()) {
+                    runGpg(inputFile, true);
+                    throw new GnuPgClDecryptionException(
+                        "gpg exit code was: " + exitCode + ", gpg output was: " + proc.getOutputBlob());
+                }
                 throw new GnuPgClDecryptionException("gpg exit code was: " + exitCode);
             }
             return proc.getOutputBlob();
@@ -75,5 +78,29 @@ public class GnuPgClWrapper {
                 }
             }
         }
+    }
+
+    private int runGpg(File inputFile, boolean includeErrorOutput) throws IOException {
+        proc = new ProcRunner(includeErrorOutput, "gpg", "-d", inputFile.getName());
+        proc.setWorkDir(inputFile.getParentFile());
+        if (gnuPgHomeDir != null) {
+            proc.environment().put("GNUPGHOME", gnuPgHomeDir);
+        }
+        return proc.run();
+    }
+
+    public boolean isLogErrorOutput() {
+        return logErrorOutput;
+    }
+
+    /**
+     * If gpg exits with a non-zero exit code, re-run it to fetch the error
+     * output? Should be used in test units mostly because it could ask the user
+     * to enter the password a second time.
+     * 
+     * @param logErrorOutput whether or not to dump the error output from GnuPG
+     */
+    public void setLogErrorOutput(boolean logErrorOutput) {
+        this.logErrorOutput = logErrorOutput;
     }
 }

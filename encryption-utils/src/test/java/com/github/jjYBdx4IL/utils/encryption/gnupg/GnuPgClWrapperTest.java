@@ -21,7 +21,10 @@ import com.github.jjYBdx4IL.utils.env.Maven;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -30,15 +33,16 @@ public class GnuPgClWrapperTest {
     @Test
     public void testDecryptTextAa() throws IOException, URISyntaxException {
         GnuPgClWrapper wrapper = new GnuPgClWrapper();
-        String gnuPgHomeDir = Maven.getBasedir(GnuPgClWrapperTest.class).toString().substring(6);
-        gnuPgHomeDir += "src/test/resources/gnupg_home";
+        wrapper.setLogErrorOutput(true);
+        String gnuPgHomeDir = new File(new File(Maven.getBasedir(GnuPgClWrapperTest.class)),
+            "src/test/resources/gnupg_home").getAbsolutePath();
         wrapper.setGnuPgHomeDir(gnuPgHomeDir);
 
         String encryptedTextAa = IOUtils
             .toString(GnuPgClWrapperTest.class.getResource("test_message.txt.asc").toURI(), "UTF-8");
 
         String plaintext = wrapper.decryptTextAa(encryptedTextAa);
-        assertEquals("test message\r\n", plaintext);
+        assertEquals("test message" + System.lineSeparator(), plaintext);
     }
 
 }

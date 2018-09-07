@@ -20,10 +20,6 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
-    <prerequisites>
-        <maven>3.1.1</maven>
-    </prerequisites>
-
     <organization>
         <name>Github jjYBdx4IL Projects</name>
         <url>https://github.com/jjYBdx4IL</url>
