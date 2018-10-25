@@ -107,6 +107,9 @@ public class QuoteTokenizer {
     /**
      * Override this to unescape stuff inside quotes. Default: no change.
      * 
+     * @param input the input string
+     * @param quoteChar the quote characters in use
+     * @return the unescaped string
      */
     public String unescape(String input, char quoteChar) {
         return input;

@@ -78,8 +78,14 @@ public class AddressUtils {
     }
 
     /**
-     * Returns true only iff none of the ip address resolved are associated with the local machine including
-     * its public ip addresses.
+     * Returns true only iff none of the ip address resolved are associated with
+     * the local machine including its public ip addresses.
+     * 
+     * @param hostname the hostname or literal IP address to check
+     * @return true iff none of the ip address resolved are associated with the
+     *         local machine including its public ip addresses.
+     * @throws UnknownHostException
+     *             if the given hostname cannot be resolved
      */
     public static boolean isSimpleNonLocalAddress(String hostname) throws UnknownHostException {
         if (hostname == null || hostname.isEmpty()) {

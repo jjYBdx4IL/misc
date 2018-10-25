@@ -44,6 +44,8 @@ public class ClusterStatusResponse {
      * going on.
      * 
      * Work in progress.
+     * 
+     * @param response the response
      */
     public ClusterStatusResponse(NamedList<Object> response) {
         if (response == null) {
@@ -213,6 +215,8 @@ public class ClusterStatusResponse {
          * We don't process that hostName, so different port numbers/paths etc. will lead
          * to this function believing that replicas are located on different hosts, so don't
          * do that in production.
+         * 
+         * @return the redundency status
          */
         public RedundancyStatus getRedundancyStatus() {
             RedundancyStatus status = new RedundancyStatus();
@@ -295,8 +299,8 @@ public class ClusterStatusResponse {
          * Also catches where replicas are located on the same host
          * and ignores those towards the replicationFactor count.
          * 
-         * @param replicationFactor
-         * @return
+         * @param replicationFactor the replication factor
+         * @return the redundancy state
          */
         public RedundancyState getRedundancyState(int replicationFactor) {
             Set<String> activeHosts = new HashSet<>(replicationFactor);

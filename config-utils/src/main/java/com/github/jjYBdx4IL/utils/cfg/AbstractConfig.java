@@ -133,6 +133,10 @@ public abstract class AbstractConfig {
     public boolean read() throws FileNotFoundException, IOException {
         File configFile = getConfigFile();
         XStream xstream = new XStream(new StaxDriver());
+        XStream.setupDefaultSecurity(xstream);
+        xstream.allowTypesByWildcard(new String[] {
+            AbstractConfig.this.getClass().getPackage().getName() + ".**"
+        });
         xstream.autodetectAnnotations(true);
 
         if (configFile.exists()) {
@@ -150,6 +154,10 @@ public abstract class AbstractConfig {
         File configFile = getConfigFile();
         configFile.getParentFile().mkdirs();
         XStream xstream = new XStream(new StaxDriver());
+        XStream.setupDefaultSecurity(xstream);
+        xstream.allowTypesByWildcard(new String[] {
+            AbstractConfig.this.getClass().getPackage().getName() + ".**"
+        });
         xstream.autodetectAnnotations(true);
         String xml = xstream.toXML(this);
         try (OutputStream os = new FileOutputStream(configFile)) {

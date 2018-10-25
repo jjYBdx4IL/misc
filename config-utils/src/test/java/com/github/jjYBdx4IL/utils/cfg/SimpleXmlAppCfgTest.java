@@ -18,6 +18,7 @@ package com.github.jjYBdx4IL.utils.cfg;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import com.github.jjYBdx4IL.utils.cfg.SimpleXmlAppCfg;
 import org.junit.Ignore;
 import org.junit.Test;
 

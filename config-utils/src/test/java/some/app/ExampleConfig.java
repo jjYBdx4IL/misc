@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jjYBdx4IL.utils.cfg;
+package some.app;
+
+import com.github.jjYBdx4IL.utils.cfg.AbstractConfig;
 
 //CHECKSTYLE:OFF
 import java.util.Locale;
 
 /**
+ * This config class needs to reside in a different (arbitrary) package hierarchy in order to
+ * verify that the xstream deserialization security mechanism works in the way we have set it up. 
  *
  * @author Github jjYBdx4IL Projects
  */

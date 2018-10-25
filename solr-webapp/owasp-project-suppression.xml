@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
+   <suppress>
+      <notes><![CDATA[
+      file name: jsoup-utils-1.1-SNAPSHOT.jar
+      ]]></notes>
+      <gav regex="true">^com\.github\.jjYBdx4IL\.utils:jsoup-utils:.*$</gav>
+      <cpe>cpe:/a:jsoup:jsoup</cpe>
+   </suppress>
+   <suppress>
+      <notes><![CDATA[
+      file name: zookeeper-3.4.13.jar
+      ]]></notes>
+      <gav regex="true">^org\.apache\.zookeeper:zookeeper:.*$</gav>
+      <cve>CVE-2014-0085</cve>
+      <cve>CVE-2018-8012</cve>
+   </suppress>
+</suppressions>

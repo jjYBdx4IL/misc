@@ -22,6 +22,109 @@
 		<url.nagios.doc>https://nagios.mycompany.org/cgi-bin/nagios3/status.cgi?host=all</url.nagios.doc>
 	</properties>
 
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <configuration>
+                    <suppressionFiles>
+                        <suppressionFile>${basedir}/owasp-project-suppression.xml</suppressionFile>
+                    </suppressionFiles>
+                </configuration>
+            </plugin>
+            
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <addClasspath>true</addClasspath>
+                                    <mainClass>com.github.jjYBdx4IL.utils.osdapp.OSDApp</mainClass>
+                                    <classpathPrefix>libs/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                            <excludes>
+                                <exclude>properties.xml</exclude>
+                                <exclude>README</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptors>src/main/assembly/bin.xml</descriptors>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-wrapper</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeScope>runtime</includeScope>
+                            <!-- <includeArtifactIds> -->
+                            <!-- config-utils, -->
+                            <!-- swing-utils, -->
+                            <!-- jsoup-utils, -->
+                            <!-- jsoup, -->
+                            <!-- commons-cli, -->
+                            <!-- commons-codec, -->
+                            <!-- commons-io, -->
+                            <!-- commons-lang3, -->
+                            <!-- dom4j, -->
+                            <!-- github-utils, -->
+                            <!-- xml-apis,slf4j-simple,slf4j-api</includeArtifactIds> -->
+                            <outputDirectory>${project.build.directory}/libs</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <phase>integration-test</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <skipTests>false</skipTests>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
 	<dependencies>
 		<dependency>
 			<groupId>commons-cli</groupId>
@@ -107,19 +210,19 @@
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-http</artifactId>
-			<version>9.4.6.v20170531</version>
+			<version>9.4.9.v20180320</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
-			<version>9.4.6.v20170531</version>
+			<version>9.4.9.v20180320</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-servlet</artifactId>
-			<version>9.4.6.v20170531</version>
+			<version>9.4.9.v20180320</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -173,100 +276,6 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
-	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-
-		<plugins>
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>default-jar</id>
-						<configuration>
-							<archive>
-								<manifest>
-									<addClasspath>true</addClasspath>
-									<mainClass>com.github.jjYBdx4IL.utils.osdapp.OSDApp</mainClass>
-									<classpathPrefix>libs/</classpathPrefix>
-								</manifest>
-							</archive>
-							<excludes>
-								<exclude>properties.xml</exclude>
-								<exclude>README</exclude>
-							</excludes>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<descriptors>src/main/assembly/bin.xml</descriptors>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>unpack-wrapper</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<includeScope>runtime</includeScope>
-							<!-- <includeArtifactIds> -->
-							<!-- config-utils, -->
-							<!-- swing-utils, -->
-							<!-- jsoup-utils, -->
-							<!-- jsoup, -->
-							<!-- commons-cli, -->
-							<!-- commons-codec, -->
-							<!-- commons-io, -->
-							<!-- commons-lang3, -->
-							<!-- dom4j, -->
-							<!-- github-utils, -->
-							<!-- xml-apis,slf4j-simple,slf4j-api</includeArtifactIds> -->
-							<outputDirectory>${project.build.directory}/libs</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>default-test</id>
-						<goals>
-							<goal>test</goal>
-						</goals>
-						<phase>integration-test</phase>
-					</execution>
-				</executions>
-				<configuration>
-					<skipTests>false</skipTests>
-				</configuration>
-			</plugin>
-
-		</plugins>
-	</build>
 
 </project>
 

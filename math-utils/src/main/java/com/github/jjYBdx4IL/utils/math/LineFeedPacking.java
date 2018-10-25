@@ -32,10 +32,10 @@ public class LineFeedPacking {
     private final int[] heights;
     private final float ratio;
     private long bestSolution = 0;
-    
+
     private List<Point> layoutOffsets = null;
     private Dimension layoutTotalSize = null;
-    
+
     /**
      * Tries to pack rectangles along lines like text (ltr). The order of the
      * childs is not changed. The returned solution is a bitmask determining
@@ -50,6 +50,10 @@ public class LineFeedPacking {
      * 
      * @param ratio
      *            x-y-ratio
+     * @param widths
+     *            the widths of the rectangles
+     * @param heights
+     *            the heights of the rectangles
      */
     public LineFeedPacking(int[] widths, int[] heights, float ratio) {
         if (widths.length == 0) {
@@ -65,7 +69,7 @@ public class LineFeedPacking {
         this.heights = heights;
         this.ratio = ratio;
     }
-    
+
     public long fit() {
         long limit = 1 << (widths.length - 1);
         float bestSize = Float.MAX_VALUE;
@@ -166,9 +170,11 @@ public class LineFeedPacking {
     }
 
     /**
-     * Determine a scale factor to fit {@link #getLayoutTotalSize()} into maxSize.
+     * Determine a scale factor to fit {@link #getLayoutTotalSize()} into
+     * maxSize.
      * 
-     * @param maxSize the maximum size allowed
+     * @param maxSize
+     *            the maximum size allowed
      * @return a scale factor &lt;= 1f
      */
     public float getOptimalSizeReductionFactor(Dimension maxSize) {

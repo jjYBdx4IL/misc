@@ -19,7 +19,7 @@
 
     <properties>
         <hibernate.version>5.2.10.Final</hibernate.version>
-        <jetty.version>9.4.6.v20170531</jetty.version>
+        <jetty.version>9.4.9.v20180320</jetty.version>
     </properties>
 
     <build>

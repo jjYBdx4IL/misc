@@ -88,6 +88,11 @@ public class DiskImageCache {
             return null;
         }
         XStream xstream = new XStream(new StaxDriver());
+        XStream.setupDefaultSecurity(xstream);
+        xstream.allowTypesByWildcard(new String[] {
+            "com.github.jjYBdx4IL.utils.vmmgmt.**"
+        });
+        
         DiskImage diskImage = null;
         try {
             diskImage = (DiskImage) xstream.fromXML(xmlFile);
@@ -125,6 +130,10 @@ public class DiskImageCache {
 
         File xmlFile = new File(CACHE_DIR, name + DOT_XML);
         XStream xstream = new XStream(new StaxDriver());
+        XStream.setupDefaultSecurity(xstream);
+        xstream.allowTypesByWildcard(new String[] {
+            "com.github.jjYBdx4IL.utils.vmmgmt.**"
+        });
         try {
             try (OutputStream os = new FileOutputStream(xmlFile)) {
                 xstream.toXML(newDiskImage, os);

@@ -28,8 +28,8 @@ public class ZipUtils {
     /**
      * Beware! This method is not very reliable (compared to "unzip -t" command line utility).
      * 
-     * @param file
-     * @return
+     * @param file the zip file to test
+     * @return true iff no errors were found
      */
     public static boolean test(File file) {
         

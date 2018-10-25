@@ -36,6 +36,7 @@ public class GnuPgClWrapperTest {
         wrapper.setLogErrorOutput(true);
         String gnuPgHomeDir = new File(new File(Maven.getBasedir(GnuPgClWrapperTest.class)),
             "src/test/resources/gnupg_home").getAbsolutePath();
+        gnuPgHomeDir = new File(GnuPgClWrapperTest.class.getResource("/gnupg_home").toURI()).getAbsolutePath();
         wrapper.setGnuPgHomeDir(gnuPgHomeDir);
 
         String encryptedTextAa = IOUtils

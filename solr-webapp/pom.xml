@@ -25,7 +25,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <hibernate.version>5.2.10.Final</hibernate.version>
-        <solr.version>7.0.1</solr.version>
+        <solr.version>7.5.0</solr.version>
         <webappAssetsDirectory>${project.build.directory}/${project.build.finalName}/assets</webappAssetsDirectory>
     </properties>
 
@@ -34,6 +34,16 @@
         <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
 
         <plugins>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <configuration>
+                    <suppressionFiles>
+                        <suppressionFile>${basedir}/owasp-project-suppression.xml</suppressionFile>
+                    </suppressionFiles>
+                </configuration>
+            </plugin>
+        
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -388,7 +398,7 @@
             <dependency>
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-core</artifactId>
-                <version>1.16</version>
+                <version>1.19.1</version>
             </dependency>
             <dependency>
                 <groupId>org.json</groupId>

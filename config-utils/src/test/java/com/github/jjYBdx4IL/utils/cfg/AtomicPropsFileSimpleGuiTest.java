@@ -19,6 +19,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assume.assumeTrue;
 
+import com.github.jjYBdx4IL.utils.cfg.AtomicPropsFileSimpleGui;
 import com.github.jjYBdx4IL.utils.env.Surefire;
 
 import org.junit.Test;
