@@ -4,6 +4,11 @@ Misc Java stuff
 
 [![Build Status](https://travis-ci.org/jjYBdx4IL/misc.png?branch=master)](https://travis-ci.org/jjYBdx4IL/misc)
 
+## LICENSE
+
+All modules are licensed under the Apache License v2.0 by default. However, there are some
+exceptions to some modules. Those modules have their own LICENSE file(s).
+
 ## RELEASE
 
 This repository consists of a lot of smaller, separate sub-projects, each of which gets released
