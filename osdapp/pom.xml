@@ -147,11 +147,6 @@
 			<version>1.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>dom4j</groupId>
-			<artifactId>dom4j</artifactId>
-			<version>1.6.1</version>
-		</dependency>
-		<dependency>
 			<groupId>com.github.jjYBdx4IL.utils</groupId>
 			<artifactId>jsoup-utils</artifactId>
 			<version>1.1-SNAPSHOT</version>
@@ -159,7 +154,7 @@
 		<dependency>
 			<groupId>com.github.jjYBdx4IL.utils</groupId>
 			<artifactId>net-utils</artifactId>
-			<version>1.0</version>
+			<version>1.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.jjYBdx4IL</groupId>
@@ -179,7 +174,7 @@
 		<dependency>
 			<groupId>com.github.jjYBdx4IL.utils</groupId>
 			<artifactId>swing-utils</artifactId>
-			<version>1.0</version>
+			<version>1.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.jjYBdx4IL.utils</groupId>
@@ -241,7 +236,7 @@
 		<dependency>
 			<groupId>com.github.jjYBdx4IL.utils</groupId>
 			<artifactId>junit4-utils</artifactId>
-			<version>1.0</version>
+			<version>1.1-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -251,9 +246,19 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	
+    
 	<dependencyManagement>
 		<dependencies>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>25.1-jre</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>3.0.2</version>
+            </dependency>
 			<dependency>
 				<groupId>com.github.jjYBdx4IL.utils</groupId>
 				<artifactId>proc-utils</artifactId>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
+<suppress>
+   <notes><![CDATA[
+   file name: rome-1.12.0.jar
+   ]]></notes>
+   <gav regex="true">^com\.rometools:rome:.*$</gav>
+   <cve>CVE-2018-12056</cve>
+</suppress></suppressions>

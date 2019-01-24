@@ -1,8 +1,9 @@
 language: java
 env:
-  - PUBLIC_CI=true JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+  - PUBLIC_CI=true
 jdk:
-  - openjdk8
+  - oraclejdk8
+  - openjdk11
 install: true
 script: ./.travis.sh
 

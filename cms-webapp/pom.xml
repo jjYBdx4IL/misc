@@ -29,10 +29,21 @@
     </properties>
 
     <build>
-        <!-- put compiled classes where jetty:run's auto-reload is looking for changes -->
+        <!-- put compiled classes where jetty:run's auto-reload is looking 
+            for changes -->
         <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
 
         <plugins>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <configuration>
+                    <suppressionFiles>
+                        <suppressionFile>${basedir}/owasp-project-suppression.xml</suppressionFile>
+                    </suppressionFiles>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -71,31 +82,31 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <attachClasses>true</attachClasses>
-<!--                     <packagingExcludes> -->
-<!--                         assets/main.js, -->
-<!--                         assets/site.js, -->
-<!--                         assets/requirejs.html, -->
-<!--                         assets/simplegrid.css, -->
-<!--                         assets/site.css, -->
-<!--                         assets/style.css, -->
-<!--                         assets/test.html -->
-<!--                     </packagingExcludes> -->
+                    <!-- <packagingExcludes> -->
+                    <!-- assets/main.js, -->
+                    <!-- assets/site.js, -->
+                    <!-- assets/requirejs.html, -->
+                    <!-- assets/simplegrid.css, -->
+                    <!-- assets/site.css, -->
+                    <!-- assets/style.css, -->
+                    <!-- assets/test.html -->
+                    <!-- </packagingExcludes> -->
                 </configuration>
             </plugin>
-<!--             <plugin> -->
-<!--                 <artifactId>maven-jar-plugin</artifactId> -->
-<!--                 <executions> -->
-<!--                     <execution> -->
-<!--                         <id>make-a-jar</id> -->
-<!--                         <goals> -->
-<!--                             <goal>jar</goal> -->
-<!--                         </goals> -->
-<!--                         <configuration> -->
-<!--                             <classifier>classes</classifier> -->
-<!--                         </configuration> -->
-<!--                     </execution> -->
-<!--                 </executions> -->
-<!--             </plugin> -->
+            <!-- <plugin> -->
+            <!-- <artifactId>maven-jar-plugin</artifactId> -->
+            <!-- <executions> -->
+            <!-- <execution> -->
+            <!-- <id>make-a-jar</id> -->
+            <!-- <goals> -->
+            <!-- <goal>jar</goal> -->
+            <!-- </goals> -->
+            <!-- <configuration> -->
+            <!-- <classifier>classes</classifier> -->
+            <!-- </configuration> -->
+            <!-- </execution> -->
+            <!-- </executions> -->
+            <!-- </plugin> -->
 
             <plugin>
                 <groupId>com.googlecode.maven-download-plugin</groupId>
@@ -149,7 +160,8 @@
                             </sources>
                         </configuration>
                     </execution>
-                <!-- help eclipse identify the webapp folder as a resource folder: -->
+                    <!-- help eclipse identify the webapp folder as a resource 
+                        folder: -->
                     <execution>
                         <id>add-resource</id>
                         <phase>generate-resources</phase>
@@ -212,7 +224,8 @@
         </plugins>
         <pluginManagement>
             <plugins>
-                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <!--This plugin's configuration is used to store Eclipse 
+                    m2e settings only. It has no influence on the Maven build itself. -->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
                     <artifactId>lifecycle-mapping</artifactId>
@@ -255,19 +268,19 @@
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
-            <version>1.22.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava-jdk5</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>1.27.0</version>
+            <!-- <exclusions> -->
+            <!-- <exclusion> -->
+            <!-- <groupId>com.google.guava</groupId> -->
+            <!-- <artifactId>guava-jdk5</artifactId> -->
+            <!-- </exclusion> -->
+            <!-- </exclusions> -->
         </dependency>
-<!--         <dependency> -->
-<!--             <groupId>com.google.apis</groupId> -->
-<!--             <artifactId>google-api-services-webmasters</artifactId> -->
-<!--             <version>v3-rev24-1.22.0</version> -->
-<!--         </dependency> -->
+        <!-- <dependency> -->
+        <!-- <groupId>com.google.apis</groupId> -->
+        <!-- <artifactId>google-api-services-webmasters</artifactId> -->
+        <!-- <version>v3-rev24-1.22.0</version> -->
+        <!-- </dependency> -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -280,7 +293,7 @@
         <dependency>
             <groupId>com.j2html</groupId>
             <artifactId>j2html</artifactId>
-            <version>1.2.0</version>
+            <version>1.3.0</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
@@ -290,25 +303,25 @@
         <dependency>
             <groupId>com.github.dfabulich</groupId>
             <artifactId>sitemapgen4j</artifactId>
-            <version>1.0.6</version>
+            <version>1.1.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-multipart-provider</artifactId>
-            <version>3.0.24.Final</version>
+            <version>3.6.2.Final</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.rometools</groupId>
             <artifactId>rome</artifactId>
-            <version>1.7.4</version>
+            <version>1.12.0</version>
         </dependency>
 
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
-            <version>7.0</version>
+            <version>8.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -316,12 +329,29 @@
             <artifactId>hibernate-search-orm</artifactId>
             <version>5.5.8.Final</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>dom4j</artifactId>
+                    <groupId>dom4j</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.25</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>2.3.2</version>
         </dependency>
     </dependencies>
 
@@ -335,12 +365,27 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>23.0</version>
+                <version>27.0.1-jre</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.istack</groupId>
+                <artifactId>istack-commons-runtime</artifactId>
+                <version>3.0.8</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.mail</groupId>
                 <artifactId>javax.mail</artifactId>
-                <version>1.5.6</version>
+                <version>1.6.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <version>2.3.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>3.3.1.Final</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>

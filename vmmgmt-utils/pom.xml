@@ -36,7 +36,7 @@
         <dependency>
             <groupId>com.github.jjYBdx4IL.utils</groupId>
             <artifactId>cache-utils</artifactId>
-            <version>1.0</version>
+            <version>1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>com.hierynomus</groupId>
             <artifactId>sshj</artifactId>
-            <version>0.22.0</version>
+            <version>0.26.0</version>
         </dependency>
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>

@@ -20,7 +20,8 @@
     <inceptionYear>2017</inceptionYear>
 
     <properties>
-        <wildfly.version>11.0.0.CR1</wildfly.version>
+        <!-- https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22org.wildfly%22%20AND%20a%3A%22wildfly-dist%22 -->
+        <wildfly.version>15.0.1.Final</wildfly.version>
         <wildfly.server.process.tag>${project.groupId}:${project.artifactId}</wildfly.server.process.tag>
         <http.port>8081</http.port>
         <wildfly.port>9991</wildfly.port>
@@ -29,9 +30,19 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <configuration>
+                    <suppressionFiles>
+                        <suppressionFile>${basedir}/owasp-project-suppression.xml</suppressionFile>
+                    </suppressionFiles>
+                </configuration>
+            </plugin>
+            
+            <plugin>
                 <groupId>org.wildfly.plugins</groupId>
                 <artifactId>wildfly-maven-plugin</artifactId>
-                <version>1.2.0.Final</version>
+                <version>2.0.0.Final</version>
                 <executions>
                     <execution>
                         <id>start-server</id>
@@ -52,6 +63,9 @@
                     </execution>
                     <execution>
                         <id>add-datasource</id>
+                        <goals>
+                            <goal>add-resource</goal>
+                        </goals>
                         <phase>pre-integration-test</phase>
                         <configuration>
                             <address>subsystem=datasources,data-source=java:jboss/datasources/CmsWebAppDS</address>
@@ -70,9 +84,6 @@
                                 </resource>
                             </resources>
                         </configuration>
-                        <goals>
-                            <goal>add-resource</goal>
-                        </goals>
                     </execution>
                     <execution>
                         <id>deploy-war</id>
@@ -161,6 +172,8 @@
                                                 value="${project.basedir}/src/main/resources/clean.sh" />
                                             <arg
                                                 value="${wildfly.server.process.tag}" />
+                                            <arg
+                                                value="${wildfly.port}" />
                                         </exec>
                                     </then>
                                     <else></else>
@@ -248,12 +261,12 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>23.0</version>
+                <version>27.0.1-jre</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.5.2</version>
+                <version>4.5.5</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>

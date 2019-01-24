@@ -81,7 +81,8 @@
         <module>jna-utils</module>
         <module>jsoup-utils</module>
         <module>junit4-utils</module>
-        <module>jutils</module>
+	<module>jutils</module>
+	<module>logging-utils</module>
         <module>math-utils</module>
         <module>net-utils</module>
         <module>osdapp</module>

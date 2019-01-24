@@ -42,6 +42,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.interactions.Actions;
@@ -223,6 +224,7 @@ public class SeleniumTestBase {
                     //((WebDriver.Window)getDriver()).setSize(new Dimension(1024, 768));
                     break;
                 case FIREFOX:
+                    FirefoxOptions opts = new FirefoxOptions();
                     FirefoxProfile fp = new FirefoxProfile();
                     fp.setPreference("dom.max_chrome_script_run_time", 3000);
                     fp.setPreference("dom.max_script_run_time", 3000);
@@ -230,7 +232,8 @@ public class SeleniumTestBase {
                     fp.setPreference("app.update.enabled", false);
                     fp.setPreference("browser.tabs.warnOnClose", false);
                     fp.setPreference("browser.tabs.warnOnOpen", false);
-                    setDriver(new FirefoxDriver(fp));
+                    opts.setProfile(fp);
+                    setDriver(new FirefoxDriver(opts));
                     break;
                 case HTMLUNIT:
                     setDriver(new HtmlUnitDriver(true));

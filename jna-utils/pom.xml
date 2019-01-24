@@ -73,6 +73,15 @@
 
 	<build>
 		<plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-h</arg>
+                        <arg>${project.build.directory}/generated-test-sources/c</arg>
+                     </compilerArgs>
+                </configuration>
+            </plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>

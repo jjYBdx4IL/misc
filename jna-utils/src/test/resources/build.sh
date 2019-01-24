@@ -21,10 +21,6 @@ sysPrefix=${sysPrefix//_/-}
 libDir="$classesOutputDir/$sysPrefix"
 install -d $libDir
 
-# JNI
-javah -classpath "$classesOutputDir" \
-    -d "$targetDir/generated-test-sources/c" \
-    com.github.jjYBdx4IL.utils.jna.ResourceUtilsJNITestHelper
 gcc -shared -fPIC -O2 -g \
     -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" \
     -I"$targetDir/generated-test-sources/c" \

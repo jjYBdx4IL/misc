@@ -13,12 +13,21 @@ scriptDir="$(readlink -f "$(dirname "$0")")"
 # this is used to verify that a process is really OUR process before
 # terminating it:
 PROCIDTAG=$1
+port=$2
 
 export LC_ALL=C
 export LANG=C
 export TZ=UTC
 
+isWin=0
+if which taskkill; then
+    isWin=1
+    which tasklist
+    which netstat
+fi
+
 function check_started() {
+    if [[ -n $(get_win_pids) ]]; then return 0; fi
     (
         set +o pipefail
         grep -l "PROCIDTAG=$PROCIDTAG" /proc/*/environ 2>/dev/null | grep proc >&/dev/null
@@ -34,10 +43,29 @@ function get_pids() {
     done
 }
 
+function get_win_pids() {
+    local l
+    netstat -a -o -n -p TCP | LC_ALL=C grep "^\s*TCP\s*[:\.0-9]*:$port\s" | while read l; do
+        if [[ $l =~ [[:space:]]([0-9]*)[[:space:]]*$ ]]; then
+            if [[ ${BASH_REMATCH[1]} -ne 0 ]]; then 
+                echo " ${BASH_REMATCH[1]}"
+            fi
+        fi
+    done
+}
+
 function stop() {
     local sig=$1
+    local pid
     for pid in `get_pids`; do
         kill -$sig $pid
+    done
+    for pid in `get_win_pids`; do
+        if [[ $sig -eq KILL ]] || [[ $sig -eq kill ]]; then
+            taskkill /F /PID $pid
+        else 
+            taskkill /PID $pid
+        fi
     done
     return 0
 }
