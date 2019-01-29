@@ -51,6 +51,32 @@
                 </configuration>
             </plugin>
 
+            <!-- usage: mvn exec:java -Dh2.location=./h2 -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>com.github.jjYBdx4IL.cms.CliExporter</mainClass>
+                    <arguments>
+                        <argument>${h2.location}</argument>
+                    </arguments>
+                    <systemProperties>
+                        <systemProperty>
+                            <key>h2.bindAddress</key>
+                            <value>localhost</value>
+                        </systemProperty>
+                    </systemProperties>
+                    <classpathScope>test</classpathScope>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.bsc.maven</groupId>
                 <artifactId>maven-processor-plugin</artifactId>
@@ -82,31 +108,8 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <attachClasses>true</attachClasses>
-                    <!-- <packagingExcludes> -->
-                    <!-- assets/main.js, -->
-                    <!-- assets/site.js, -->
-                    <!-- assets/requirejs.html, -->
-                    <!-- assets/simplegrid.css, -->
-                    <!-- assets/site.css, -->
-                    <!-- assets/style.css, -->
-                    <!-- assets/test.html -->
-                    <!-- </packagingExcludes> -->
                 </configuration>
             </plugin>
-            <!-- <plugin> -->
-            <!-- <artifactId>maven-jar-plugin</artifactId> -->
-            <!-- <executions> -->
-            <!-- <execution> -->
-            <!-- <id>make-a-jar</id> -->
-            <!-- <goals> -->
-            <!-- <goal>jar</goal> -->
-            <!-- </goals> -->
-            <!-- <configuration> -->
-            <!-- <classifier>classes</classifier> -->
-            <!-- </configuration> -->
-            <!-- </execution> -->
-            <!-- </executions> -->
-            <!-- </plugin> -->
 
             <plugin>
                 <groupId>com.googlecode.maven-download-plugin</groupId>
@@ -269,21 +272,17 @@
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
             <version>1.27.0</version>
-            <!-- <exclusions> -->
-            <!-- <exclusion> -->
-            <!-- <groupId>com.google.guava</groupId> -->
-            <!-- <artifactId>guava-jdk5</artifactId> -->
-            <!-- </exclusion> -->
-            <!-- </exclusions> -->
         </dependency>
-        <!-- <dependency> -->
-        <!-- <groupId>com.google.apis</groupId> -->
-        <!-- <artifactId>google-api-services-webmasters</artifactId> -->
-        <!-- <version>v3-rev24-1.22.0</version> -->
-        <!-- </dependency> -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+        </dependency>
+        <!-- h2 has a CVE, only used for mvn exec:java -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.197</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.imgscalr</groupId>
@@ -293,7 +292,7 @@
         <dependency>
             <groupId>com.j2html</groupId>
             <artifactId>j2html</artifactId>
-            <version>1.3.0</version>
+            <version>1.4.0</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
@@ -351,7 +350,6 @@
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
-            <version>2.3.2</version>
         </dependency>
     </dependencies>
 

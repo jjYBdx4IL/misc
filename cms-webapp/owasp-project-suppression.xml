@@ -6,4 +6,9 @@
    ]]></notes>
    <gav regex="true">^com\.rometools:rome:.*$</gav>
    <cve>CVE-2018-12056</cve>
-</suppress></suppressions>
+</suppress>
+<suppress>
+   <cve>CVE-2018-10054</cve>
+   <cve>CVE-2018-14335</cve>
+</suppress>
+</suppressions>

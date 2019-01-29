@@ -15,13 +15,39 @@
  */
 package com.github.jjYBdx4IL.utils.text;
 
-//CHECKSTYLE:OFF
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Set;
 
+//CHECKSTYLE:OFF
 public class StringUtil {
 
     public static String f(String pattern, Object... args) {
         return String.format(Locale.ROOT, pattern, args);
+    }
+    
+    public static boolean haveEqualSets(Collection<String> a, Collection<String> b) {
+        if (a == null || a.isEmpty()) {
+            return b == null || b.isEmpty();
+        }
+        if (b == null || b.isEmpty()) {
+            return a == null || a.isEmpty();
+        }
+        
+        Set<String> c = new HashSet<>(b.size());
+        Iterator<String> it = b.iterator();
+        while(it.hasNext()) {
+            c.add(it.next());
+        }
+        it = a.iterator();
+        while(it.hasNext()) {
+            if (!c.remove(it.next())) {
+                return false;
+            }
+        }
+        return c.isEmpty();
     }
 
     private StringUtil() {

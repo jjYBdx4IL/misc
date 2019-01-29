@@ -156,3 +156,9 @@ Adjust to your own needs. I don't take any responsibility. This is just an examp
 Go to settings page and set the corresponding option to TRUE.
 
 
+
+## Exporting to markdown on the command line
+
+```
+mvn exec:java -Dh2.location=./h2
+```

@@ -15,16 +15,31 @@
  */
 package com.github.jjYBdx4IL.utils.text;
 
-//CHECKSTYLE:OFF
-import static org.junit.Assert.*;
+import static com.github.jjYBdx4IL.utils.text.StringUtil.haveEqualSets;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+
+//CHECKSTYLE:OFF
 public class StringUtilTest {
 
     @Test
     public void testF() {
         assertEquals("0123 - abc - 1.02", StringUtil.f("%04d - %s - %.2f", 123, "abc", 1.023f));
+    }
+    
+    @Test
+    public void testHaveEqualSets() {
+        assertTrue(haveEqualSets(Arrays.asList(), Arrays.asList()));
+        assertTrue(haveEqualSets(Arrays.asList(), null));
+        assertTrue(haveEqualSets(null, Arrays.asList()));
+        assertTrue(haveEqualSets(null, null));
+        assertTrue(haveEqualSets(Arrays.asList("a", "b"), Arrays.asList("b", "a")));
+        assertTrue(haveEqualSets(Arrays.asList("a", "b"), Arrays.asList("b", "a", "a")));
+        assertTrue(haveEqualSets(Arrays.asList("a"), Arrays.asList("a")));
     }
 
 }
