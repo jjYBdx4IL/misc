@@ -80,7 +80,8 @@ None. Defaults should be appropriate.
 See also cms-it/pom.xml where you can find the test setup.
 
 The `cms.devel` system property enables access to /devel/login which is needed
-for automated testing.
+for automated testing. You also don't need to set up google auth for development, just point your
+browser at /devel/login once to get admin rights.
 
 
 
@@ -162,3 +163,24 @@ Go to settings page and set the corresponding option to TRUE.
 ```
 mvn exec:java -Dh2.location=./h2
 ```
+
+
+
+## DEVELOPMENT
+
+Start Wildfly in standalone mode. Deploy exploded webapp. Wildfly has an auto-discovery for updated WARs, but
+it doesn't auto-reload exploded (unmanaged) webapps on its own. However, there is
+[jee_autodeploy.sh](https://github.com/jjYBdx4IL/snippets/blob/master/bash/jee_autodeploy.sh), which
+uses file system notifications to detect on-disk changes and then send a reload request to the management interface
+of wildfly. One could even extend this to support multi-module project by using rsync/copying all of them into
+the target webapp structure.
+
+
+
+## TODO
+
+The hibernate stuff (JPA data definitions and the full-text indexer) should be separated out into their own module
+because it slows down webapp reloads quite a bit.
+
+
+

@@ -7,7 +7,7 @@
 		<groupId>com.github.jjYBdx4IL</groupId>
 		<artifactId>release-parent</artifactId>
 		<version>1.4-SNAPSHOT</version>
-		<relativePath />
+		<relativePath>../release-parent/</relativePath>
 	</parent>
 
 	<groupId>com.github.jjYBdx4IL.utils</groupId>
@@ -89,18 +89,6 @@
                         </goals>
                         <configuration>
                             <includeScope>runtime</includeScope>
-                            <!-- <includeArtifactIds> -->
-                            <!-- config-utils, -->
-                            <!-- swing-utils, -->
-                            <!-- jsoup-utils, -->
-                            <!-- jsoup, -->
-                            <!-- commons-cli, -->
-                            <!-- commons-codec, -->
-                            <!-- commons-io, -->
-                            <!-- commons-lang3, -->
-                            <!-- dom4j, -->
-                            <!-- github-utils, -->
-                            <!-- xml-apis,slf4j-simple,slf4j-api</includeArtifactIds> -->
                             <outputDirectory>${project.build.directory}/libs</outputDirectory>
                         </configuration>
                     </execution>
@@ -108,19 +96,7 @@
             </plugin>
 
             <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-test</id>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <phase>integration-test</phase>
-                    </execution>
-                </executions>
-                <configuration>
-                    <skipTests>false</skipTests>
-                </configuration>
+                <artifactId>maven-failsafe-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
@@ -164,7 +140,6 @@
 		<dependency>
 			<groupId>com.github.jjYBdx4IL.utils</groupId>
 			<artifactId>proc-utils</artifactId>
-			<version>1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -179,7 +154,6 @@
 		<dependency>
 			<groupId>com.github.jjYBdx4IL.utils</groupId>
 			<artifactId>text-utils</artifactId>
-			<version>1.1</version>
 		</dependency>
 
 		<!-- Testing -->

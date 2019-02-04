@@ -31,7 +31,6 @@ import com.github.jjYBdx4IL.utils.logic.Condition;
 import com.github.jjYBdx4IL.utils.parser.nagios.NagiosParserTest;
 import com.github.jjYBdx4IL.utils.proc.ProcessUtil;
 import com.github.jjYBdx4IL.utils.text.Snippets;
-
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
@@ -53,7 +52,6 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,7 +64,6 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
@@ -74,9 +71,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 //CHECKSTYLE:OFF
-public class OSDAppTest extends AbstractHandler {
+public class OSDAppIT extends AbstractHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OSDAppTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OSDAppIT.class);
 
     private Server server = null;
 
@@ -136,8 +133,8 @@ public class OSDAppTest extends AbstractHandler {
         baseRequest.setHandled(true);
     }
 
-    private final static File targetDir = Maven.getMavenBuildDir(OSDAppTest.class);
-    private final static File tempDir = Maven.getTempTestDir(OSDAppTest.class);
+    private final static File targetDir = Maven.getMavenBuildDir(OSDAppIT.class);
+    private final static File tempDir = Maven.getTempTestDir(OSDAppIT.class);
     private final static File stdoutDump = new File(tempDir, "stdout");
     private final static File stderrDump = new File(tempDir, "stderr");
     private static String stdout;
@@ -349,7 +346,7 @@ public class OSDAppTest extends AbstractHandler {
     }
 
     private static String getREADMESnippet(String snippetName) throws IOException {
-        String readme = IOUtils.toString(OSDAppTest.class.getResourceAsStream("/README"), "UTF-8");
+        String readme = FileUtils.readFileToString(new File("target/classes/README"), "UTF-8");
         assertNotNull(readme);
         LOG.info("readme: " + readme);
         String cmd = Snippets.extract(readme).get(snippetName);

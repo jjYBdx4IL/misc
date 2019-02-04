@@ -21,10 +21,11 @@
 
     <properties>
         <!-- https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22org.wildfly%22%20AND%20a%3A%22wildfly-dist%22 -->
+<!--         <wildfly.version>11.0.0.Final</wildfly.version> -->
         <wildfly.version>15.0.1.Final</wildfly.version>
         <wildfly.server.process.tag>${project.groupId}:${project.artifactId}</wildfly.server.process.tag>
-        <http.port>8081</http.port>
-        <wildfly.port>9991</wildfly.port>
+        <http.port>8080</http.port>
+        <wildfly.port>9990</wildfly.port>
     </properties>
 
     <build>
@@ -53,11 +54,13 @@
                         <configuration>
                             <javaOpts>
                                 <javaOpt>-Denv.devel=true</javaOpt>
-                                <javaOpt>-Djboss.socket.binding.port-offset=1</javaOpt>
+                                <javaOpt>-Djboss.socket.binding.port-offset=0</javaOpt>
                                 <javaOpt>-Dhibernate.hbm2ddl.auto=update</javaOpt>
                                 <!-- persistence.xml defines lucene index 
                                     storage relative to user.home -->
                                 <javaOpt>-Duser.home=${project.build.directory}</javaOpt>
+                                <javaOpt>-Xdebug</javaOpt>
+                                <javaOpt>-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5000</javaOpt>
                             </javaOpts>
                         </configuration>
                     </execution>
@@ -74,6 +77,7 @@
                                     <addIfAbsent>true</addIfAbsent>
                                     <properties>
                                         <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1</connection-url>
+<!--                                         <connection-url>jdbc:h2:file:~/h2</connection-url> -->
                                         <jndi-name>java:jboss/datasources/CmsWebAppDS</jndi-name>
                                         <enabled>true</enabled>
                                         <enable>true</enable>
@@ -107,6 +111,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <skip>${skipITs}</skip>
                     <!-- needed to identify stray test instances because 
                         wildfly maven plugin is too stupid to clean up reliably -->
                     <env>
@@ -124,28 +129,12 @@
             </plugin>
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>integration-test</id>
-                        <goals>
-                            <goal>integration-test</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>verify</id>
-                        <goals>
-                            <goal>verify</goal>
-                        </goals>
-                        <configuration>
-                            <failIfNoTests>true</failIfNoTests>
-                        </configuration>
-                    </execution>
-                </executions>
                 <configuration>
                     <systemPropertyVariables>
                         <http.port>${http.port}</http.port>
                     </systemPropertyVariables>
                     <forkCount>0</forkCount>
+                    <failIfNoTests>true</failIfNoTests>
                 </configuration>
             </plugin>
             <plugin>
@@ -217,7 +206,7 @@
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
-            <version>7.0</version>
+            <version>8.0</version>
             <scope>provided</scope>
         </dependency>
 

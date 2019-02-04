@@ -57,7 +57,6 @@ import j2html.tags.DomContent;
 import j2html.tags.UnescapedText;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.text.StringEscapeUtils;
-import org.jboss.resteasy.spi.ResteasyUriInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

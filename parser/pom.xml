@@ -6,7 +6,7 @@
         <groupId>com.github.jjYBdx4IL</groupId>
         <artifactId>release-parent</artifactId>
         <version>1.4-SNAPSHOT</version>
-        <relativePath />
+        <relativePath>../release-parent/</relativePath>
     </parent>
 
     <artifactId>parser</artifactId>

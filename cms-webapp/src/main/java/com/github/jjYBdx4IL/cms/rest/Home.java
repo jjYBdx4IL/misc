@@ -18,7 +18,6 @@ package com.github.jjYBdx4IL.cms.rest;
 import static j2html.TagCreator.div;
 import static j2html.TagCreator.link;
 
-import com.github.jjYBdx4IL.cms.Env;
 import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
 import com.github.jjYBdx4IL.cms.jpa.dto.Article;
@@ -107,7 +106,7 @@ public class Home {
         List<Article> articles = qf.getArticleDisplayList(null, null, true, subdomain)
             .setMaxResults(MAX_ARTICLES_PER_REQUEST).setFirstResult(skip).getResultList();
 
-        return Response.ok(htmlBuilder.createArticleListRowInner(articles, false, false).toString()).build();
+        return Response.ok(htmlBuilder.createArticleListRowInner(articles, false, false).render()).build();
     }
 
     @GET

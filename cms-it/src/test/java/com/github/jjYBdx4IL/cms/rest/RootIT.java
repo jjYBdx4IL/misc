@@ -26,8 +26,7 @@ import com.github.jjYBdx4IL.cms.jaxb.dto.ExportDump;
 import com.github.jjYBdx4IL.utils.jersey.JerseyClientUtils;
 import com.github.jjYBdx4IL.utils.text.PasswordGenerator;
 import com.github.jjYBdx4IL.wsverifier.WebsiteVerifier;
-
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,9 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,7 +54,7 @@ public class RootIT {
 
     private static final Logger LOG = LoggerFactory.getLogger(RootIT.class);
 
-    private static final String rootUrl = "http://localhost:" + System.getProperty("http.port", "8081") + "/";
+    private static final String rootUrl = "http://localhost:" + System.getProperty("http.port", "8080") + "/";
 
     private static Client client = null;
 
@@ -177,9 +175,19 @@ public class RootIT {
     }
 
     @Test
+    public void testContinueBug() {
+        LOG.info("testContinueBug()");
+        // GET continue page
+        Response response = (Response) getTarget("continue/1000000").request(MediaType.TEXT_HTML_TYPE).get();
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        String content = response.readEntity(String.class);
+        assertFalse(content, content.toLowerCase().contains("j2html.tags.ContainerTag@".toLowerCase()));
+    }
+    
+    @Test
     public void testWorkflow() throws Exception {
         LOG.info("testWorkflow()");
-        // GET empty main page
+        // GET main page
         Response response = (Response) getTarget("").request(MediaType.TEXT_HTML_TYPE).get();
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
 
@@ -482,7 +490,7 @@ public class RootIT {
             fail(verifier.resultToString());
         }
     }
-
+    
     @After
     public void after() {
         if (client != null) {

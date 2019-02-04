@@ -16,7 +16,6 @@
 package com.github.jjYBdx4IL.cms.rest;
 
 import com.github.jjYBdx4IL.cms.Env;
-import com.github.jjYBdx4IL.cms.jpa.AppCache;
 import com.github.jjYBdx4IL.cms.rest.app.SessionData;
 import com.github.jjYBdx4IL.utils.text.MimeType;
 import org.slf4j.Logger;
@@ -24,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
@@ -46,8 +44,6 @@ public class Assets {
     ServletContext ctx;
     @Inject
     SessionData session;
-    @Inject
-    private AppCache appCache;
 
     @GET
     @Path("{filename: .*}")
