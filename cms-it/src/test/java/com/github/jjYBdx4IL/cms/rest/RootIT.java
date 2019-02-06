@@ -54,7 +54,7 @@ public class RootIT {
 
     private static final Logger LOG = LoggerFactory.getLogger(RootIT.class);
 
-    private static final String rootUrl = "http://localhost:" + System.getProperty("http.port", "8080") + "/";
+    private static final String rootUrl = "http://localhost:" + System.getProperty("http.port", "8081") + "/";
 
     private static Client client = null;
 

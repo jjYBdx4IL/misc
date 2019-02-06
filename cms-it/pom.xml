@@ -21,11 +21,10 @@
 
     <properties>
         <!-- https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22org.wildfly%22%20AND%20a%3A%22wildfly-dist%22 -->
-<!--         <wildfly.version>11.0.0.Final</wildfly.version> -->
         <wildfly.version>15.0.1.Final</wildfly.version>
         <wildfly.server.process.tag>${project.groupId}:${project.artifactId}</wildfly.server.process.tag>
-        <http.port>8080</http.port>
-        <wildfly.port>9990</wildfly.port>
+        <http.port>8081</http.port>
+        <wildfly.port>9991</wildfly.port>
     </properties>
 
     <build>
@@ -54,7 +53,7 @@
                         <configuration>
                             <javaOpts>
                                 <javaOpt>-Denv.devel=true</javaOpt>
-                                <javaOpt>-Djboss.socket.binding.port-offset=0</javaOpt>
+                                <javaOpt>-Djboss.socket.binding.port-offset=1</javaOpt>
                                 <javaOpt>-Dhibernate.hbm2ddl.auto=update</javaOpt>
                                 <!-- persistence.xml defines lucene index 
                                     storage relative to user.home -->
