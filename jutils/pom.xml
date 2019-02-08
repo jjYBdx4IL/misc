@@ -14,8 +14,6 @@
     <inceptionYear>2016</inceptionYear>
 
     <properties>
-        <url.jenkins.doc>http://jenkins.mycompany.org/view/Current/</url.jenkins.doc>
-        <url.nagios.doc>https://nagios.mycompany.org/cgi-bin/nagios3/status.cgi?host=all</url.nagios.doc>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -142,19 +140,19 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-http</artifactId>
-            <version>9.4.9.v20180320</version>
+            <version>9.4.14.v20181114</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.9.v20180320</version>
+            <version>9.4.14.v20181114</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>9.4.9.v20180320</version>
+            <version>9.4.14.v20181114</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -269,6 +267,14 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.7.1</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.20</version>

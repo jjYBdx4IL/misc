@@ -15,17 +15,17 @@
  */
 package com.github.jjYBdx4IL.utils.io;
 
+import org.apache.commons.io.DirectoryWalker;
+
 //CHECKSTYLE:OFF
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
-
-import org.apache.commons.io.DirectoryWalker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FileScanner extends DirectoryWalker<File> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FileScanner.class);
+    private static final Logger LOG = Logger.getLogger(FileScanner.class.getName());
     private final boolean relativize;
     private final Pattern regex;
     private String prefix;
@@ -72,7 +72,7 @@ public class FileScanner extends DirectoryWalker<File> {
     }
 
     public List<File> scanFiles(File startDirectory) throws IOException {
-        LOG.debug("startDirectory: " + startDirectory.getAbsolutePath());
+        LOG.log(Level.FINER, "startDirectory: " + startDirectory.getAbsolutePath());
         ArrayList<File> dirs = new ArrayList<>();
         prefix = startDirectory.getAbsolutePath();
         if (!prefix.endsWith(File.separator)) {
@@ -89,7 +89,7 @@ public class FileScanner extends DirectoryWalker<File> {
      * @throws IOException if there is a problem with I/O
      */
     public List<File> getFiles(File startDirectory) throws IOException {
-        LOG.debug("startDirectory: " + startDirectory.getAbsolutePath());
+        LOG.log(Level.FINER, "startDirectory: " + startDirectory.getAbsolutePath());
         ArrayList<File> dirs = new ArrayList<>();
         prefix = startDirectory.getAbsolutePath();
         if (!prefix.endsWith(File.separator)) {
@@ -102,8 +102,8 @@ public class FileScanner extends DirectoryWalker<File> {
     @Override
     protected void handleFile(File file, int depth, Collection<File> results) throws IOException {
         String absPath = file.getAbsolutePath();
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("handleFile: " + absPath);
+        if (LOG.isLoggable(Level.FINEST)) {
+            LOG.log(Level.FINEST, "handleFile: " + absPath);
         }
         if (!absPath.startsWith(prefix)) {
             throw new IOException(String.format("scanned file %s is not below scanner root directory %s",

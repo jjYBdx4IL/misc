@@ -12,10 +12,6 @@
     <url>https://github.com/jjYBdx4IL/misc</url>
     <inceptionYear>2017</inceptionYear>
 
-    <prerequisites>
-        <maven>3.1.1</maven>
-    </prerequisites>
-
     <properties>
         <default.encoding>UTF-8</default.encoding>
         <project.build.sourceEncoding>${default.encoding}</project.build.sourceEncoding>
@@ -81,8 +77,8 @@
         <module>jna-utils</module>
         <module>jsoup-utils</module>
         <module>junit4-utils</module>
-	<module>jutils</module>
-	<module>logging-utils</module>
+        <module>jutils</module>
+        <module>logging-utils</module>
         <module>math-utils</module>
         <module>net-utils</module>
         <module>osdapp</module>
@@ -100,5 +96,17 @@
         <module>h2-frontend</module>
         <module>xml-dom4j-utils</module>
     </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.7.1</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

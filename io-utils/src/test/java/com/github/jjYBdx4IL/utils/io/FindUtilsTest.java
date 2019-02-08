@@ -18,7 +18,6 @@ package com.github.jjYBdx4IL.utils.io;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import com.github.jjYBdx4IL.utils.env.Maven;
@@ -28,7 +27,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.regex.Pattern;
 
 public class FindUtilsTest {
 
@@ -44,9 +42,8 @@ public class FindUtilsTest {
     @Test
     public void testFind() throws IOException {
         try {
-            FindUtils.find(new File(tempDir, "1/22/333/4444"), ""); // s tart
-                                                                    // dir is a
-                                                                    // file
+            // start dir is a file
+            FindUtils.find(new File(tempDir, "1/22/333/4444"), "");
             fail();
         } catch (IOException ex) {
         }
