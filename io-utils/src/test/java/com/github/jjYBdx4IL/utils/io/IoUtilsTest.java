@@ -38,4 +38,25 @@ public class IoUtilsTest {
         IoUtils.safeWriteTo(TEST_FILE, new ByteArrayInputStream("123".getBytes("UTF-8")));
         assertEquals("123", FileUtils.readFileToString(TEST_FILE, "UTF-8"));
     }
+    
+    @Test
+    public void testGetExt() {
+        assertEquals(null, IoUtils.getExt("1."));
+        assertEquals(null, IoUtils.getExt("."));
+        assertEquals(null, IoUtils.getExt(""));
+        assertEquals(null, IoUtils.getExt("abc"));
+        assertEquals("java", IoUtils.getExt("abc.java"));
+        assertEquals("java", IoUtils.getExt("abc.jAVa"));
+    }
+    
+    @Test
+    public void testGetExtFile() {
+        assertEquals(null, IoUtils.getExt(new File("1.")));
+        assertEquals(null, IoUtils.getExt(new File(".")));
+        assertEquals(null, IoUtils.getExt(new File("")));
+        assertEquals(null, IoUtils.getExt(new File("abc")));
+        assertEquals("java", IoUtils.getExt(new File("abc.java")));
+        assertEquals("java", IoUtils.getExt(new File("abc.jAVa"))); 
+    }
 }
+

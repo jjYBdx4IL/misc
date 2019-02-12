@@ -27,6 +27,7 @@ import java.nio.charset.Charset;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Locale;
 
 //CHECKSTYLE:OFF
 public class IoUtils {
@@ -58,14 +59,15 @@ public class IoUtils {
             FileUtils.writeStringToFile(tempFile, data, cs, true);
             IoUtils.syncRenameTo(tempFile, dest);
         } finally {
-            if(tempFile.exists() && !tempFile.delete()) {
+            if (tempFile.exists() && !tempFile.delete()) {
                 tempFile.deleteOnExit();
             }
         }
     }
-    
+
     /**
-     * Same as {@link #safeWriteTo(File, String, Charset)}, but always uses UTF-8 for writing.
+     * Same as {@link #safeWriteTo(File, String, Charset)}, but always uses
+     * UTF-8 for writing.
      * 
      * @param dest
      *            the destination file name, an existing file will be
@@ -86,7 +88,8 @@ public class IoUtils {
      * @param dest
      *            the destination file name, an existing file will be
      *            overwritten in an atomic way if possible
-     * @param is the data to write
+     * @param is
+     *            the data to write
      * @throws IOException
      *             on error
      */
@@ -99,7 +102,7 @@ public class IoUtils {
             }
             IoUtils.renameTo(tempFile, dest);
         } finally {
-            if(tempFile.exists() && !tempFile.delete()) {
+            if (tempFile.exists() && !tempFile.delete()) {
                 tempFile.deleteOnExit();
             }
         }
@@ -178,14 +181,50 @@ public class IoUtils {
         }
         return baos.toByteArray();
     }
-    
+
     /**
      * Calls {@link FileUtils#deleteQuietly(File)} on all arguments.
-     * @param files the files to delete quietly
+     * 
+     * @param files
+     *            the files to delete quietly
      */
     public static void deleteQuietly(File... files) {
         for (File f : files) {
             FileUtils.deleteQuietly(f);
         }
+    }
+
+    /**
+     * Return the lower case extension of a file's name.
+     * 
+     * @param filename
+     *            the filename
+     * @return the filename's extension, ie. "java". Null if there is none or
+     *         if filename is null or if filename ends with a dot.
+     */
+    public static String getExt(String filename) {
+        if (filename == null) {
+            return null;
+        }
+        if (filename.indexOf('.') == -1) {
+            return null;
+        }
+        String ext = filename.substring(filename.lastIndexOf('.') + 1);
+        return ext.isEmpty() ? null : ext.toLowerCase(Locale.ROOT);
+    }
+    
+    /**
+     * Return the lower case extension of a file's name.
+     * 
+     * @param file
+     *            the file
+     * @return the file name's extension, ie. "java". Null if there is none or
+     *         if file is null or if the file's name ends with a dot.
+     */
+    public static String getExt(File file) {
+        if (file == null) {
+            return null;
+        }
+        return getExt(file.getName());
     }
 }
