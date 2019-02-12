@@ -16,6 +16,10 @@
 package com.github.jjYBdx4IL.utils.awt;
 
 //CHECKSTYLE:OFF
+import com.github.jjYBdx4IL.utils.env.Surefire;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.GraphicsDevice;
@@ -24,27 +28,24 @@ import java.awt.MouseInfo;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import javax.swing.AbstractAction;
 
+import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-
-import com.github.jjYBdx4IL.utils.env.Surefire;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -73,7 +74,7 @@ public class AWTUtils {
      *            whether the notification should be closeable by the user
      */
     public static void showPopupNotification(final int screen, final String message, final int position,
-            final int timeoutMS, final boolean closeableByUser) {
+        final int timeoutMS, final boolean closeableByUser) {
         if (screen == -1) {
             final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             final GraphicsDevice[] gd = ge.getScreenDevices();
@@ -87,7 +88,7 @@ public class AWTUtils {
             @Override
             public void run() {
                 final JOptionPane optionPane = new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE,
-                        JOptionPane.DEFAULT_OPTION, null, new Object[] {}, null);
+                    JOptionPane.DEFAULT_OPTION, null, new Object[] {}, null);
 
                 final JDialog dialog = new JDialog();
                 dialog.setModal(false);
@@ -191,7 +192,7 @@ public class AWTUtils {
         }
         final Rectangle bounds = gd[screen].getDefaultConfiguration().getBounds();
         frame.setLocation(bounds.x + (bounds.width - frame.getWidth()) / 2,
-                bounds.y + (bounds.height - frame.getHeight()) / 2);
+            bounds.y + (bounds.height - frame.getHeight()) / 2);
     }
 
     /**
@@ -204,7 +205,7 @@ public class AWTUtils {
         GraphicsDevice gd = MouseInfo.getPointerInfo().getDevice();
         final Rectangle bounds = gd.getDefaultConfiguration().getBounds();
         window.setLocation(bounds.x + (bounds.width - window.getWidth()) / 2,
-                bounds.y + (bounds.height - window.getHeight()) / 2);
+            bounds.y + (bounds.height - window.getHeight()) / 2);
     }
 
     /**
@@ -228,10 +229,10 @@ public class AWTUtils {
         }
 
         switch (dialogResult) {
-        case JOptionPane.YES_OPTION:
-            return true;
-        default:
-            return false;
+            case JOptionPane.YES_OPTION:
+                return true;
+            default:
+                return false;
         }
     }
 
@@ -295,7 +296,7 @@ public class AWTUtils {
      *            the JFrame
      */
     public static void showFrameAndWaitForCloseByUser(final JFrame frame) {
-        showFrameAndWaitForCloseByUser(frame, -1L);
+        showFrameAndWaitForCloseByUser(frame, -1L, null);
     }
 
     /**
@@ -309,7 +310,24 @@ public class AWTUtils {
      *            the JFrame
      */
     public static void showFrameAndWaitForCloseByUserTest(final JFrame frame) {
-        showFrameAndWaitForCloseByUser(frame, Surefire.isSingleTestExecution() ? -1L : 1000L);
+        showFrameAndWaitForCloseByUser(frame, Surefire.isSingleTestExecution() ? -1L : 1000L, null);
+    }
+
+    /**
+     * Used for testing stuff interactively. If a single unit test execution is
+     * detected, it will wait indefinitely for the user to close the frame.
+     * Otherwise it will automatically close the frame after one second to allow
+     * for somewhat fast test unit execution without disabling UI tests
+     * entirely.
+     * 
+     * @param frame
+     *            the JFrame
+     * @param png
+     *            render the frame into this file in PNG format if != null and
+     *            when tne timeout expires
+     */
+    public static void showFrameAndWaitForCloseByUserTest(final JFrame frame, File png) {
+        showFrameAndWaitForCloseByUser(frame, Surefire.isSingleTestExecution() ? -1L : 1000L, png);
     }
 
     /**
@@ -321,8 +339,11 @@ public class AWTUtils {
      * @param timeoutMs
      *            the timeout after which to close the frame automatically,
      *            non-positive value to disable
+     * @param png
+     *            render the frame into this file in PNG format if != null and
+     *            when tne timeout expires
      */
-    public static void showFrameAndWaitForCloseByUser(final JFrame frame, final long timeoutMs) {
+    public static void showFrameAndWaitForCloseByUser(final JFrame frame, final long timeoutMs, File png) {
         if (GraphicsEnvironment.isHeadless()) {
             return;
         }
@@ -345,7 +366,15 @@ public class AWTUtils {
                 latch.await();
             } else {
                 if (!latch.await(timeoutMs, TimeUnit.MILLISECONDS)) {
-                    close(frame);
+                    try {
+                        if (png != null) {
+                            writeToPng(frame, png);
+                        }
+                    } catch (IOException | InvocationTargetException e1) {
+                        throw new RuntimeException(e1);
+                    } finally {
+                        close(frame);
+                    }
                 }
             }
         } catch (InterruptedException ex) {
@@ -387,6 +416,32 @@ public class AWTUtils {
             @Override
             public void run() {
                 frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+            }
+        });
+    }
+
+    /**
+     * Use {@link Container#paintAll(java.awt.Graphics)} to write the container's content
+     * to a PNG file.
+     * 
+     * @param container the container whose contents are to be written
+     * @param png the PNG output file
+     * @throws IOException on error
+     * @throws InvocationTargetException on error
+     * @throws InterruptedException on error
+     */
+    public static void writeToPng(final Container container, final File png) throws IOException, InvocationTargetException, InterruptedException {
+        SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                BufferedImage img = new BufferedImage(container.getWidth(), container.getHeight(),
+                    BufferedImage.TYPE_INT_ARGB);
+                container.paintAll(img.getGraphics());
+                try {
+                    ImageIO.write(img, "png", png);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }
