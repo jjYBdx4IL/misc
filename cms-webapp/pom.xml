@@ -22,8 +22,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.9</maven.compiler.source>
+        <maven.compiler.target>1.9</maven.compiler.target>
         <hibernate.version>5.2.10.Final</hibernate.version>
         <webappAssetsDirectory>${project.build.directory}/${project.build.finalName}/assets</webappAssetsDirectory>
     </properties>
@@ -302,7 +302,7 @@
         <dependency>
             <groupId>com.github.dfabulich</groupId>
             <artifactId>sitemapgen4j</artifactId>
-            <version>1.1.1</version>
+            <version>1.1.2</version>
         </dependency>
 
         <dependency>

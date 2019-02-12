@@ -26,7 +26,6 @@ import com.github.jjYBdx4IL.cms.jaxb.dto.ExportDump;
 import com.github.jjYBdx4IL.utils.jersey.JerseyClientUtils;
 import com.github.jjYBdx4IL.utils.text.PasswordGenerator;
 import com.github.jjYBdx4IL.wsverifier.WebsiteVerifier;
-import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
