@@ -384,8 +384,6 @@ public class InteractiveTestBase {
 
     protected void saveWindowAsImage(String filename) {
         screenshotCounter++;
-        BufferedImage img = new BufferedImage(getContainer().getWidth(), getContainer().getHeight(), BufferedImage.TYPE_INT_ARGB);
-        getContainer().paintAll(img.getGraphics());
         File f = new File(Maven.getMavenTargetDir(),
                 "screenshots" + File.separator + getClass().getName() + "_" + screenshotCounter + (filename != null ? "_" + filename : "") + ".png");
         File parent = f.getParentFile();
@@ -393,8 +391,14 @@ public class InteractiveTestBase {
             assertTrue(parent.mkdirs());
         }
         log.info("saving window contents to " + f.getPath());
+        writeWindowAsPng(f);
+    }
+
+    protected void writeWindowAsPng(File out) {
+        BufferedImage img = new BufferedImage(getContainer().getWidth(), getContainer().getHeight(), BufferedImage.TYPE_INT_ARGB);
+        getContainer().paintAll(img.getGraphics());
         try {
-            assertTrue(ImageIO.write(img, "png", f));
+            assertTrue(ImageIO.write(img, "png", out));
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
