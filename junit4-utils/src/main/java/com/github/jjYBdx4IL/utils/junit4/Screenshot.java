@@ -66,6 +66,7 @@ public class Screenshot {
     }
 
     public static File getMavenScreenshotOutputDir(String subDirName) {
+        @SuppressWarnings("deprecation")
         File outputDir = new File(Maven.getMavenTargetDir(), "screenshots");
         if (subDirName != null) {
             outputDir = new File(outputDir, subDirName);

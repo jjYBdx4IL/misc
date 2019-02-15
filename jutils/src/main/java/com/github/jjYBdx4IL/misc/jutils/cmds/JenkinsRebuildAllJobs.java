@@ -17,17 +17,13 @@ package com.github.jjYBdx4IL.misc.jutils.cmds;
 
 import com.github.jjYBdx4IL.misc.jutils.JUtilsCommandAnnotation;
 import com.github.jjYBdx4IL.misc.jutils.JUtilsCommandInterface;
-
 import com.github.jjYBdx4IL.utils.ci.jenkins.DependencyGraph;
-
-import java.net.URL;
-import java.util.List;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.net.URL;
+import java.util.List;
 
 /**
  *
@@ -42,14 +38,13 @@ import org.slf4j.LoggerFactory;
 )
 public class JenkinsRebuildAllJobs implements JUtilsCommandInterface {
 
-    private static final Logger log = LoggerFactory.getLogger(JenkinsRebuildAllJobs.class);
     private static final String OPTNAME_URL = "u";
     private static final String OPTNAME_PREPEND = "p";
     private static final String OPTNAME_DRYRUN = "d";
     private String[] optPrepend = null;
 
     @Override
-    public int run(CommandLine line) throws Exception {
+    public int run(CommandLine line, String[] args) throws Exception {
         if (!line.hasOption(OPTNAME_URL)) {
             throw new ParseException("need URL");
         }

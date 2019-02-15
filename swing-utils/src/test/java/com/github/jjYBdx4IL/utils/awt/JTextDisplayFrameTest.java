@@ -15,8 +15,6 @@
  */
 package com.github.jjYBdx4IL.utils.awt;
 
-import static org.junit.Assert.*;
-
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;

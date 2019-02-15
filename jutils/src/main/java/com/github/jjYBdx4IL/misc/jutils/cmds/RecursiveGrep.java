@@ -17,17 +17,14 @@ package com.github.jjYBdx4IL.misc.jutils.cmds;
 
 import com.github.jjYBdx4IL.misc.jutils.JUtilsCommandAnnotation;
 import com.github.jjYBdx4IL.misc.jutils.JUtilsCommandInterface;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
+import org.apache.tools.ant.DirectoryScanner;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.regex.Pattern;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Options;
-import org.apache.tools.ant.DirectoryScanner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -42,12 +39,11 @@ import org.slf4j.LoggerFactory;
 )
 public class RecursiveGrep implements JUtilsCommandInterface {
 
-    private static final Logger log = LoggerFactory.getLogger(RecursiveGrep.class);
     private static final String OPTNAME_QUIET = "q";
     private boolean optQuiet = false;
 
     @Override
-    public int run(CommandLine line) {
+    public int run(CommandLine line, String[] args) {
         final String fileSearchGlob = line.getArgs()[0];
         final Pattern contentSearchPattern = Pattern.compile(line.getArgs()[1], Pattern.CASE_INSENSITIVE);
         int filesMatched = 0;

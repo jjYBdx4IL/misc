@@ -17,6 +17,18 @@
     <description>graphics helpers</description>
     <inceptionYear>2017</inceptionYear>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.github.jjYBdx4IL.utils.gfx.Text2ImageAppMain</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <!-- sorted by artifactId -->
         <dependency>

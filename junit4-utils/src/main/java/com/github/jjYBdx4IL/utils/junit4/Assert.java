@@ -46,7 +46,7 @@ public class Assert {
         do {
             if (file.exists()) {
                 try (InputStream is = new FileInputStream(file)) {
-                    tmp = IOUtils.toString(is);
+                    tmp = IOUtils.toString(is, "UTF-8");
                 } catch (IOException ex) {
                     log.debug("", ex);
                 }

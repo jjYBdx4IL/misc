@@ -235,7 +235,7 @@ public class FindUtils {
     }
     protected static List<File> find(File startDir, Pattern pattern, String prefix, int maxDepth,
         List<File> result, boolean filesOnly) throws IOException {
-
+        
         if (maxDepth == 0) {
             throw new IOException("max depth reached: " + startDir);
         }

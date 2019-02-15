@@ -22,17 +22,11 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.build.directory}/classes</directory>
+            <directory>${basedir}/src/main/filtered</directory>
             <outputDirectory>jutils</outputDirectory>
-            <excludes>
-                <exclude>jutils.sh</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.build.directory}/classes</directory>
-            <outputDirectory>jutils</outputDirectory>
+            <filtered>true</filtered>
             <includes>
-                <include>jutils.sh</include>
+                <include>jutils</include>
             </includes>
             <fileMode>0755</fileMode>
             <lineEnding>unix</lineEnding>

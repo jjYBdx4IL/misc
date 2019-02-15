@@ -29,7 +29,11 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -48,17 +52,23 @@ import javax.xml.stream.XMLStreamException;
 //@formatter:on
 public class MavenDependencyConvergenceErrorParseCmd implements JUtilsCommandInterface {
 
-    private static final String OPTNAME_QUIET = "q";
-    private boolean optQuiet = false;
-
     @Override
-    public int run(CommandLine line) throws UnsupportedFlavorException, IOException, XMLStreamException {
+    public int run(CommandLine line, String[] args) throws UnsupportedFlavorException, IOException, XMLStreamException {
         Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
         String dependencyConvergenceErrorOutput = (String) clpbrd.getData(DataFlavor.stringFlavor);
 
         Collection<MavenDependency> deps = DependencyConvergenceReportParser.parse(dependencyConvergenceErrorOutput);
         Collection<MavenDependency> newest = DependencyConvergenceReportParser.selectNewestOnly(deps);
-        String xmlFragment = DependencyConvergenceReportParser.toMavenPomXmlFragment(newest);
+        List<MavenDependency> _newest = new ArrayList<>(newest);
+        Collections.sort(_newest, new Comparator<MavenDependency>() {
+
+            @Override
+            public int compare(MavenDependency o1, MavenDependency o2) {
+                return o1.getArtifactId().compareToIgnoreCase(o2.getArtifactId());
+            }
+            
+        });
+        String xmlFragment = DependencyConvergenceReportParser.toMavenPomXmlFragment(_newest);
         System.out.println(xmlFragment);
 
         StringSelection stringSelection = new StringSelection(xmlFragment);

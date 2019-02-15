@@ -384,6 +384,7 @@ public class InteractiveTestBase {
 
     protected void saveWindowAsImage(String filename) {
         screenshotCounter++;
+        @SuppressWarnings("deprecation")
         File f = new File(Maven.getMavenTargetDir(),
                 "screenshots" + File.separator + getClass().getName() + "_" + screenshotCounter + (filename != null ? "_" + filename : "") + ".png");
         File parent = f.getParentFile();

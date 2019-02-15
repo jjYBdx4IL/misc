@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jjYBdx4IL.misc.jutils;
+package com.github.jjYBdx4IL.misc.jutils.cmds;
 
+import com.github.jjYBdx4IL.misc.jutils.JUtilsCommandAnnotation;
+import com.github.jjYBdx4IL.misc.jutils.JUtilsCommandInterface;
+import com.github.jjYBdx4IL.utils.gfx.Text2ImageAppMain;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 
@@ -22,11 +25,24 @@ import org.apache.commons.cli.Options;
  *
  * @author jjYBdx4IL (https://github.com/jjYBdx4IL)
  */
-public interface JUtilsCommandInterface {
+@JUtilsCommandAnnotation(
+        name = "2img",
+        help = "convert text/html to an image",
+        usage = "-html -i <input-file> -o out.png",
+        minArgs = 0,
+        maxArgs = 0
+)
+public class Text2Image implements JUtilsCommandInterface {
 
-    public static final String OPTNAME_DEVTESTS = "devtests";
+    @Override
+    public int run(CommandLine line, String[] args) {
+        Text2ImageAppMain.main(args);
+        return 0;
+    }
 
-    int run(CommandLine line, String[] args) throws Exception;
+    @Override
+    public Options getCommandLineOptions() {
+        return Text2ImageAppMain.getOptions();
+    }
 
-    Options getCommandLineOptions();
 }

@@ -70,7 +70,7 @@ public class BackupGithubRepos implements JUtilsCommandInterface {
     private boolean useSshUrl = false;
 
     @Override
-    public int run(CommandLine line) {
+    public int run(CommandLine line, String[] args) {
         try {
             verbose = line.hasOption(OPTNAME_VERBOSE);
             embedded = line.hasOption(OPTNAME_EMBEDDED);

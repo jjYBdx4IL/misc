@@ -64,7 +64,9 @@ public class JUtilsCommandAnnotationProcessor extends AbstractProcessor {
 
     private Types typeUtils;
     private Elements elementUtils;
+    @SuppressWarnings("unused")
     private Filer filer;
+    @SuppressWarnings("unused")
     private Messager messager;
 
     public JUtilsCommandAnnotationProcessor() {

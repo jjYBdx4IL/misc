@@ -10,6 +10,5 @@ which java
 java -version
 which javac
 javac -version
-mvn "$@" -V -B install -f release-parent
 mvn "$@" -B clean install
 

@@ -69,8 +69,10 @@ public class Main {
         // help display logic:
         // 1.) exit after showing help
         // 2.) show complete help if no valid command could be detected
-        // 3.) show specific help if we have a valid command and help option has been used
-        // 4.) show specific help if we have a valid command and command line parsing for that command failed
+        // 3.) show specific help if we have a valid command and help option has
+        // been used
+        // 4.) show specific help if we have a valid command and command line
+        // parsing for that command failed
         AnnotationValues selectedCmdAnnoValues = null;
 
         if (selectedCmdName != null) {
@@ -103,7 +105,7 @@ public class Main {
 
             int numUnnamedArgs = line.getArgs().length;
             if (numUnnamedArgs < selectedCmdAnnoValues.getMinArgs()
-                    || numUnnamedArgs > selectedCmdAnnoValues.getMaxArgs()) {
+                || numUnnamedArgs > selectedCmdAnnoValues.getMaxArgs()) {
                 LOG.error("invalid number of arguments");
                 cmdOptionParseFailed = true;
             }
@@ -139,7 +141,7 @@ public class Main {
             return 1;
         }
 
-        return jCmd.run(line);
+        return jCmd.run(line, args.toArray(new String[args.size()]));
     }
 
     private String extractFirstNonDashedArg(List<String> args) {

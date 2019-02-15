@@ -15,7 +15,18 @@
  */
 package com.github.jjYBdx4IL.misc.jutils;
 
+import static com.github.jjYBdx4IL.utils.io.FindUtils.globOne;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import com.github.jjYBdx4IL.utils.proc.ProcRunner;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,14 +36,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
-import static org.junit.Assert.*;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -58,7 +61,7 @@ public class MainTest {
         List<String> _args = new ArrayList<>();
         _args.add("java");
         _args.add("-jar");
-        _args.add(System.getProperty("testJar"));
+        _args.add(System.getProperty("testJar", globOne("/target/*-SNAPSHOT.jar").getAbsolutePath()));
         Collections.addAll(_args, args);
         LOG.info("running external process: " + StringUtils.join(_args, " "));
         ProcRunner pr = new ProcRunner(true, _args);
@@ -202,6 +205,14 @@ public class MainTest {
 
     private boolean isSingleCmdHelp() {
         return countMatchesML("^usage: jutils") == 2;
+    }
+
+    @Test
+    public void test2Img() throws IOException {
+        run("2img", "-html", "-i", globOne("/src/**/a.html").getAbsolutePath(), "-o",
+            new File(globOne("/target/"), "a.png").getAbsolutePath());
+        assertEquals(outputBlob, 0, exitCode);
+        assertEquals(outputBlob, 1, output.size());
     }
 
 }

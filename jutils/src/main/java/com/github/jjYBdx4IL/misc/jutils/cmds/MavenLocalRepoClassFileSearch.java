@@ -45,7 +45,7 @@ import java.util.zip.ZipFile;
 public class MavenLocalRepoClassFileSearch implements JUtilsCommandInterface {
 
     @Override
-    public int run(CommandLine line) {
+    public int run(CommandLine line, String[] args) {
         Pattern searchPattern = Pattern.compile(line.getArgs()[0], Pattern.CASE_INSENSITIVE);
         int filesMatched = 0;
         int filesTotal = 0;
@@ -79,6 +79,7 @@ public class MavenLocalRepoClassFileSearch implements JUtilsCommandInterface {
             return false;
         }
 
+        @SuppressWarnings("resource")
         ZipFile zipFile = new ZipFile(jarFile);
         @SuppressWarnings("unchecked")
         Enumeration<ZipEntry> zipEntries = (Enumeration<ZipEntry>) zipFile.entries();

@@ -46,6 +46,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -162,10 +163,7 @@ public class Text2ImageAppMain {
         }
     }
 
-    public void run(String[] args) {
-        // create the command line parser
-        CommandLineParser parser = new GnuParser();
-
+    public static Options getOptions() {
         // create the Options
         Options options = new Options();
         options.addOption(OPTNAME_I, OPTNAME_INPUT_FILENAME, true, "name of input text file (replaces --text)");
@@ -205,83 +203,95 @@ public class Text2ImageAppMain {
         options.addOption(OPTNAME_STOP, false,
                 "separate output definitions to allow for multiple image defs on one command line");
         options.addOption(OPTNAME_H, OPTNAME_HELP, false, "show help (this page)");
+        return options;
+    }
+    
+    public void parseCommandLine(CommandLine line) {
+        if (line.hasOption(OPTNAME_H)) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp(PROGNAME, getOptions());
+            return;
+        }
+        if (line.hasOption(OPTNAME_INPUT_FILENAME)) {
+            setOptInputFileName(line.getOptionValue(OPTNAME_INPUT_FILENAME));
+        }
+        if (line.hasOption(OPTNAME_OUTPUT_FILENAME)) {
+            setOptOutputFileName(line.getOptionValue(OPTNAME_OUTPUT_FILENAME));
+        }
+        if (line.hasOption(OPTNAME_FONTSIZE)) {
+            setOptFontSize(Integer.parseInt(line.getOptionValue(OPTNAME_FONTSIZE)));
+        }
+        if (line.hasOption(OPTNAME_FONTCOLOR)) {
+            setOptFontColor(Color.decode(line.getOptionValue(OPTNAME_FONTCOLOR)));
+        }
+        if (line.hasOption(OPTNAME_TRANSPARENT)) {
+            setOptTransparent(true);
+        }
+        if (line.hasOption(OPTNAME_INPUT_IS_HTML)) {
+            setOptInputIsHtml(true);
+        }
+        if (line.hasOption(OPTNAME_HTML_WIDTH)) {
+            setOptHtmlWidth(Integer.parseInt(line.getOptionValue(OPTNAME_HTML_WIDTH)));
+        }
+        if (line.hasOption(OPTNAME_SHADOW_BLUR)) {
+            setOptShadowType(ShadowType.BLUR);
+        }
+        if (line.hasOption(OPTNAME_SHADOW_DROP)) {
+            setOptShadowType(ShadowType.DROP);
+        }
+        if (line.hasOption(OPTNAME_SHADOW_OFFSET)) {
+            setOptShadowOffset(Integer.parseInt(line.getOptionValue(OPTNAME_SHADOW_OFFSET)));
+        }
+        if (line.hasOption(OPTNAME_TEXT)) {
+            setOptText(line.getOptionValue(OPTNAME_TEXT));
+        }
+        if (line.hasOption(OPTNAME_JIGGLE)) {
+            setOptJiggle(true);
+        }
+        if (line.hasOption(OPTNAME_JIGGLE_SEED)) {
+            setOptJiggleSeed(Integer.parseInt(line.getOptionValue(OPTNAME_JIGGLE_SEED)));
+        }
+
+        if (line.hasOption(OPTNAME_MERGE)) {
+            setOptMerge(true);
+        }
+        if (line.hasOption(OPTNAME_MERGE_INPUT1_FILENAME)) {
+            setOptMergeInput1FileName(line.getOptionValue(OPTNAME_MERGE_INPUT1_FILENAME));
+        }
+        if (line.hasOption(OPTNAME_MERGE_INPUT2_FILENAME)) {
+            setOptMergeInput2FileName(line.getOptionValue(OPTNAME_MERGE_INPUT2_FILENAME));
+        }
+        if (line.hasOption(OPTNAME_MERGE_GAP)) {
+            setOptMergeGap(Integer.parseInt(line.getOptionValue(OPTNAME_MERGE_GAP)));
+        }
+        if (line.hasOption(OPTNAME_MERGE_PADDING)) {
+            setOptMergePadding(Integer.parseInt(line.getOptionValue(OPTNAME_MERGE_PADDING)));
+        }
+
+        if (line.hasOption(OPTNAME_SCALE)) {
+            setOptScale(true);
+        }
+        if (line.hasOption(OPTNAME_SCALE_INPUT_FILENAME)) {
+            setOptScaleInputFileName(line.getOptionValue(OPTNAME_SCALE_INPUT_FILENAME));
+        }
+        if (line.hasOption(OPTNAME_SCALE_WIDTH)) {
+            setOptScaleWidth(Integer.parseInt(line.getOptionValue(OPTNAME_SCALE_WIDTH)));
+        }
+        if (line.hasOption(OPTNAME_SCALE_HEIGHT)) {
+            setOptScaleHeight(Integer.parseInt(line.getOptionValue(OPTNAME_SCALE_HEIGHT)));
+        }
+    }
+    
+    public void run(String[] args) {
+        // create the command line parser
+        CommandLineParser parser = new GnuParser();
+
+        Options options = getOptions();
 
         // parse the command line arguments
         try {
             CommandLine line = parser.parse(options, args);
-            if (line.hasOption(OPTNAME_H)) {
-                HelpFormatter formatter = new HelpFormatter();
-                formatter.printHelp(PROGNAME, options);
-                return;
-            }
-            if (line.hasOption(OPTNAME_INPUT_FILENAME)) {
-                setOptInputFileName(line.getOptionValue(OPTNAME_INPUT_FILENAME));
-            }
-            if (line.hasOption(OPTNAME_OUTPUT_FILENAME)) {
-                setOptOutputFileName(line.getOptionValue(OPTNAME_OUTPUT_FILENAME));
-            }
-            if (line.hasOption(OPTNAME_FONTSIZE)) {
-                setOptFontSize(Integer.parseInt(line.getOptionValue(OPTNAME_FONTSIZE)));
-            }
-            if (line.hasOption(OPTNAME_FONTCOLOR)) {
-                setOptFontColor(Color.decode(line.getOptionValue(OPTNAME_FONTCOLOR)));
-            }
-            if (line.hasOption(OPTNAME_TRANSPARENT)) {
-                setOptTransparent(true);
-            }
-            if (line.hasOption(OPTNAME_INPUT_IS_HTML)) {
-                setOptInputIsHtml(true);
-            }
-            if (line.hasOption(OPTNAME_HTML_WIDTH)) {
-                setOptHtmlWidth(Integer.parseInt(line.getOptionValue(OPTNAME_HTML_WIDTH)));
-            }
-            if (line.hasOption(OPTNAME_SHADOW_BLUR)) {
-                setOptShadowType(ShadowType.BLUR);
-            }
-            if (line.hasOption(OPTNAME_SHADOW_DROP)) {
-                setOptShadowType(ShadowType.DROP);
-            }
-            if (line.hasOption(OPTNAME_SHADOW_OFFSET)) {
-                setOptShadowOffset(Integer.parseInt(line.getOptionValue(OPTNAME_SHADOW_OFFSET)));
-            }
-            if (line.hasOption(OPTNAME_TEXT)) {
-                setOptText(line.getOptionValue(OPTNAME_TEXT));
-            }
-            if (line.hasOption(OPTNAME_JIGGLE)) {
-                setOptJiggle(true);
-            }
-            if (line.hasOption(OPTNAME_JIGGLE_SEED)) {
-                setOptJiggleSeed(Integer.parseInt(line.getOptionValue(OPTNAME_JIGGLE_SEED)));
-            }
-
-            if (line.hasOption(OPTNAME_MERGE)) {
-                setOptMerge(true);
-            }
-            if (line.hasOption(OPTNAME_MERGE_INPUT1_FILENAME)) {
-                setOptMergeInput1FileName(line.getOptionValue(OPTNAME_MERGE_INPUT1_FILENAME));
-            }
-            if (line.hasOption(OPTNAME_MERGE_INPUT2_FILENAME)) {
-                setOptMergeInput2FileName(line.getOptionValue(OPTNAME_MERGE_INPUT2_FILENAME));
-            }
-            if (line.hasOption(OPTNAME_MERGE_GAP)) {
-                setOptMergeGap(Integer.parseInt(line.getOptionValue(OPTNAME_MERGE_GAP)));
-            }
-            if (line.hasOption(OPTNAME_MERGE_PADDING)) {
-                setOptMergePadding(Integer.parseInt(line.getOptionValue(OPTNAME_MERGE_PADDING)));
-            }
-
-            if (line.hasOption(OPTNAME_SCALE)) {
-                setOptScale(true);
-            }
-            if (line.hasOption(OPTNAME_SCALE_INPUT_FILENAME)) {
-                setOptScaleInputFileName(line.getOptionValue(OPTNAME_SCALE_INPUT_FILENAME));
-            }
-            if (line.hasOption(OPTNAME_SCALE_WIDTH)) {
-                setOptScaleWidth(Integer.parseInt(line.getOptionValue(OPTNAME_SCALE_WIDTH)));
-            }
-            if (line.hasOption(OPTNAME_SCALE_HEIGHT)) {
-                setOptScaleHeight(Integer.parseInt(line.getOptionValue(OPTNAME_SCALE_HEIGHT)));
-            }
+            parseCommandLine(line);
         } catch (ParseException ex) {
             throw new RuntimeException(ex);
         }
@@ -375,10 +385,13 @@ public class Text2ImageAppMain {
     public void runHtmlConversion() throws MalformedURLException, IOException, SAXException {
         URL url = new File(getOptInputFileName()).toURI().toURL();
         LOG.debug("reading: " + url.toString());
-        DocumentSource src = new StreamDocumentSource(new ByteArrayInputStream(IOUtils.toByteArray(url)), url, "text/html");
-        //Parse the input document (replace this with your own parser if desired)
-        DOMSource parser = new DefaultDOMSource(src);
-        Document doc = parser.parse(); //doc represents the obtained DOM
+        Document doc = null;
+        try (InputStream is = url.openStream()) {
+            DocumentSource src = new StreamDocumentSource(is, url, "text/html");
+            //Parse the input document (replace this with your own parser if desired)
+            DOMSource parser = new DefaultDOMSource(src);
+            doc = parser.parse(); //doc represents the obtained DOM
+        }
 
         DOMAnalyzer da = new DOMAnalyzer(doc, url);
         da.attributesToStyles(); //convert the HTML presentation attributes to inline styles
