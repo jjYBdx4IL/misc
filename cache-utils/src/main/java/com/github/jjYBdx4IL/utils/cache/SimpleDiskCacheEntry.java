@@ -26,6 +26,7 @@ import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -40,6 +41,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This is essentially a HTTP GET backed with a simple disk cache. There is no
+ * thread-safety yet, no on-disk locking, though updates are done atomically by
+ * writing to temporary files first. There is also no automatic clean up yet, so
+ * if you use this in scenarios where the requested number of unqiue URLs is
+ * inifite, your disk space will fill up at some point.
  *
  * @author jjYBdx4IL
  */
@@ -55,7 +61,7 @@ public class SimpleDiskCacheEntry {
     private final UpdateMode updateMode;
 
     public SimpleDiskCacheEntry(URL url, File localCacheFile, UpdateMode updateMode)
-            throws MalformedURLException {
+        throws MalformedURLException {
         this.url = new URL(url.toString());
         this.urlMD5 = md5();
         this.localCacheFile = localCacheFile != null ? new File(localCacheFile.getPath()) : computeDiskCacheFile(url);
@@ -71,7 +77,7 @@ public class SimpleDiskCacheEntry {
     }
 
     public SimpleDiskCacheEntry(String url, File localCacheFile, UpdateMode updateMode)
-            throws MalformedURLException {
+        throws MalformedURLException {
         this(new URL(url), localCacheFile, updateMode);
     }
 
@@ -120,7 +126,7 @@ public class SimpleDiskCacheEntry {
         // hint: do NOT use try-with-resources directly on the ObjectInputStream
         // -- it won't close the underlying FileInputStream reliably....
         try (InputStream is = new FileInputStream(localCacheFile)) {
-        	ObjectInputStream ois = new ObjectInputStream(is);
+            ObjectInputStream ois = new ObjectInputStream(is);
             header = (SimpleDiskCacheEntryHeader) ois.readObject();
             log.debug(header.toString());
         } catch (IOException | ClassNotFoundException | ClassCastException ex) {
@@ -160,10 +166,330 @@ public class SimpleDiskCacheEntry {
         return url;
     }
 
+    /**
+     * Return the contents of the requested URL as a string. No fallback to
+     * outdated cache data on update failure. Remote content is assumed to be
+     * encoded in UTF-8.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @throws IOException
+     *             on error
+     */
+    public String readToString() throws IOException {
+        try (InputStream is = getInputStream(false)) {
+            return IOUtils.toString(is, StandardCharsets.UTF_8);
+        }
+    }
+    
+    /**
+     * Return the contents of the requested URL as a string. No fallback to
+     * outdated cache data on update failure. Remote content is assumed to be
+     * encoded in UTF-8.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @param url the requested url
+     * @throws IOException
+     *             on error
+     */
+    public static String fetch(String url) throws IOException {
+        return new SimpleDiskCacheEntry(url).readToString();
+    }
+    
+    /**
+     * Return the contents of the requested URL as a string. No fallback to
+     * outdated cache data on update failure. Remote content is assumed to be
+     * encoded in UTF-8.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @param url the requested url
+     * @throws IOException
+     *             on error
+     */
+    public static String fetch(URL url) throws IOException {
+        return new SimpleDiskCacheEntry(url).readToString();
+    }
+    
+    /**
+     * Return the contents of the requested URL as a string. No fallback to
+     * outdated cache data on update failure.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @param charset
+     *            decode remote content using this charset
+     * @throws IOException
+     *             on error
+     */
+    public String readToString(String charset) throws IOException {
+        return readToString(Charset.forName(charset));
+    }
+    
+    /**
+     * Return the contents of the requested URL as a string. No fallback to
+     * outdated cache data on update failure.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @param url the requested url
+     * @param charset
+     *            decode remote content using this charset
+     * @throws IOException
+     *             on error
+     */
+    public static String fetch(String url, String charset) throws IOException {
+        return new SimpleDiskCacheEntry(url).readToString(charset);
+    }
+    
+    /**
+     * Return the contents of the requested URL as a string. No fallback to
+     * outdated cache data on update failure.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @param url the requested url
+     * @param charset
+     *            decode remote content using this charset
+     * @throws IOException
+     *             on error
+     */
+    public static String fetch(URL url, String charset) throws IOException {
+        return new SimpleDiskCacheEntry(url).readToString(charset);
+    }
+
+    /**
+     * Return the contents of the requested URL as a string. No fallback to
+     * outdated cache data on update failure.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @param charset
+     *            decode remote content using this charset
+     * @throws IOException
+     *             on error
+     */
+    public String readToString(Charset charset) throws IOException {
+        try (InputStream is = getInputStream(false)) {
+            return IOUtils.toString(is, charset);
+        }
+    }
+
+    /**
+     * Return the contents of the requested URL as a string. No fallback to
+     * outdated cache data on update failure.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @param url the requested url
+     * @param charset
+     *            decode remote content using this charset
+     * @throws IOException
+     *             on error
+     */
+    public static String fetch(String url, Charset charset) throws IOException {
+        return new SimpleDiskCacheEntry(url).readToString(charset);
+    }
+    
+    /**
+     * Return the contents of the requested URL as a string. No fallback to
+     * outdated cache data on update failure.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @param url the requested url
+     * @param charset
+     *            decode remote content using this charset
+     * @throws IOException
+     *             on error
+     */
+    public static String fetch(URL url, Charset charset) throws IOException {
+        return new SimpleDiskCacheEntry(url).readToString(charset);
+    }
+
+    /**
+     * Return the contents of the requested URL as a string. Remote content is
+     * assumed to be encoded in UTF-8.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @param fallback
+     *            fall back to outdated cache contents if update fails?
+     * @throws IOException
+     *             on error
+     */
+    public String readToString(boolean fallback) throws IOException {
+        try (InputStream is = getInputStream(fallback)) {
+            return IOUtils.toString(is, StandardCharsets.UTF_8);
+        }
+    }
+    
+    /**
+     * Return the contents of the requested URL as a string. Remote content is
+     * assumed to be encoded in UTF-8.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @param url the requested url
+     * @param fallback
+     *            fall back to outdated cache contents if update fails?
+     * @throws IOException
+     *             on error
+     */
+    public static String fetch(String url, boolean fallback) throws IOException {
+        return new SimpleDiskCacheEntry(url).readToString(fallback);
+    }
+    
+    /**
+     * Return the contents of the requested URL as a string. Remote content is
+     * assumed to be encoded in UTF-8.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @param url the requested url
+     * @param fallback
+     *            fall back to outdated cache contents if update fails?
+     * @throws IOException
+     *             on error
+     */
+    public static String fetch(URL url, boolean fallback) throws IOException {
+        return new SimpleDiskCacheEntry(url).readToString(fallback);
+    }
+
+    /**
+     * Return the contents of the requested URL as a string.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @param fallback
+     *            fall back to outdated cache contents if update fails?
+     * @param charset
+     *            decode remote content using this charset
+     * @throws IOException
+     *             on error
+     */
+    public String readToString(boolean fallback, String charset) throws IOException {
+        try (InputStream is = getInputStream(fallback)) {
+            return IOUtils.toString(is, charset);
+        }
+    }
+    
+    /**
+     * Return the contents of the requested URL as a string.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @param url the requested url
+     * @param fallback
+     *            fall back to outdated cache contents if update fails?
+     * @param charset
+     *            decode remote content using this charset
+     * @throws IOException
+     *             on error
+     */
+    public static String fetch(String url, boolean fallback, String charset) throws IOException {
+        return new SimpleDiskCacheEntry(url).readToString(fallback, charset);
+    }
+
+    /**
+     * Return the contents of the requested URL as a string.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @param url the requested url
+     * @param fallback
+     *            fall back to outdated cache contents if update fails?
+     * @param charset
+     *            decode remote content using this charset
+     * @throws IOException
+     *             on error
+     */
+    public static String fetch(URL url, boolean fallback, String charset) throws IOException {
+        return new SimpleDiskCacheEntry(url).readToString(fallback, charset);
+    }
+
+    /**
+     * Return the contents of the requested URL as a string.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @param fallback
+     *            fall back to outdated cache contents if update fails?
+     * @param charset
+     *            decode remote content using this charset
+     * @throws IOException
+     *             on error
+     */
+    public String readToString(boolean fallback, Charset charset) throws IOException {
+        try (InputStream is = getInputStream(fallback)) {
+            return IOUtils.toString(is, charset);
+        }
+    }
+    
+    /**
+     * Return the contents of the requested URL as a string.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @param url the requested url
+     * @param fallback
+     *            fall back to outdated cache contents if update fails?
+     * @param charset
+     *            decode remote content using this charset
+     * @throws IOException
+     *             on error
+     */
+    public static String fetch(String url, boolean fallback, Charset charset) throws IOException {
+        return new SimpleDiskCacheEntry(url).readToString(fallback, charset);
+    }
+    
+    /**
+     * Return the contents of the requested URL as a string.
+     * 
+     * @return the URL's content, assumed to be as UTF-8
+     * @param url the requested url
+     * @param fallback
+     *            fall back to outdated cache contents if update fails?
+     * @param charset
+     *            decode remote content using this charset
+     * @throws IOException
+     *             on error
+     */
+    public static String fetch(URL url, boolean fallback, Charset charset) throws IOException {
+        return new SimpleDiskCacheEntry(url).readToString(fallback, charset);
+    }
+
+    /**
+     * Get the input stream for reading the requested URL. Won't use fallback to
+     * outdated cache contents if update fails.
+     * 
+     * @return input data stream to the requested URL
+     * @throws IOException
+     *             on error
+     */
     public InputStream getInputStream() throws IOException {
         return getInputStream(false);
     }
+    
+    /**
+     * Get the input stream for reading the requested URL. Won't use fallback to
+     * outdated cache contents if update fails.
+     * 
+     * @return input data stream to the requested URL
+     * @param url the requested url
+     * @throws IOException
+     *             on error
+     */
+    public static InputStream inputStream(String url) throws IOException {
+        return new SimpleDiskCacheEntry(url).getInputStream(false);
+    }
+    
+    /**
+     * Get the input stream for reading the requested URL. Won't use fallback to
+     * outdated cache contents if update fails.
+     * 
+     * @return input data stream to the requested URL
+     * @param url the requested url
+     * @throws IOException
+     *             on error
+     */
+    public static InputStream inputStream(URL url) throws IOException {
+        return new SimpleDiskCacheEntry(url).getInputStream(false);
+    }
 
+    /**
+     * Get the input stream for reading the requested URL.
+     * 
+     * @return input data stream to the requested URL
+     * @param allowFallback
+     *            fall back to outdated cache contents if update fails?
+     * @throws IOException
+     *             on error
+     */
     public InputStream getInputStream(boolean allowFallback) throws IOException {
         log.debug("getInputStream " + getLocalCacheFile().getPath());
         if (isUpdateRequired()) {
@@ -190,12 +516,13 @@ public class SimpleDiskCacheEntry {
                         int sc = response.getStatusLine().getStatusCode();
                         if (sc != 200) {
                             throw new IOException(String.format("%s (%d)",
-                                    response.getStatusLine().getReasonPhrase(), sc));
+                                response.getStatusLine().getReasonPhrase(), sc));
                         }
                         try (FileOutputStream fos = new FileOutputStream(localTempFile)) {
                             try (ObjectOutputStream oos = new ObjectOutputStream(fos)) {
                                 oos.writeObject(new SimpleDiskCacheEntryHeader(getUrl()));
                                 IOUtils.copyLarge(response.getEntity().getContent(), fos);
+                                fos.getFD().sync();
                             }
                         }
                     }
@@ -233,6 +560,34 @@ public class SimpleDiskCacheEntry {
         }
     }
 
+    /**
+     * Get the input stream for reading the requested URL.
+     * 
+     * @return input data stream to the requested URL
+     * @param url the requested url
+     * @param allowFallback
+     *            fall back to outdated cache contents if update fails?
+     * @throws IOException
+     *             on error
+     */
+    public static InputStream inputStream(URL url, boolean allowFallback) throws IOException {
+        return new SimpleDiskCacheEntry(url).getInputStream(false);
+    }
+    
+    /**
+     * Get the input stream for reading the requested URL.
+     * 
+     * @return input data stream to the requested URL
+     * @param url the requested url
+     * @param allowFallback
+     *            fall back to outdated cache contents if update fails?
+     * @throws IOException
+     *             on error
+     */
+    public static InputStream inputStream(String url, boolean allowFallback) throws IOException {
+        return new SimpleDiskCacheEntry(url).getInputStream(false);
+    }
+    
     public enum UpdateMode {
 
         // CHECKSTYLE IGNORE MagicNumber FOR NEXT 1 LINE

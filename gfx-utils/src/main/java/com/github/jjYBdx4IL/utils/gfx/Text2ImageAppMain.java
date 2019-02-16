@@ -16,7 +16,6 @@
 package com.github.jjYBdx4IL.utils.gfx;
 
 import com.github.jjYBdx4IL.utils.gfx.FontEffects.ShadowType;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -42,7 +41,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

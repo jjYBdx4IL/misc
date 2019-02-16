@@ -250,7 +250,6 @@ public class SimpleDiskCacheEntryTest extends AbstractHandler {
     	return getUrl(relPath);
     }
 
-    @SuppressWarnings("deprecation")
     private String retrieveSameFile(URL url, UpdateMode updateMode) throws MalformedURLException, IOException {
         try (InputStream is = new SimpleDiskCacheEntry(url, new File(cacheDir, "test"), updateMode)
                 .getInputStream(false)) {
@@ -258,14 +257,12 @@ public class SimpleDiskCacheEntryTest extends AbstractHandler {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private String retrieve(URL url, UpdateMode updateMode) throws MalformedURLException, IOException {
         try (InputStream is = new SimpleDiskCacheEntry(url, updateMode).getInputStream(false)) {
             return IOUtils.toString(is, "UTF-8");
         }
     }
 
-    @SuppressWarnings("deprecation")
     private String retrieveFallback(URL url, UpdateMode updateMode) throws MalformedURLException, IOException {
         try (InputStream is = new SimpleDiskCacheEntry(url, updateMode).getInputStream(true)) {
             return IOUtils.toString(is, "UTF-8");
