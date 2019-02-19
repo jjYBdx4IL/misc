@@ -32,16 +32,6 @@
 
         <plugins>
             <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <configuration>
-                    <suppressionFiles>
-                        <suppressionFile>${basedir}/owasp-project-suppression.xml</suppressionFile>
-                    </suppressionFiles>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>

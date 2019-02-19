@@ -19,6 +19,7 @@
         <maven.compiler.plugin.encoding>${default.encoding}</maven.compiler.plugin.encoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <jetty.version>9.4.15.v20190215</jetty.version>
     </properties>
 
     <organization>
@@ -126,6 +127,27 @@
                         </executions>
                         <configuration>
                             <keyname>jjYBdx4IL@github.com</keyname>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>owasp-suppression</id>
+            <activation>
+                <file>
+                    <exists>${basedir}/owasp.xml</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <configuration>
+                            <suppressionFiles>
+                                <suppressionFile>${basedir}/owasp.xml</suppressionFile>
+                            </suppressionFiles>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -282,7 +304,7 @@
                 <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
-                    <version>4.0.2</version>
+                    <version>5.0.0-M1</version>
                 </plugin>
                 <plugin>
                     <groupId>com.googlecode.maven-download-plugin</groupId>
@@ -334,7 +356,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>2.17</version>
+                    <version>3.0.0</version>
                     <configuration>
                         <logViolationsToConsole>true</logViolationsToConsole>
                         <failOnViolation>true</failOnViolation>
@@ -398,6 +420,11 @@
                             </goals>
                         </execution>
                     </executions>
+                    <configuration>
+                        <systemProperties>
+                            <project.version>${project.version}</project.version>
+                        </systemProperties>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-gpg-plugin</artifactId>

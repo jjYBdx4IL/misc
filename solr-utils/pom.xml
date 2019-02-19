@@ -21,20 +21,6 @@
         <solr.version>7.5.0</solr.version>
     </properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <configuration>
-                    <suppressionFiles>
-                        <suppressionFile>${basedir}/owasp-project-suppression.xml</suppressionFile>
-                    </suppressionFiles>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <!-- sorted by artifactId -->
         <dependency>

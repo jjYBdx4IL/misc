@@ -11,6 +11,8 @@ exceptions to some modules. Those modules have their own LICENSE file(s).
 
 ## RELEASE
 
+Open an ISSUE here on github if you want me to push updates to maven central.
+
 This repository consists of a lot of smaller, separate sub-projects, each of which gets released
 independently and therefore has its own 1.0, 1.1, 1.2, etc. version sequence numbering.
 

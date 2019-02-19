@@ -35,16 +35,6 @@
 
         <plugins>
             <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <configuration>
-                    <suppressionFiles>
-                        <suppressionFile>${basedir}/owasp-project-suppression.xml</suppressionFile>
-                    </suppressionFiles>
-                </configuration>
-            </plugin>
-        
-            <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <compilerArgument>-proc:none</compilerArgument>
@@ -397,7 +387,7 @@
             <dependency>
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-core</artifactId>
-                <version>1.19.1</version>
+                <version>1.20</version>
             </dependency>
             <dependency>
                 <groupId>org.json</groupId>
