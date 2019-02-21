@@ -106,7 +106,57 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <target>
+                                <copy todir="${project.build.directory}/site.agg" includeEmptyDirs="no"
+                                    verbose="false">
+                                    <fileset dir="${project.basedir}">
+                                        <include name="*/target/site/com.github.*/**" />
+                                    </fileset>
+                                    <mapper type="regexp" from="^.*/target/site/(com\.github\..*)$$" to="\1" />
+                                </copy>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <id>assemble-site</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptors>${basedir}/bin.xml</descriptors>
+                    <formats>zip</formats>
+                    <attach>true</attach>
+                </configuration>
+                <inherited>false</inherited>
+            </plugin>
         </plugins>
+        
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>3.0.0-M1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
-
 </project>

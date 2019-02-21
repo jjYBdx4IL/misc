@@ -84,6 +84,10 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
+                <configuration>
+                    <failBuildOnAnyVulnerability>true</failBuildOnAnyVulnerability>
+                    <skipTestScope>true</skipTestScope>
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-report-plugin</artifactId>
@@ -152,6 +156,19 @@
                     </plugin>
                 </plugins>
             </build>
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <configuration>
+                            <suppressionFiles>
+                                <suppressionFile>${basedir}/owasp.xml</suppressionFile>
+                            </suppressionFiles>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </reporting>
         </profile>
         <profile>
             <id>only-eclipse</id>

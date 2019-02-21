@@ -83,7 +83,7 @@ may be useful in the many situations where setting the drive's spindown timeout 
 BUG REPORTS
 ===========
 
-Visit ${company.about.url} to find out how to contact us.
+https://github.com/jjYBdx4IL/misc
 
 
 
@@ -98,8 +98,7 @@ is generic enough, we might consider implementing it for free.
 LICENSE
 =======
 
-The main program in ${finalJarName} is provided as is and you are allowed to run it. Redistribution without
-permission is not allowed, neither is any reverse-engineering.
+The main program in ${finalJarName} is distributed under the The Apache Software License, Version 2.0.
 
 The libraries in the libs/ sub folder have their own licenses. Have a look into the corresponding library
 file to find out more.
