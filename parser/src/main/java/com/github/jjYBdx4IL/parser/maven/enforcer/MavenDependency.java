@@ -118,11 +118,11 @@ public class MavenDependency implements Comparable<MavenDependency> {
 
     @Override
     public int compareTo(MavenDependency other) {
-        if (!groupId.equalsIgnoreCase(other.groupId)) {
-            return groupId.compareToIgnoreCase(other.groupId);
-        }
         if (!artifactId.equalsIgnoreCase(other.artifactId)) {
             return artifactId.compareToIgnoreCase(other.artifactId);
+        }
+        if (!groupId.equalsIgnoreCase(other.groupId)) {
+            return groupId.compareToIgnoreCase(other.groupId);
         }
         if (!version.equalsIgnoreCase(other.version)) {
             return VersionComparator.largerThan(version, other.version) ? 1 : -1;

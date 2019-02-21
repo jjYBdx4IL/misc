@@ -1,6 +1,18 @@
-# jutils
+# jutils ${my.release.version}
 
 A Java command line client for miscellaneous tools.
+
+
+
+## Homepage
+
+Home for J-Utils is at:
+
+https://webtools.leponceau.org
+
+There you can find binaries and source code. 
+
+
 
 ## Functionality
 
@@ -8,9 +20,20 @@ A Java command line client for miscellaneous tools.
 * recursive grep allowing to filter both file names (ant-style glob) and line patterns (regex)
 * jenkins: re-queue all projects
 * local maven repository search (class names and assets contained in jar files)
+* transforms output of maven enforcer plugin's dependency conflict into a set of dependencies with unique versions
+  to put into your dependencyManagement section. No more tedious version checking just to have determinate
+  versions.
+* Text(html)-2-image conversion with CSS support through CSS-BOX.
+
+
 
 ## Features
 
 * Environment for easy addition of more functions, ie. command line parsing and help display.
 * Functionality modules are detected by annotation scanning during compilation.
-* Includes a script that automatically installs newly built jars that it finds in your local maven repository.
+
+
+
+## Repository
+
+https://github.com/jjYBdx4IL/misc

@@ -59,16 +59,7 @@ public class MavenDependencyConvergenceErrorParseCmd implements JUtilsCommandInt
 
         Collection<MavenDependency> deps = DependencyConvergenceReportParser.parse(dependencyConvergenceErrorOutput);
         Collection<MavenDependency> newest = DependencyConvergenceReportParser.selectNewestOnly(deps);
-        List<MavenDependency> _newest = new ArrayList<>(newest);
-        Collections.sort(_newest, new Comparator<MavenDependency>() {
-
-            @Override
-            public int compare(MavenDependency o1, MavenDependency o2) {
-                return o1.getArtifactId().compareToIgnoreCase(o2.getArtifactId());
-            }
-            
-        });
-        String xmlFragment = DependencyConvergenceReportParser.toMavenPomXmlFragment(_newest);
+        String xmlFragment = DependencyConvergenceReportParser.toMavenPomXmlFragment(newest);
         System.out.println(xmlFragment);
 
         StringSelection stringSelection = new StringSelection(xmlFragment);

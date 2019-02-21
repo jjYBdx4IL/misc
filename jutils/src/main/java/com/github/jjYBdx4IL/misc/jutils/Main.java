@@ -16,14 +16,6 @@
 package com.github.jjYBdx4IL.misc.jutils;
 
 import com.github.jjYBdx4IL.utils.cli.ExtendedGnuParser;
-
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -31,6 +23,15 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  *
@@ -41,6 +42,7 @@ public class Main {
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
     public static final String PROGNAME = "jutils";
     public static final String OPTNAME_HELP = "h";
+    public static final String OPTNAME_VERSION = "version";
 
     public static void main(String[] args) {
         try {
@@ -64,7 +66,16 @@ public class Main {
         CommandLineParser parser = new ExtendedGnuParser(true);
         Options options = new Options();
         options.addOption(OPTNAME_HELP, "help", false, "show help");
+        options.addOption(null, OPTNAME_VERSION, false, "show version");
         CommandLine line = parser.parse(options, args.toArray(new String[args.size()]), false);
+
+        if (line.hasOption(OPTNAME_VERSION)) {
+            try (InputStream is = getClass().getResourceAsStream("/app.properties")) {
+                Properties p = new Properties();
+                p.load(is);
+                System.out.println(PROGNAME + " " + p.getProperty("project.version"));
+            }
+        }
 
         // help display logic:
         // 1.) exit after showing help
