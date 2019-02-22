@@ -26,7 +26,14 @@
             <outputDirectory>osdapp</outputDirectory>
             <includes>
                 <include>properties.xml</include>
-                <include>README</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}</directory>
+            <outputDirectory>osdapp</outputDirectory>
+            <filtered>true</filtered>
+            <includes>
+                <include>README.md</include>
             </includes>
         </fileSet>
     </fileSets>

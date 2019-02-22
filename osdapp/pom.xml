@@ -10,10 +10,11 @@
         <relativePath>../release-parent/</relativePath>
     </parent>
 
-    <groupId>com.github.jjYBdx4IL.utils</groupId>
+    <groupId>com.github.jjYBdx4IL.misc</groupId>
     <artifactId>osdapp</artifactId>
-    <name>Java OSD App</name>
     <version>1.0-SNAPSHOT</version>
+    
+    <name>Java OSD App</name>
     <inceptionYear>2014</inceptionYear>
 
     <properties>
@@ -27,6 +28,13 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>${basedir}</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>README.md</include>
+                </includes>
             </resource>
         </resources>
 
@@ -65,6 +73,7 @@
                 </executions>
                 <configuration>
                     <descriptors>src/main/assembly/bin.xml</descriptors>
+                    <attach>true</attach>
                 </configuration>
             </plugin>
 
@@ -100,12 +109,10 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.6</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.8.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.jjYBdx4IL.utils</groupId>
@@ -155,7 +162,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.12</version>
+            <version>1.18</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -174,19 +181,19 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-http</artifactId>
-            <version>9.4.9.v20180320</version>
+            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.9.v20180320</version>
+            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>9.4.9.v20180320</version>
+            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -211,7 +218,7 @@
         <dependency>
             <groupId>org.tukaani</groupId>
             <artifactId>xz</artifactId>
-            <version>1.6</version>
+            <version>1.8</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

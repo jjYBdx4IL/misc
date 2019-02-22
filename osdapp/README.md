@@ -1,6 +1,18 @@
-HOW TO RUN
-==========
+# OSD-APP
 
+Version: ${my.release.version}
+
+
+
+## Homepage / Download
+
+https://webtools.leponceau.org
+
+
+
+## HOW TO RUN
+
+```
 --- START: COMMAND EXAMPLE ---
 
 java -Xms16m -XX:+UseSerialGC -XX:MinHeapFreeRatio=3 -XX:MaxHeapFreeRatio=5 \
@@ -19,7 +31,7 @@ java -Xms16m -XX:+UseSerialGC -XX:MinHeapFreeRatio=3 -XX:MaxHeapFreeRatio=5 \
     --disk-standby sda,5 --disk-standby-script <standby.sh> \
 
 --- END: COMMAND EXAMPLE ---
-
+```
 
 Run
 
@@ -28,20 +40,18 @@ Run
 to show a short description of all available command line parameters.
 
 Have a look at properties.xml if you need to supply credentials to access your nagios status page.
-You will have to copy it to ~/.config/java-osd/properties.xml.
+You will have to copy it to `~/.config/java-osd/properties.xml`.
 
 
 
-Jenkins/Hudson Monitoring
-=========================
+## Jenkins/Hudson Monitoring
 
 Hint: to configure which jobs should be monitored, set up a specific monitoring view and point this application
-to it using the --jenkins-url argument (do not append the '/app/xml' part to the url).
+to it using the `--jenkins-url` argument (do not append the `/app/xml` part to the url).
 
 
 
-Wake-On-LAN (Keep-Alive)
-========================
+## Wake-On-LAN (Keep-Alive)
 
 The WoL functionality is intended to be used in conjunction with utilities like powernap: powernap is
 monitoring a machine for inactivity and you can configure it to listen to WoL ports. If it receives WoL
@@ -55,9 +65,9 @@ scrubbing/scanning/resilvering activity.
 
 
 
-Plugin
-======
+## Plugin
 
+```
 --- START: PLUGIN COMMAND EXAMPLE ---
 
 java -jar ${finalJarName} --orientation CENTER_TOP -w 800 \
@@ -66,42 +76,45 @@ java -jar ${finalJarName} --orientation CENTER_TOP -w 800 \
     --plugin-wol
 
 --- END: PLUGIN COMMAND EXAMPLE ---
+```
 
 
 
-Disk Standby
-============
+## Disk Standby
 
-  java -jar ${finalJarName} --disk-standby sda,5
+    java -jar ${finalJarName} --disk-standby sda,5
 
-checks /proc/diskstats for disk activity on /dev/sda. If there is no activity for 5 or more minutes,
-the command "sudo hdparm -y /dev/sda" will be issued. A corresponding sudoers entry is required. This feature
+checks `/proc/diskstats` for disk activity on `/dev/sda`. If there is no activity for 5 or more minutes,
+the command `sudo hdparm -y /dev/sda` will be issued. A corresponding `sudoers` entry is required. This feature
 may be useful in the many situations where setting the drive's spindown timeout does not work.
 
 
 
-BUG REPORTS
-===========
+## BUG REPORTS
 
-https://github.com/jjYBdx4IL/misc
-
+[https://github.com/jjYBdx4IL/misc](https://github.com/jjYBdx4IL/misc)
 
 
-FEATURE REQUESTS
-================
+
+## FEATURE REQUESTS
 
 If you have the need for a specific monitoring extension to this app, send us an inquiry. If your request
 is generic enough, we might consider implementing it for free.
 
 
 
-LICENSE
-=======
+## LICENSE
 
-The main program in ${finalJarName} is distributed under the The Apache Software License, Version 2.0.
+The main program in `${finalJarName}` is distributed under **The Apache Software License, Version 2.0**.
 
-The libraries in the libs/ sub folder have their own licenses. Have a look into the corresponding library
+The libraries in the `libs/` sub folder have their own licenses. Have a look into the corresponding library
 file to find out more.
+
+
+
+## SOURCE CODE
+
+https://github.com/jjYBdx4IL/misc
 
 
 

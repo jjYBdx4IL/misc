@@ -1,10 +1,12 @@
-# jutils ${my.release.version}
+# jutils
 
 A Java command line client for miscellaneous tools.
 
+Version: ${my.release.version}
 
 
-## Homepage
+
+## Homepage / Download
 
 Home for J-Utils is at:
 

@@ -346,7 +346,7 @@ public class OSDAppIT extends AbstractHandler {
     }
 
     private static String getREADMESnippet(String snippetName) throws IOException {
-        String readme = FileUtils.readFileToString(new File("target/classes/README"), "UTF-8");
+        String readme = FileUtils.readFileToString(new File("target/classes/README.md"), "UTF-8");
         assertNotNull(readme);
         LOG.info("readme: " + readme);
         String cmd = Snippets.extract(readme).get(snippetName);
