@@ -1,0 +1,31 @@
+#!/bin/bash
+# vim:set sw=4 ts=4 et ai smartindent fileformat=unix fileencoding=utf-8 syntax=sh:
+set -Ee ; set -o pipefail
+if [[ -n "$DEBUG" ]]; then set -x; fi
+scriptdir=$(dirname "$(readlink -f "$0")")
+
+jarfile=$scriptdir/${project.artifactId}-${project.version}.jar
+
+# check for local development build if ${project.artifactId} is being usedfrom proper install location
+# (ignore this, development only)
+iloc=~/.local/${project.artifactId}/${project.artifactId}
+
+if iloc=$(readlink -f "$iloc") && [[ -x "$iloc" ]] && [[ "$iloc" == "$scriptdir/${project.artifactId}" ]]; then
+    groupdir=${project.groupId}
+    groupdir=${groupdir//\./\/}
+    snapzip=~/.m2/repository/$groupdir/${project.artifactId}/1.0-SNAPSHOT/${project.artifactId}-1.0-SNAPSHOT-bin.zip
+    if [[ -f "$snapzip" ]] && test "$snapzip" -nt "$iloc"; then
+        rm -rf ~/.local/${project.artifactId}
+        pushd ~/.local
+        unzip "$snapzip"
+        touch ${project.artifactId}/${project.artifactId}
+        popd
+        exec "$iloc" "$@"
+    fi
+fi
+
+if which cygpath >&/dev/null; then
+    jarfile=$(cygpath -w "$jarfile")
+fi
+
+exec java -jar "$jarfile" "$@"

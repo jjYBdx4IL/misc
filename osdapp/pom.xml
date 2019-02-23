@@ -13,7 +13,7 @@
     <groupId>com.github.jjYBdx4IL.misc</groupId>
     <artifactId>osdapp</artifactId>
     <version>1.0-SNAPSHOT</version>
-    
+
     <name>Java OSD App</name>
     <inceptionYear>2014</inceptionYear>
 
@@ -39,6 +39,33 @@
         </resources>
 
         <plugins>
+            <!-- create/update LICENSE.other -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+            </plugin>
+            <!-- keep LICENSE.other in basedir up-to-date -->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <target>
+                                <copy todir="${project.basedir}" includeEmptyDirs="no" verbose="true">
+                                    <fileset dir="${project.build.directory}/generated-sources/license">
+                                        <include name="LICENSE*" />
+                                    </fileset>
+                                </copy>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
@@ -54,7 +81,8 @@
                             </archive>
                             <excludes>
                                 <exclude>properties.xml</exclude>
-                                <exclude>README</exclude>
+                                <exclude>README*</exclude>
+                                <exclude>${project.artifactId}</exclude>
                             </excludes>
                         </configuration>
                     </execution>
@@ -72,8 +100,13 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <descriptors>src/main/assembly/bin.xml</descriptors>
+                    <descriptors>bin.xml</descriptors>
                     <attach>true</attach>
+                    <formats>
+                        <format>zip</format>
+                        <format>dir</format>
+                    </formats>
+                    <ignoreDirFormatExtensions>false</ignoreDirFormatExtensions>
                 </configuration>
             </plugin>
 
@@ -137,7 +170,7 @@
         <dependency>
             <groupId>com.github.jjYBdx4IL</groupId>
             <artifactId>parser</artifactId>
-            <version>1.2</version>
+            <version>1.4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.github.jjYBdx4IL.utils</groupId>
@@ -172,9 +205,15 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.github.jjYBdx4IL.utils</groupId>
+            <artifactId>io-utils</artifactId>
+            <version>1.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.github.jjYBdx4IL</groupId>
             <artifactId>parser</artifactId>
-            <version>1.2</version>
+            <version>1.4-SNAPSHOT</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>

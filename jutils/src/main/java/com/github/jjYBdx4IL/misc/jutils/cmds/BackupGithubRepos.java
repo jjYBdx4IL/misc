@@ -17,10 +17,9 @@ package com.github.jjYBdx4IL.misc.jutils.cmds;
 
 import com.github.jjYBdx4IL.misc.jutils.JUtilsCommandAnnotation;
 import com.github.jjYBdx4IL.misc.jutils.JUtilsCommandInterface;
-import com.github.jjYBdx4IL.utils.proc.ProcRunner;
 import com.github.jjYBdx4IL.utils.cfg.AtomicPropsFile;
 import com.github.jjYBdx4IL.utils.cfg.AtomicPropsFileSimpleGui;
-
+import com.github.jjYBdx4IL.utils.proc.ProcRunner;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +42,7 @@ import java.util.Map;
  *
  * @author jjYBdx4IL (https://github.com/jjYBdx4IL)
  */
+//CHECKSTYLE:OFF
 @JUtilsCommandAnnotation(
         name = "bgr",
         help = "backup all github repositories of the configured user (not tested with private repos, paid accounts, organization accounts etc)",

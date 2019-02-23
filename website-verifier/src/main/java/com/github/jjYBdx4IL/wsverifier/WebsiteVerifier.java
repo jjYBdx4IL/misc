@@ -43,6 +43,8 @@ public class WebsiteVerifier {
     protected final Set<String> badUrls = new HashSet<>();
     protected String[] exclusions = null;
     private String rootUrl = null;
+    protected final Set<String> externalUrls = new HashSet<>();
+    private boolean checkExternalUrls = false;
 
     /**
      * verify method. runs the crawling process.
@@ -77,7 +79,7 @@ public class WebsiteVerifier {
                 // find new urls
                 for (Element element : page.document().select("a")) {
                     String url = element.absUrl("href");
-                    if (!isFollow(url)) {
+                    if (!isFollow(url, request)) {
                         continue;
                     }
                     LOG.info("url found: " + url);
@@ -86,7 +88,7 @@ public class WebsiteVerifier {
                 }
                 for (Element element : page.document().select("img")) {
                     String url = element.absUrl("src");
-                    if (!isFollow(url)) {
+                    if (!isFollow(url, request)) {
                         continue;
                     }
                     LOG.info("img url found: " + url);
@@ -95,7 +97,7 @@ public class WebsiteVerifier {
                 }
                 for (Element element : page.document().select("link")) {
                     String url = element.absUrl("href");
-                    if (!isFollow(url)) {
+                    if (!isFollow(url, request)) {
                         continue;
                     }
                     LOG.info("img url found: " + url);
@@ -104,7 +106,7 @@ public class WebsiteVerifier {
                 }
                 for (Element element : page.document().select("script")) {
                     String url = element.absUrl("src");
-                    if (!isFollow(url)) {
+                    if (!isFollow(url, request)) {
                         continue;
                     }
                     LOG.info("img url found: " + url);
@@ -147,9 +149,9 @@ public class WebsiteVerifier {
         return isOk();
     }
     
-    protected boolean isFollow(String url) {
+    protected boolean isFollow(String url, Request request) {
         if (!url.startsWith(rootUrl)) {
-            return false;
+            return isCheckExternalUrls() && request.getUrl().startsWith(rootUrl);
         }        
         url = url.substring(rootUrl.length());
         for (String m : exclusions) {
@@ -207,5 +209,17 @@ public class WebsiteVerifier {
         }
 
         return sb.toString();
+    }
+
+    public Set<String> getExternalUrls() {
+        return externalUrls;
+    }
+
+    public boolean isCheckExternalUrls() {
+        return checkExternalUrls;
+    }
+
+    public void setCheckExternalUrls(boolean checkExternalUrls) {
+        this.checkExternalUrls = checkExternalUrls;
     }
 }

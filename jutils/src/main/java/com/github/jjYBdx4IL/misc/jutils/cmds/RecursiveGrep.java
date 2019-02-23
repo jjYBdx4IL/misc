@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
  *
  * @author jjYBdx4IL (https://github.com/jjYBdx4IL)
  */
+//CHECKSTYLE:OFF
 @JUtilsCommandAnnotation(
         name = "grep",
         help = "recursive grep starting in the current working directory (glob is ant-style)",

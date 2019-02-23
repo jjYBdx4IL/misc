@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <!-- http://launch4j.sourceforge.net/docs.html -->
+  <dontWrapJar>true</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>${launch4j.input.jar}</jar>
+  <outfile>${launch4j.output.exe}</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>https://www.azul.com/downloads/zulu/zulu-windows/</downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon></icon>
+  <classPath>
+      <mainClass>com.github.jjYBdx4IL.desktop.clipboardmgr.ClipBoardManagerMain</mainClass>
+  </classPath>
+<!--   <splash> -->
+<!--     <file>${basedir}/src/main/resources/com/github/jjYBdx4IL/desktop/clipboardmgr/CM.bmp</file> -->
+<!--     <timeout>5</timeout> -->
+<!--   </splash> -->
+  <singleInstance>
+    <mutexName>${project.artifactId}</mutexName>
+    <windowTitle>${project.artifactId}</windowTitle>
+  </singleInstance>
+  <jre>
+    <path>jre/</path>
+<!--     <bundledJre64Bit>false</bundledJre64Bit> -->
+    <minVersion>1.8.0</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <runtimeBits>64/32</runtimeBits>
+    <opt>-Dfile.encoding=UTF-8</opt>
+  </jre>
+</launch4jConfig>

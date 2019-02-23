@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.github.jjYBdx4IL</groupId>
+        <artifactId>release-parent</artifactId>
+        <version>1.4-SNAPSHOT</version>
+        <relativePath>../release-parent/</relativePath>
+    </parent>
+
+    <groupId>com.github.jjYBdx4IL.desktop</groupId>
+    <artifactId>clipboard-manager</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>ClipBoard Manager</name>
+    <url>https://github.com/jjYBdx4IL/misc</url>
+    <inceptionYear>2017</inceptionYear>
+
+    <properties>
+        <launch4j.version>3.12</launch4j.version>
+        <launch4j.work.unpackdir>${project.build.directory}/launch4j-workdir</launch4j.work.unpackdir>
+        <launch4j.work.workdir>${launch4j.work.unpackdir}/launch4j-${launch4j.version}-workdir-${launch4j.os.classifier}</launch4j.work.workdir>
+        <launch4j.xml>${project.build.outputDirectory}/launch4j.xml</launch4j.xml>
+        <launch4j.input.jar>${project.artifactId}-${project.version}.jar</launch4j.input.jar>
+        <launch4j.output.exe>${project.build.directory}/${project.artifactId}.exe</launch4j.output.exe>
+    </properties>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <formats>zip</formats>
+                            <attach>true</attach>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptors>bin.xml</descriptors>
+                </configuration>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>net.sf.launch4j.MainRelocated</mainClass>
+                            <classpathScope>test</classpathScope>
+                            <arguments>
+                                <argument>${launch4j.xml}</argument>
+                                <argument>${launch4j.work.workdir}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- create/update LICENSE.other -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+            </plugin>
+            <!-- keep LICENSE.other in basedir up-to-date -->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <target>
+                                <copy todir="${project.basedir}" includeEmptyDirs="no" verbose="true">
+                                    <fileset dir="${project.build.directory}/generated-sources/license">
+                                        <include name="LICENSE*" />
+                                    </fileset>
+                                </copy>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <includeScope>test</includeScope>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>net.sf.launch4j</groupId>
+                                    <artifactId>launch4j</artifactId>
+                                    <version>${launch4j.version}</version>
+                                    <classifier>workdir-${launch4j.os.classifier}</classifier>
+                                    <outputDirectory>${launch4j.work.unpackdir}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeScope>runtime</includeScope>
+                            <outputDirectory>${project.build.directory}/libs</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <addClasspath>true</addClasspath>
+                                    <mainClass>com.github.jjYBdx4IL.desktop.clipboardmgr.ClipBoardManagerMain</mainClass>
+                                    <classpathPrefix>libs/</classpathPrefix>
+                                </manifest>
+                            </archive>
+                            <excludes>
+                                <exclude>README.md</exclude>
+                                <exclude>${project.artifactId}</exclude>
+                                <exclude>launch4j.xml</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            </dependency>
+        <dependency>
+            <groupId>com.github.jjYBdx4IL.utils</groupId>
+            <artifactId>encryption-utils</artifactId>
+            <version>1.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jjYBdx4IL.utils</groupId>
+            <artifactId>env-utils</artifactId>
+            <version>1.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jjYBdx4IL.utils</groupId>
+            <artifactId>proc-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jjYBdx4IL.utils</groupId>
+            <artifactId>swing-utils</artifactId>
+            <version>1.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.launch4j</groupId>
+            <artifactId>launch4j</artifactId>
+            <version>${launch4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.launch4j</groupId>
+            <artifactId>launch4j</artifactId>
+            <version>${launch4j.version}</version>
+            <classifier>workdir-${launch4j.os.classifier}</classifier>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+
+        <!-- make sure -am also triggers installation of depmgmt module: -->
+        <dependency>
+            <groupId>com.github.jjYBdx4IL</groupId>
+            <artifactId>depmgmt</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>linux</id>
+            <activation>
+                <os>
+                    <name>linux</name>
+                </os>
+            </activation>
+            <properties>
+                <launch4j.os.classifier>linux</launch4j.os.classifier>
+            </properties>
+        </profile>
+        <profile>
+            <id>macosx</id>
+            <activation>
+                <os>
+                    <name>mac os x</name>
+                </os>
+            </activation>
+            <properties>
+                <launch4j.os.classifier>max</launch4j.os.classifier>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <launch4j.os.classifier>win32</launch4j.os.classifier>
+            </properties>
+        </profile>
+        <profile>
+            <!-- mvn -Pgui -s ../.empty-settings.xml exec:java -->
+            <id>gui</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <configuration>
+                            <mainClass>net.sf.launch4j.Main</mainClass>
+                            <classpathScope>test</classpathScope>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.github.jjYBdx4IL</groupId>
+                <artifactId>depmgmt</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>

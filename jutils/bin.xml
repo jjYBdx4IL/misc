@@ -8,33 +8,34 @@
 
     <includeBaseDirectory>false</includeBaseDirectory>
 
-    <formats>
-        <format>zip</format>
-    </formats>
-
     <fileSets>
         <fileSet>
             <directory>${project.build.directory}</directory>
-            <outputDirectory>osdapp</outputDirectory>
+            <outputDirectory>${project.artifactId}</outputDirectory>
             <includes>
-                <include>${project.artifactId}-${project.version}.jar</include>
+                <include>${project.build.finalName}.jar</include>
                 <include>libs/*</include>
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.build.directory}/classes</directory>
-            <outputDirectory>osdapp</outputDirectory>
+            <directory>${project.build.outputDirectory}</directory>
+            <outputDirectory>${project.artifactId}</outputDirectory>
             <includes>
-                <include>properties.xml</include>
+                <include>${project.artifactId}</include>
             </includes>
+            <fileMode>0755</fileMode>
+            <lineEnding>unix</lineEnding>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}</directory>
-            <outputDirectory>osdapp</outputDirectory>
+            <outputDirectory>${project.artifactId}</outputDirectory>
             <filtered>true</filtered>
             <includes>
-                <include>README.md</include>
+                <include>README*</include>
+                <include>LICENSE*</include>
             </includes>
+            <fileMode>0644</fileMode>
+            <lineEnding>unix</lineEnding>
         </fileSet>
     </fileSets>
 </assembly>

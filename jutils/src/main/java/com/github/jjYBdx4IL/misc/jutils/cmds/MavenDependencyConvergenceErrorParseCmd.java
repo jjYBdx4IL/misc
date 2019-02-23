@@ -19,7 +19,6 @@ import com.github.jjYBdx4IL.misc.jutils.JUtilsCommandAnnotation;
 import com.github.jjYBdx4IL.misc.jutils.JUtilsCommandInterface;
 import com.github.jjYBdx4IL.parser.maven.enforcer.DependencyConvergenceReportParser;
 import com.github.jjYBdx4IL.parser.maven.enforcer.MavenDependency;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 
@@ -29,11 +28,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -44,7 +39,8 @@ import javax.xml.stream.XMLStreamException;
 //@formatter:off
 @JUtilsCommandAnnotation(
         name = "mep",
-        help = "produce pom.xml dependency management fragment from enforcer plugin convergence error output stored in clipboard",
+        help = "produce pom.xml dependency management fragment from enforcer plugin"
+        + " convergence error output stored in clipboard",
         usage = "",
         minArgs = 0,
         maxArgs = 0

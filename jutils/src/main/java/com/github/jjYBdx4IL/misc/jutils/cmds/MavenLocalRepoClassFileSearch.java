@@ -35,6 +35,7 @@ import java.util.zip.ZipFile;
  *
  * @author jjYBdx4IL (https://github.com/jjYBdx4IL)
  */
+//CHECKSTYLE:OFF
 @JUtilsCommandAnnotation(
         name = "mrs",
         help = "searches the local maven repository for classes",

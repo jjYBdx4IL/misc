@@ -364,6 +364,29 @@
                     </configuration>
                 </plugin>
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>1.17</version>
+                    <executions>
+                        <execution>
+                            <id>add-third-party-licenses</id>
+                            <goals>
+                                <goal>add-third-party</goal>
+                            </goals>
+                            <phase>initialize</phase>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <excludedScopes>test</excludedScopes>
+                        <thirdPartyFilename>LICENSE.other</thirdPartyFilename>
+                        <failOnMissing>true</failOnMissing>
+                        <failOnBlacklist>true</failOnBlacklist>
+                        <licenseFile>${basedir}/LICENSE</licenseFile>
+                        <failOnMissing>true</failOnMissing>
+                        <useRepositoryMissingFiles>true</useRepositoryMissingFiles>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <artifactId>maven-antrun-plugin</artifactId>
                     <version>1.8</version>
                 </plugin>
@@ -378,7 +401,9 @@
                         <logViolationsToConsole>true</logViolationsToConsole>
                         <failOnViolation>true</failOnViolation>
                         <configLocation>checkstyle.xml</configLocation>
-                        <excludes>**/jpa/**/*_.java</excludes>
+                        <sourceDirectories>
+                            <sourceDirectory>src/main/java</sourceDirectory>
+                        </sourceDirectories>
                     </configuration>
                     <dependencies>
                         <dependency>
@@ -501,7 +526,11 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>3.1.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.2.1</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-site-plugin</artifactId>

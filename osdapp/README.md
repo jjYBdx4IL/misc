@@ -15,8 +15,7 @@ https://webtools.leponceau.org
 ```
 --- START: COMMAND EXAMPLE ---
 
-java -Xms16m -XX:+UseSerialGC -XX:MinHeapFreeRatio=3 -XX:MaxHeapFreeRatio=5 \
-    -jar ${finalJarName} \
+./${project.artifactId} \
     --orientation CENTER_TOP -w 800 \
     --disable-cert-checks \
     --nagios-url ${url.nagios.doc} \
@@ -35,7 +34,7 @@ java -Xms16m -XX:+UseSerialGC -XX:MinHeapFreeRatio=3 -XX:MaxHeapFreeRatio=5 \
 
 Run
 
-    java -jar ${finalJarName} -help
+    ./${project.artifactId} --help
 
 to show a short description of all available command line parameters.
 
@@ -70,7 +69,7 @@ scrubbing/scanning/resilvering activity.
 ```
 --- START: PLUGIN COMMAND EXAMPLE ---
 
-java -jar ${finalJarName} --orientation CENTER_TOP -w 800 \
+./${project.artifactId} --orientation CENTER_TOP -w 800 \
     --plugin-exe <some-script-or-executable> \
     --plugin-ival 60 \
     --plugin-wol
@@ -82,7 +81,7 @@ java -jar ${finalJarName} --orientation CENTER_TOP -w 800 \
 
 ## Disk Standby
 
-    java -jar ${finalJarName} --disk-standby sda,5
+    ./${project.artifactId} --disk-standby sda,5
 
 checks `/proc/diskstats` for disk activity on `/dev/sda`. If there is no activity for 5 or more minutes,
 the command `sudo hdparm -y /dev/sda` will be issued. A corresponding `sudoers` entry is required. This feature
@@ -90,9 +89,9 @@ may be useful in the many situations where setting the drive's spindown timeout 
 
 
 
-## BUG REPORTS
+## BUG REPORTS, SOURCE CODE
 
-[https://github.com/jjYBdx4IL/misc](https://github.com/jjYBdx4IL/misc)
+https://github.com/jjYBdx4IL/misc
 
 
 
@@ -100,21 +99,4 @@ may be useful in the many situations where setting the drive's spindown timeout 
 
 If you have the need for a specific monitoring extension to this app, send us an inquiry. If your request
 is generic enough, we might consider implementing it for free.
-
-
-
-## LICENSE
-
-The main program in `${finalJarName}` is distributed under **The Apache Software License, Version 2.0**.
-
-The libraries in the `libs/` sub folder have their own licenses. Have a look into the corresponding library
-file to find out more.
-
-
-
-## SOURCE CODE
-
-https://github.com/jjYBdx4IL/misc
-
-
 

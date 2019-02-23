@@ -16,20 +16,37 @@
 package com.github.jjYBdx4IL.misc.jutils;
 
 /**
+ * Command config params.
  *
  * @author jjYBdx4IL (https://github.com/jjYBdx4IL)
  */
 public @interface JUtilsCommandAnnotation {
 
+    /**
+     * 
+     * @return the name
+     */
     String name();
+    /**
+     * 
+     * @return the help
+     */
     String help();
+    /**
+     * 
+     * @return the usage
+     */
     String usage();
     /**
      * minimum number of unnamed arguments
+     * 
+     * @return minimum
      */
     int minArgs();
     /**
      * maximum number of unnamed arguments
+     * 
+     * @return maximum
      */
     int maxArgs();
 }

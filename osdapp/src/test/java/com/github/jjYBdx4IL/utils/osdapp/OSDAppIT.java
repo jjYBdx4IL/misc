@@ -25,6 +25,7 @@ import static org.junit.Assume.assumeFalse;
 import com.github.jjYBdx4IL.parser.linux.ZFSStatusParserTest;
 import com.github.jjYBdx4IL.utils.env.Maven;
 import com.github.jjYBdx4IL.utils.gfx.ImageUtils;
+import com.github.jjYBdx4IL.utils.io.FindUtils;
 import com.github.jjYBdx4IL.utils.junit4.ImageTester;
 import com.github.jjYBdx4IL.utils.junit4.Screenshot;
 import com.github.jjYBdx4IL.utils.logic.Condition;
@@ -74,7 +75,15 @@ import javax.servlet.http.HttpServletResponse;
 public class OSDAppIT extends AbstractHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(OSDAppIT.class);
-
+    private static final File UNPACKED_DIST_DIR;
+    static {
+        try {
+            UNPACKED_DIST_DIR = FindUtils.globOne("/target/osdapp-*-bin.dir/osdapp/");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
     private Server server = null;
 
     @Before
@@ -224,6 +233,7 @@ public class OSDAppIT extends AbstractHandler {
         pb.redirectOutput(stdoutDump);
         pb.redirectError(stderrDump);
         pb.environment().put("PATH", targetDir.getCanonicalPath() + File.pathSeparator + pb.environment().get("PATH"));
+        pb.directory(UNPACKED_DIST_DIR);
 
         final Process p = pb.start();
         assertTrue(terminationCondition.waitUntil());
@@ -346,8 +356,10 @@ public class OSDAppIT extends AbstractHandler {
     }
 
     private static String getREADMESnippet(String snippetName) throws IOException {
-        String readme = FileUtils.readFileToString(new File("target/classes/README.md"), "UTF-8");
+        File readmeFile = new File(UNPACKED_DIST_DIR, "README.md");
+        String readme = FileUtils.readFileToString(readmeFile, "UTF-8");
         assertNotNull(readme);
+        LOG.info("readme file: " + readmeFile.getAbsolutePath());
         LOG.info("readme: " + readme);
         String cmd = Snippets.extract(readme).get(snippetName);
         assertNotNull(snippetName, cmd);

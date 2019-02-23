@@ -37,6 +37,7 @@ import java.util.Properties;
  *
  * @author jjYBdx4IL (https://github.com/jjYBdx4IL)
  */
+//CHECKSTYLE:OFF
 public class Main {
 
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
@@ -71,9 +72,9 @@ public class Main {
 
         if (line.hasOption(OPTNAME_VERSION)) {
             try (InputStream is = getClass().getResourceAsStream("/app.properties")) {
-                Properties p = new Properties();
-                p.load(is);
-                System.out.println(PROGNAME + " " + p.getProperty("project.version"));
+                Properties props = new Properties();
+                props.load(is);
+                System.out.println(PROGNAME + " " + props.getProperty("project.version"));
             }
         }
 
@@ -105,11 +106,11 @@ public class Main {
                     if (!(opt instanceof Option)) {
                         throw new RuntimeException();
                     }
-                    Option _opt = (Option) opt;
-                    if (OPTNAME_HELP.equals(_opt.getArgName())) {
+                    Option opt2 = (Option) opt;
+                    if (OPTNAME_HELP.equals(opt2.getArgName())) {
                         throw new RuntimeException();
                     }
-                    options.addOption(_opt);
+                    options.addOption(opt2);
                 }
             }
             line = parser.parse(options, args.toArray(new String[args.size()]), false);
@@ -136,17 +137,17 @@ public class Main {
                     continue;
                 }
                 AnnotationValues annoValues = cmdAnnoValues.get(cmdName);
-                JUtilsCommandInterface _jCmd = cmds.get(cmdName);
-                Options jCmdOptions = _jCmd.getCommandLineOptions();
-                if (jCmdOptions == null) {
-                    jCmdOptions = new Options();
+                JUtilsCommandInterface jcmd2 = cmds.get(cmdName);
+                Options jcmdOptions = jcmd2.getCommandLineOptions();
+                if (jcmdOptions == null) {
+                    jcmdOptions = new Options();
                 }
-                String jCmdUsage = annoValues.getUsage();
+                String jcmdUsage = annoValues.getUsage();
                 String cmdLineSyntax = String.format("%s %s -- %s", PROGNAME, cmdName, annoValues.getHelp());
-                if (!jCmdUsage.isEmpty()) {
-                    cmdLineSyntax = String.format("%s %s %s -- %s", PROGNAME, cmdName, jCmdUsage, annoValues.getHelp());
+                if (!jcmdUsage.isEmpty()) {
+                    cmdLineSyntax = String.format("%s %s %s -- %s", PROGNAME, cmdName, jcmdUsage, annoValues.getHelp());
                 }
-                formatter.printHelp(pw, 78, cmdLineSyntax, null, jCmdOptions, 2, 4, null, false);
+                formatter.printHelp(pw, 78, cmdLineSyntax, null, jcmdOptions, 2, 4, null, false);
             }
             pw.flush();
             return 1;

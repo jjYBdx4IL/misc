@@ -16,9 +16,11 @@
 package com.github.jjYBdx4IL.misc.jutils;
 
 /**
+ * Command config values container.
  *
  * @author jjYBdx4IL (https://github.com/jjYBdx4IL)
  */
+//CHECKSTYLE:OFF
 public class AnnotationValues {
 
     private final String name;
@@ -27,6 +29,15 @@ public class AnnotationValues {
     private final int minArgs;
     private final int maxArgs;
 
+    /**
+     * 
+     * 
+     * @param name the name
+     * @param help the help
+     * @param usage the usage
+     * @param minArgs min (unparsed/positional) args
+     * @param maxArgs max (unparsed/positional) args
+     */
     public AnnotationValues(String name, String help, String usage, int minArgs, int maxArgs) {
         this.name = name;
         this.help = help;
@@ -36,6 +47,7 @@ public class AnnotationValues {
     }
 
     /**
+     * 
      * @return the name
      */
     public String getName() {
@@ -43,6 +55,7 @@ public class AnnotationValues {
     }
 
     /**
+     * 
      * @return the help
      */
     public String getHelp() {
@@ -50,6 +63,7 @@ public class AnnotationValues {
     }
 
     /**
+     * 
      * @return the minArgs
      */
     public int getMinArgs() {
@@ -57,6 +71,7 @@ public class AnnotationValues {
     }
 
     /**
+     * 
      * @return the maxArgs
      */
     public int getMaxArgs() {
@@ -64,6 +79,7 @@ public class AnnotationValues {
     }
 
     /**
+     * 
      * @return the usage
      */
     public String getUsage() {

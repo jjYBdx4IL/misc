@@ -24,6 +24,8 @@ import com.helger.jcodemodel.JMethod;
 import com.helger.jcodemodel.JMod;
 import com.helger.jcodemodel.JVar;
 import com.helger.jcodemodel.writer.FileCodeWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,11 +51,9 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
- *
+ * JUtilsCommandAnnotationProcessor.
+ * 
  * @author jjYBdx4IL
  */
 @SupportedAnnotationTypes("com.github.jjYBdx4IL.misc.jutils.JUtilsCommandAnnotation")
@@ -81,7 +81,7 @@ public class JUtilsCommandAnnotationProcessor extends AbstractProcessor {
         filer = processingEnv.getFiler();
         messager = processingEnv.getMessager();
     }
-    
+
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         if (roundEnv.processingOver()) {
@@ -94,12 +94,15 @@ public class JUtilsCommandAnnotationProcessor extends AbstractProcessor {
             LOG.info("annotation found in " + elem.toString());
 
             if (!elem.getKind().isClass() || !(elem instanceof QualifiedNameable)) {
-                throw new AnnotationFormatError(elem.toString() + " type not supported by " + JUtilsCommandAnnotation.class);
+                throw new AnnotationFormatError(
+                    elem.toString() + " type not supported by " + JUtilsCommandAnnotation.class);
             }
 
-            TypeMirror requiredIface = elementUtils.getTypeElement(JUtilsCommandInterface.class.getCanonicalName()).asType();
+            TypeMirror requiredIface = elementUtils.getTypeElement(JUtilsCommandInterface.class.getCanonicalName())
+                .asType();
             if (typeUtils.isAssignable(requiredIface, elem.asType())) {
-                throw new AnnotationFormatError(elem.toString() + " does not implement " + JUtilsCommandInterface.class);
+                throw new AnnotationFormatError(
+                    elem.toString() + " does not implement " + JUtilsCommandInterface.class);
             }
 
             classesFound.add(elem);
@@ -126,35 +129,35 @@ public class JUtilsCommandAnnotationProcessor extends AbstractProcessor {
 
         JMethod getAllCommandInstancesMethod = cls.method(JMod.STATIC, mapStringIfaceType, "getAllCommandInstances");
         JVar cmdMapVar = getAllCommandInstancesMethod.body()
-                .decl(mapStringIfaceType, "cmdMap", JExpr._new(hashMapStringIfaceType));
+            .decl(mapStringIfaceType, "cmdMap", JExpr._new(hashMapStringIfaceType));
         for (Element element : classesFound) {
             JUtilsCommandAnnotation annotation = element.getAnnotation(JUtilsCommandAnnotation.class);
             AbstractJClass cmdType = cm.ref(element.toString());
             getAllCommandInstancesMethod.body()
-                    .invoke(cmdMapVar, "put")
-                    .arg(annotation.name())
-                    .arg(JExpr._new(cmdType));
+                .invoke(cmdMapVar, "put")
+                .arg(annotation.name())
+                .arg(JExpr._new(cmdType));
         }
         getAllCommandInstancesMethod.body()._return(cmdMapVar);
 
         AbstractJClass annotationValuesType = cm.ref(AnnotationValues.class);
-        AbstractJClass hashMapStringAVType = cm.ref(HashMap.class).narrow(stringType, annotationValuesType);
-        AbstractJClass mapStringAVType = mapType.narrow(stringType, annotationValuesType);
+        AbstractJClass hashMapStringAvType = cm.ref(HashMap.class).narrow(stringType, annotationValuesType);
+        AbstractJClass mapStringAvType = mapType.narrow(stringType, annotationValuesType);
 
-        JMethod getAllCommandHelpTexts = cls.method(JMod.STATIC, mapStringAVType, "getAllCommandAnnotationValues");
+        JMethod getAllCommandHelpTexts = cls.method(JMod.STATIC, mapStringAvType, "getAllCommandAnnotationValues");
         JVar avMapVar = getAllCommandHelpTexts.body()
-                .decl(mapStringAVType, "annotationValuesMap", JExpr._new(hashMapStringAVType));
+            .decl(mapStringAvType, "annotationValuesMap", JExpr._new(hashMapStringAvType));
         for (Element element : classesFound) {
             JUtilsCommandAnnotation annotation = element.getAnnotation(JUtilsCommandAnnotation.class);
             getAllCommandHelpTexts.body()
-                    .invoke(avMapVar, "put")
-                    .arg(annotation.name())
-                    .arg(JExpr._new(annotationValuesType)
-                            .arg(JExpr.lit(annotation.name()))
-                            .arg(JExpr.lit(annotation.help()))
-                            .arg(JExpr.lit(annotation.usage()))
-                            .arg(JExpr.lit(annotation.minArgs()))
-                            .arg(JExpr.lit(annotation.maxArgs())));
+                .invoke(avMapVar, "put")
+                .arg(annotation.name())
+                .arg(JExpr._new(annotationValuesType)
+                    .arg(JExpr.lit(annotation.name()))
+                    .arg(JExpr.lit(annotation.help()))
+                    .arg(JExpr.lit(annotation.usage()))
+                    .arg(JExpr.lit(annotation.minArgs()))
+                    .arg(JExpr.lit(annotation.maxArgs())));
         }
         getAllCommandHelpTexts.body()._return(avMapVar);
 

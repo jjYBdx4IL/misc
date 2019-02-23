@@ -21,6 +21,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import com.github.jjYBdx4IL.utils.io.FindUtils;
 import com.github.jjYBdx4IL.utils.proc.ProcRunner;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.BeforeClass;
@@ -45,6 +46,14 @@ public class MainTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MainTest.class);
     private static File workDir;
+    private static final File UNPACKED_DIST_DIR;
+    static {
+        try {
+            UNPACKED_DIST_DIR = FindUtils.globOne("/target/jutils-*-bin.dir/jutils/");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private static int exitCode = -1;
     private static List<String> output = null;
@@ -59,9 +68,7 @@ public class MainTest {
 
     private static void run(String... args) throws IOException {
         List<String> _args = new ArrayList<>();
-        _args.add("java");
-        _args.add("-jar");
-        _args.add(System.getProperty("testJar", globOne("/target/*-SNAPSHOT.jar").getAbsolutePath()));
+        _args.add(new File(UNPACKED_DIST_DIR, "jutils").getAbsolutePath());
         Collections.addAll(_args, args);
         LOG.info("running external process: " + StringUtils.join(_args, " "));
         ProcRunner pr = new ProcRunner(true, _args);

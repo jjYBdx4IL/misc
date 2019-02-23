@@ -6,6 +6,13 @@
             ">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>com.github.jjYBdx4IL</groupId>
+        <artifactId>release-parent</artifactId>
+        <version>1.4-SNAPSHOT</version>
+        <relativePath>../release-parent/</relativePath>
+    </parent>
+
     <groupId>com.github.jjYBdx4IL.misc</groupId>
     <artifactId>jutils</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -14,81 +21,44 @@
     <url>https://github.com/jjYBdx4IL/misc</url>
     <inceptionYear>2016</inceptionYear>
 
-    <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
-    <organization>
-        <name>Github jjYBdx4IL Projects</name>
-        <url>https://github.com/jjYBdx4IL</url>
-    </organization>
-
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <id>jjYBdx4IL</id>
-            <roles>
-                <role>author</role>
-                <role>maven build/maven central deployment</role>
-            </roles>
-            <url>https://github.com/jjYBdx4IL</url>
-        </developer>
-    </developers>
-
-    <issueManagement>
-        <system>Github Issues</system>
-        <url>https://github.com/jjYBdx4IL/misc/issues</url>
-    </issueManagement>
-
-    <scm>
-        <connection>scm:git:git://github.com/jjYBdx4IL/misc.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/jjYBdx4IL/misc.git</developerConnection>
-        <url>https://github.com/jjYBdx4IL/misc</url>
-        <tag>HEAD</tag>
-    </scm>
-
     <build>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-            </resource>
-            <resource>
-                <directory>src/main/filtered</directory>
                 <filtering>true</filtering>
-                <includes>
-                    <include>app.properties</include>
-                </includes>
             </resource>
         </resources>
 
         <plugins>
+            <!-- create/update LICENSE.other -->
             <plugin>
-                <groupId>com.mycila</groupId>
+                <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
+            </plugin>
+            <!-- keep LICENSE.other in basedir up-to-date -->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>check-headers</id>
-                        <phase>verify</phase>
                         <goals>
-                            <goal>check</goal>
+                            <goal>run</goal>
                         </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <target>
+                                <copy todir="${project.basedir}" includeEmptyDirs="no" verbose="true">
+                                    <fileset dir="${project.build.directory}/generated-sources/license">
+                                        <include name="LICENSE*" />
+                                    </fileset>
+                                </copy>
+                            </target>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
 
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.1</version>
                 <executions>
                     <execution>
                         <id>default-jar</id>
@@ -103,17 +73,8 @@
                             <excludes>
                                 <exclude>properties.xml</exclude>
                                 <exclude>README</exclude>
+                                <exclude>${project.artifactId}</exclude>
                             </excludes>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>test-jar</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                        <configuration>
-                            <testClassesDirectory>${project.build.directory}/screenshots</testClassesDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -121,7 +82,6 @@
 
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -131,14 +91,17 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <descriptors>src/main/assembly/bin.xml</descriptors>
-                    <finalName>jutils-${project.version}</finalName>
+                    <descriptors>bin.xml</descriptors>
+                    <formats>
+                        <format>zip</format>
+                        <format>dir</format>
+                    </formats>
+                    <ignoreDirFormatExtensions>false</ignoreDirFormatExtensions>
                 </configuration>
             </plugin>
 
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.1</version>
                 <executions>
                     <execution>
                         <id>unpack-wrapper</id>
@@ -148,25 +111,6 @@
                         </goals>
                         <configuration>
                             <includeScope>runtime</includeScope>
-<!--                             <excludeGroupIds>${project.groupId}</excludeGroupIds> -->
-<!--                             <includeArtifactIds> -->
-<!--                                 ant, -->
-<!--                                 ci-utils, -->
-<!--                                 commons-cli,commons-codec,commons-io,commons-lang3, -->
-<!--                                 cli-utils, -->
-<!--                                 config-utils, -->
-<!--                                 dom4j, -->
-<!--                                 gson, -->
-<!--                                 jsoup, -->
-<!--                                 parser, -->
-<!--                                 proc-utils, -->
-<!--                                 swing-utils, -->
-<!--                                 slf4j-simple,slf4j-api, -->
-<!--                                 xml-apis, -->
-<!--                                 org.eclipse.egit.github.core, -->
-<!--                                 org.eclipse.jgit, -->
-<!--                                 jsch -->
-<!--                             </includeArtifactIds> -->
                             <outputDirectory>${project.build.directory}/libs</outputDirectory>
                         </configuration>
                     </execution>
@@ -174,16 +118,7 @@
             </plugin>
 
             <plugin>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>3.7.1</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M3</version>
                 <executions>
                     <execution>
                         <id>default-test</id>
@@ -193,17 +128,11 @@
                         <phase>integration-test</phase>
                     </execution>
                 </executions>
-                <configuration>
-                    <systemPropertyVariables>
-                        <testJar>${project.build.directory}/${project.build.finalName}.jar</testJar>
-                    </systemPropertyVariables>
-                </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -219,9 +148,7 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
                 <executions>
                     <execution>
                         <id>compiler-processor</id>
@@ -269,41 +196,6 @@
                 </executions>
             </plugin>
         </plugins>
-
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>com.mycila</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>3.0</version>
-                    <executions>
-                        <execution>
-                            <id>check-headers</id>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
-                        <aggregate>true</aggregate>
-                        <failIfMissing>true</failIfMissing>
-                        <strictCheck>true</strictCheck>
-                        <properties>
-                            <owner>jjYBdx4IL</owner>
-                            <email>https://github.com/jjYBdx4IL</email>
-                        </properties>
-                        <mapping>
-                            <java>SLASHSTAR_STYLE</java>
-                        </mapping>
-                        <includes>
-                            <include>src/**/*.java</include>
-                        </includes>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 
     <dependencies>
@@ -330,7 +222,7 @@
         <dependency>
             <groupId>com.github.jjYBdx4IL</groupId>
             <artifactId>parser</artifactId>
-            <version>1.2</version>
+            <version>1.4-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -339,14 +231,10 @@
             <version>1.10.1</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.8.1</version>
-        </dependency>
-        <dependency>
             <groupId>com.helger</groupId>
             <artifactId>jcodemodel</artifactId>
             <version>2.8.6</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.mylyn.github</groupId>
@@ -361,17 +249,11 @@
         <dependency>
             <groupId>com.github.jjYBdx4IL.utils</groupId>
             <artifactId>proc-utils</artifactId>
-            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.25</version>
-        </dependency>
-        <dependency>
-            <groupId>org.dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>2.1.1</version>
         </dependency>
 
         <!-- Testing -->
@@ -417,6 +299,28 @@
             <version>9.4.14.v20181114</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- make sure -am also triggers installation of depmgmt module: -->
+        <dependency>
+            <groupId>com.github.jjYBdx4IL</groupId>
+            <artifactId>depmgmt</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.github.jjYBdx4IL</groupId>
+                <artifactId>depmgmt</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 </project>
 
