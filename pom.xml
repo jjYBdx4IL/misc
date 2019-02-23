@@ -7,6 +7,7 @@
     <artifactId>misc-aggregator</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+    
     <name>Misc Aggregator</name>
     <description />
     <url>https://github.com/jjYBdx4IL/misc</url>
@@ -100,6 +101,21 @@
         <module>xml-dom4j-utils</module>
     </modules>
 
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.7.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
     <profiles>
         <profile>
             <id>site-archive</id>
@@ -112,7 +128,6 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-site-plugin</artifactId>
-                        <version>3.7.1</version>
                         <configuration>
                             <skip>true</skip>
                         </configuration>
