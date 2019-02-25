@@ -81,6 +81,9 @@ public class TimeUtils {
             sb.append("-");
             millis = -millis;
         }
+        if (millis < 1000L) {
+            return "0s";
+        }
         long seconds = millis / 1000L;
         long minutes = seconds / 60L;
         long hours = minutes / 60L;
@@ -105,9 +108,6 @@ public class TimeUtils {
         if (seconds % 60L > 0L) {
             sb.append(Long.toString(seconds % 60L));
             sb.append("s");
-        }
-        if (sb.length() == 0) {
-            sb.append("0s");
         }
         return sb.toString();
     }

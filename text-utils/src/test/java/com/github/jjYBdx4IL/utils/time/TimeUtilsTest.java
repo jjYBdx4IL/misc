@@ -58,6 +58,7 @@ public class TimeUtilsTest {
     public void testMillisToDuration() {
         assertEquals("0s", TimeUtils.millisToDuration(0L));
         assertEquals("0s", TimeUtils.millisToDuration(999L));
+        assertEquals("0s", TimeUtils.millisToDuration(-999L));
         assertEquals("1s", TimeUtils.millisToDuration(1000L));
         assertEquals("16m40s", TimeUtils.millisToDuration(1000L * 1000L));
     }
