@@ -34,8 +34,16 @@ public class TimeUtils {
     public final static String ISO8601_FMT = "yyyy-MM-dd'T'HH:mm'Z'";
     public final static String ISO8601_SECS_FMT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     public static final Pattern DURATION_PATTERN = Pattern.compile(
-            "(?:(\\d+)w)?\\s*(?:(\\d+)d)?\\s*(?:(\\d+)h)?\\s*(?:(\\d+)m)?\\s*(?:(\\d+)s)?", Pattern.CASE_INSENSITIVE);
+        "(?:(\\d+)w)?\\s*(?:(\\d+)d)?\\s*(?:(\\d+)h)?\\s*(?:(\\d+)m)?\\s*(?:(\\d+)s)?", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * Converts a given date to its ISO8601 ({@link #ISO8601_FMT}) format.
+     * Always uses UTC for string representation of the date.
+     * 
+     * @param date
+     *            the date to format
+     * @return the formatted date in ISO8601 without seconds part
+     */
     public static String toISO8601(Date date) {
         final TimeZone tz = TimeZone.getTimeZone(TZ);
         final DateFormat df = new SimpleDateFormat(ISO8601_FMT);
@@ -43,6 +51,14 @@ public class TimeUtils {
         return df.format(date);
     }
 
+    /**
+     * Converts a given date to its ISO8601 ({@link #ISO8601_SECS_FMT}) format.
+     * Always uses UTC for string representation of the date.
+     * 
+     * @param date
+     *            the date to format
+     * @return the formatted date in ISO8601 with seconds part
+     */
     public static String toISO8601WithSeconds(Date date) {
         final TimeZone tz = TimeZone.getTimeZone(TZ);
         final DateFormat df = new SimpleDateFormat(ISO8601_SECS_FMT);
@@ -75,6 +91,15 @@ public class TimeUtils {
         }
     }
 
+    /**
+     * Convert a millisecond duration/time amount into a string formatted like
+     * "1w3d4s". For an exact specification of the returned string, refer to
+     * {@link #durationToMillis(String)}.
+     * 
+     * @param millis
+     *            the milliseconds to convert
+     * @return the string description of the time amount
+     */
     public static String millisToDuration(long millis) {
         StringBuilder sb = new StringBuilder();
         if (millis < 0) {
@@ -112,6 +137,24 @@ public class TimeUtils {
         return sb.toString();
     }
 
+    /**
+     * Convert a duration/time amount specification into a millisecond value.
+     * Example: "2d3h5s" - which stands for 2days, 3 hours and 5 seconds.
+     * Supported elements are:
+     * <ul>
+     * <li>w - week
+     * <li>d - day
+     * <li>h - hour
+     * <li>m - minute
+     * <li>s - second
+     * </ul>
+     * Order is important, each element must be listed not more than once in the
+     * order listed above.
+     * 
+     * @param duration
+     *            the duration/time amount in the format described above.
+     * @return the number of milliseconds
+     */
     public static long durationToMillis(String duration) {
         long millis = 0L;
         Matcher m = DURATION_PATTERN.matcher(duration);
@@ -138,6 +181,23 @@ public class TimeUtils {
             millis *= 1000L;
         }
         return millis;
+    }
+
+    /**
+     * Check if a given {@link Date} is older than some amount of time.
+     * 
+     * @param date
+     *            the date in question
+     * @param ageDurationStr
+     *            the amount of time in a format described at
+     *            {@link #durationToMillis(String)}
+     * @return true if date lies father back in time than what durationStr
+     *         indicates
+     */
+    public static boolean isOlderThan(Date date, String ageDurationStr) {
+        long minMillisAge = durationToMillis(ageDurationStr);
+        long millisAge = System.currentTimeMillis() - date.getTime();
+        return millisAge > minMillisAge;
     }
 
     private TimeUtils() {

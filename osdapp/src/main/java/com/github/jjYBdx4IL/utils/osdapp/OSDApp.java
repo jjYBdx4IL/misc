@@ -172,6 +172,7 @@ public class OSDApp {
         }
 
         // create the command line parser
+        @SuppressWarnings("deprecation")
         CommandLineParser parser = new GnuParser();
 
         // create the Options

@@ -91,4 +91,11 @@ public class TimeUtilsTest {
         assertEquals(8L * 24L * 3600L * 1000L, TimeUtils.durationToMillis("1w1d"));
         assertEquals(8L * 24L * 3600L * 1000L, TimeUtils.durationToMillis("1w 1d"));
     }
+    
+    @Test
+    public void testIsOlderThan() {
+        assertTrue(TimeUtils.isOlderThan(new Date(), "-1s"));
+        assertFalse(TimeUtils.isOlderThan(new Date(), "10s"));
+        assertTrue(TimeUtils.isOlderThan(new Date(System.currentTimeMillis() - 20000L), "10s"));
+    }
 }
