@@ -24,12 +24,14 @@ import com.helger.jcodemodel.JMethod;
 import com.helger.jcodemodel.JMod;
 import com.helger.jcodemodel.JVar;
 import com.helger.jcodemodel.writer.FileCodeWriter;
+import com.helger.jcodemodel.writer.JCMWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.AnnotationFormatError;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -133,10 +135,10 @@ public class JUtilsCommandAnnotationProcessor extends AbstractProcessor {
         for (Element element : classesFound) {
             JUtilsCommandAnnotation annotation = element.getAnnotation(JUtilsCommandAnnotation.class);
             AbstractJClass cmdType = cm.ref(element.toString());
-            getAllCommandInstancesMethod.body()
-                .invoke(cmdMapVar, "put")
-                .arg(annotation.name())
-                .arg(JExpr._new(cmdType));
+            getAllCommandInstancesMethod.body().add(
+                JExpr.invoke(cmdMapVar, "put")
+                    .arg(annotation.name())
+                    .arg(JExpr._new(cmdType)));
         }
         getAllCommandInstancesMethod.body()._return(cmdMapVar);
 
@@ -149,15 +151,15 @@ public class JUtilsCommandAnnotationProcessor extends AbstractProcessor {
             .decl(mapStringAvType, "annotationValuesMap", JExpr._new(hashMapStringAvType));
         for (Element element : classesFound) {
             JUtilsCommandAnnotation annotation = element.getAnnotation(JUtilsCommandAnnotation.class);
-            getAllCommandHelpTexts.body()
-                .invoke(avMapVar, "put")
-                .arg(annotation.name())
-                .arg(JExpr._new(annotationValuesType)
-                    .arg(JExpr.lit(annotation.name()))
-                    .arg(JExpr.lit(annotation.help()))
-                    .arg(JExpr.lit(annotation.usage()))
-                    .arg(JExpr.lit(annotation.minArgs()))
-                    .arg(JExpr.lit(annotation.maxArgs())));
+            getAllCommandHelpTexts.body().add(
+                JExpr.invoke(avMapVar, "put")
+                    .arg(annotation.name())
+                    .arg(JExpr._new(annotationValuesType)
+                        .arg(JExpr.lit(annotation.name()))
+                        .arg(JExpr.lit(annotation.help()))
+                        .arg(JExpr.lit(annotation.usage()))
+                        .arg(JExpr.lit(annotation.minArgs()))
+                        .arg(JExpr.lit(annotation.maxArgs()))));
         }
         getAllCommandHelpTexts.body()._return(avMapVar);
 
@@ -166,6 +168,6 @@ public class JUtilsCommandAnnotationProcessor extends AbstractProcessor {
             outputDir.mkdirs();
         }
         LOG.info("writing source code to: " + outputDir.getAbsolutePath());
-        cm.build(new FileCodeWriter(outputDir));
+        new JCMWriter(cm).setCharset(StandardCharsets.UTF_8).setNewLine("\n").build(new FileCodeWriter(outputDir));
     }
 }
