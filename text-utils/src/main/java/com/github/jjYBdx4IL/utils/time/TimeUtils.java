@@ -59,7 +59,7 @@ public class TimeUtils {
      * 
      * @param date
      *            the date to format
-     * @return the date part of the ISO8601 formatted time 
+     * @return the date part of the ISO8601 formatted time
      */
     public static String toISO8601Date(Date date) {
         final TimeZone tz = TimeZone.getTimeZone(TZ);
@@ -155,9 +155,9 @@ public class TimeUtils {
     }
 
     /**
-     * Convert a duration/time amount specification into a millisecond value.
-     * Example: "2d3h5s" - which stands for 2days, 3 hours and 5 seconds.
-     * Supported elements are:
+     * Convert a non-negative duration/time amount specification into a
+     * millisecond value. Example: "2d3h5s" - which stands for 2days, 3 hours
+     * and 5 seconds. Supported elements are:
      * <ul>
      * <li>w - week
      * <li>d - day
@@ -207,7 +207,7 @@ public class TimeUtils {
      *            the date in question
      * @param ageDurationStr
      *            the amount of time in a format described at
-     *            {@link #durationToMillis(String)}
+     *            {@link #durationToMillis(String)}, non-negative
      * @return true if date lies father back in time than what durationStr
      *         indicates
      */

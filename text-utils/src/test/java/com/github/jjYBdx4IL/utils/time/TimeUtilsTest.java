@@ -100,7 +100,6 @@ public class TimeUtilsTest {
     
     @Test
     public void testIsOlderThan() {
-        assertTrue(TimeUtils.isOlderThan(new Date(), "-1s"));
         assertFalse(TimeUtils.isOlderThan(new Date(), "10s"));
         assertTrue(TimeUtils.isOlderThan(new Date(System.currentTimeMillis() - 20000L), "10s"));
     }
