@@ -32,6 +32,7 @@ public class TimeUtils {
 
     public final static String TZ = "UTC";
     public final static String ISO8601_FMT = "yyyy-MM-dd'T'HH:mm'Z'";
+    public final static String ISO8601_DATE_FMT = "yyyy-MM-dd";
     public final static String ISO8601_SECS_FMT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     public static final Pattern DURATION_PATTERN = Pattern.compile(
         "(?:(\\d+)w)?\\s*(?:(\\d+)d)?\\s*(?:(\\d+)h)?\\s*(?:(\\d+)m)?\\s*(?:(\\d+)s)?", Pattern.CASE_INSENSITIVE);
@@ -47,6 +48,22 @@ public class TimeUtils {
     public static String toISO8601(Date date) {
         final TimeZone tz = TimeZone.getTimeZone(TZ);
         final DateFormat df = new SimpleDateFormat(ISO8601_FMT);
+        df.setTimeZone(tz);
+        return df.format(date);
+    }
+
+    /**
+     * Converts a given date to its ISO8601 ({@link #ISO8601_DATE_FMT}) format.
+     * Always uses UTC for string representation of the date. Only returns the
+     * date part.
+     * 
+     * @param date
+     *            the date to format
+     * @return the date part of the ISO8601 formatted time 
+     */
+    public static String toISO8601Date(Date date) {
+        final TimeZone tz = TimeZone.getTimeZone(TZ);
+        final DateFormat df = new SimpleDateFormat(ISO8601_DATE_FMT);
         df.setTimeZone(tz);
         return df.format(date);
     }

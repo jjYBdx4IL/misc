@@ -89,7 +89,7 @@ public class TimeUsage implements AutoCloseable {
         Map<String, Long> cumulativeByName = new HashMap<>();
         Set<String> unclosed = new HashSet<>();
         for (TimeUsage child : childs) {
-            cumulativeByName.put(child.name, new Long(0));
+            cumulativeByName.put(child.name, 0L);
         }
         for (TimeUsage child : childs) {
             if (child.isOpen()) {

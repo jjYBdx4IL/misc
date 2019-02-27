@@ -43,6 +43,12 @@ public class TimeUtilsTest {
     }
 
     @Test
+    public void testToISO8601Date() {
+        Date input = new Date(1409051344183l);
+        assertEquals("2014-08-26", TimeUtils.toISO8601Date(input));
+    }
+
+    @Test
     public void testToISO8601WithSeconds() {
         Date input = new Date(1409051344183l);
         assertEquals("2014-08-26T11:09:04Z", TimeUtils.toISO8601WithSeconds(input));
