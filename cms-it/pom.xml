@@ -20,7 +20,6 @@
 
     <properties>
         <!-- https://search.maven.org/classic/#search%7Cgav%7C1%7Cg%3A%22org.wildfly%22%20AND%20a%3A%22wildfly-dist%22 -->
-        <wildfly.version>15.0.1.Final</wildfly.version>
         <wildfly.server.process.tag>${project.groupId}:${project.artifactId}</wildfly.server.process.tag>
         <http.port>8081</http.port>
         <wildfly.port>9991</wildfly.port>

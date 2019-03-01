@@ -29,3 +29,12 @@ mvn release:perform
 
 When the last step hangs (happends often after the first 4 files have been uploaded), interrupt it and
 restart with "mvn clean && mvn release:perform".
+
+## Build Site Archive
+
+In the root directory (`misc-aggregator` project) do:
+
+```
+mvn clean install site
+mvn clean install -Psite-archive -N
+```

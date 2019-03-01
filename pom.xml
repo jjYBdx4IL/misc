@@ -18,8 +18,8 @@
         <project.build.sourceEncoding>${default.encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${default.encoding}</project.reporting.outputEncoding>
         <maven.compiler.plugin.encoding>${default.encoding}</maven.compiler.plugin.encoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.9</maven.compiler.source>
+        <maven.compiler.target>1.9</maven.compiler.target>
     </properties>
 
     <organization>
@@ -119,11 +119,6 @@
     <profiles>
         <profile>
             <id>site-archive</id>
-            <activation>
-                <file>
-                    <exists>io-utils/target/site</exists>
-                </file>
-            </activation>
             <build>
                 <plugins>
                     <plugin>
