@@ -3,10 +3,12 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>com.github.jjYBdx4IL</groupId>
     <artifactId>release-parent</artifactId>
     <version>1.4-SNAPSHOT</version>
     <packaging>pom</packaging>
+
     <name>Maven Central Release Parent Package</name>
     <description>parent package for jjYBdx4IL projects</description>
     <url>https://github.com/jjYBdx4IL</url>
@@ -17,8 +19,8 @@
         <project.build.sourceEncoding>${default.encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${default.encoding}</project.reporting.outputEncoding>
         <maven.compiler.plugin.encoding>${default.encoding}</maven.compiler.plugin.encoding>
-        <maven.compiler.source>1.9</maven.compiler.source>
-        <maven.compiler.target>1.9</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <jetty.version>9.4.15.v20190215</jetty.version>
         <wildfly.version>16.0.0.Final</wildfly.version>
     </properties>
@@ -80,7 +82,6 @@
                 <configuration>
                     <linksource>true</linksource>
                     <linksourcetab>4</linksourcetab>
-                    <detectOfflineLinks>false</detectOfflineLinks>
                 </configuration>
             </plugin>
             <plugin>
@@ -172,10 +173,49 @@
                 </plugins>
             </reporting>
         </profile>
+        <profile>
+            <id>javadoc-html5</id>
+            <activation>
+                <jdk>[1.9,)</jdk>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-javadoc-plugin</artifactId>
+                            <configuration>
+                                <additionalOptions>-html5</additionalOptions>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
     </profiles>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>animal-sniffer-maven-plugin</artifactId>
+                <version>1.17</version>
+                <executions>
+                    <execution>
+                        <id>verify-java-api</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>verify</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <signature>
+                        <groupId>org.codehaus.mojo.signature</groupId>
+                        <artifactId>java18</artifactId>
+                        <version>1.0</version>
+                    </signature>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
@@ -444,6 +484,9 @@
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>3.0.1</version>
+                    <configuration>
+                        <detectOfflineLinks>false</detectOfflineLinks>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-jxr-plugin</artifactId>

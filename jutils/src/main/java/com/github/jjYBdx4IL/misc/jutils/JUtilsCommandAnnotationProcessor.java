@@ -59,7 +59,7 @@ import javax.lang.model.util.Types;
  * @author jjYBdx4IL
  */
 @SupportedAnnotationTypes("com.github.jjYBdx4IL.misc.jutils.JUtilsCommandAnnotation")
-@SupportedSourceVersion(SourceVersion.RELEASE_7)
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class JUtilsCommandAnnotationProcessor extends AbstractProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(JUtilsCommandAnnotationProcessor.class);

@@ -119,7 +119,7 @@ public class CliExporter {
         while(rs.next()) {
             String tagname = rs.getString("tagname");
             checkNotNull(tagname);
-            checkArgument(!tagname.isBlank());
+            checkArgument(!tagname.trim().isEmpty());
             tags.add(tagname);
         }        
         Collections.sort(tags);

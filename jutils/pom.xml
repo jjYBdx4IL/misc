@@ -163,6 +163,7 @@
                             <excludes>
                                 <exclude>**/Main.java</exclude>
                                 <exclude>**/Generated*.java</exclude>
+                                <exclude>**/cmds/*.java</exclude>
                             </excludes>
                         </configuration>
                     </execution>
@@ -173,15 +174,14 @@
                             <goal>compile</goal>
                         </goals>
                         <configuration>
-                            <annotationProcessors>
+                            <compilerArgs>
+                                <arg>-J-Dbasedir=${project.basedir}</arg>
+                                <arg>-proc:only</arg>
+                                <arg>-processor</arg>
                                 <arg>com.github.jjYBdx4IL.misc.jutils.JUtilsCommandAnnotationProcessor</arg>
-                            </annotationProcessors>
-                            <fork>true</fork> <!-- bug; non-forked compiler has basedir set to user.dir or sth -->
-                            <excludes>
-                                <exclude>**/Main.java</exclude>
-                                <exclude>**/Generated*.java</exclude>
-                            </excludes>
-                            <verbose>true</verbose>
+                            </compilerArgs>
+                            <fork>true</fork>
+                            <verbose>false</verbose>
                             <showWarnings>true</showWarnings>
                         </configuration>
                     </execution>
@@ -194,6 +194,13 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <linksource>true</linksource>
+                    <linksourcetab>4</linksourcetab>
+                </configuration>
             </plugin>
         </plugins>
     </build>

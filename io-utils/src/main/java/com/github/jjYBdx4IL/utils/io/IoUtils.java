@@ -183,6 +183,42 @@ public class IoUtils {
     }
 
     /**
+     * Read some input stream into a byte array, requiring an expected length.
+     * Writing will always start at the start of the given byte array.
+     * 
+     * @param is
+     *            the input stream
+     * @param expBytes
+     *            number of bytes to read and expect
+     * @param arr
+     *            provide a byte array for re-use. Ignored if expBytes is larger
+     *            than <code>arr.length</code>.
+     * @return null if the input stream was longer than maxBytes
+     * @throws IOException
+     *             on I/O error or if the number of read bytes is less than
+     *             expected
+     */
+    public static byte[] toByteArray(InputStream is, int expBytes, byte[] arr) throws IOException {
+        if (is == null) {
+            throw new NullPointerException();
+        }
+        if (arr == null || arr.length < expBytes) {
+            arr = new byte[expBytes];
+        }
+
+        int nread = 0;
+        int n;
+        do {
+            n = is.read(arr, nread, expBytes - nread);
+            if (n <= 0) {
+                throw new IOException(
+                    "not enough data: terminated after " + nread + " bytes, but expected " + expBytes + " bytes");
+            }
+        } while (nread < expBytes);
+        return arr;
+    }
+
+    /**
      * Calls {@link FileUtils#deleteQuietly(File)} on all arguments.
      * 
      * @param files
@@ -199,8 +235,8 @@ public class IoUtils {
      * 
      * @param filename
      *            the filename
-     * @return the filename's extension, ie. "java". Null if there is none or
-     *         if filename is null or if filename ends with a dot.
+     * @return the filename's extension, ie. "java". Null if there is none or if
+     *         filename is null or if filename ends with a dot.
      */
     public static String getExt(String filename) {
         if (filename == null) {
@@ -212,7 +248,7 @@ public class IoUtils {
         String ext = filename.substring(filename.lastIndexOf('.') + 1);
         return ext.isEmpty() ? null : ext.toLowerCase(Locale.ROOT);
     }
-    
+
     /**
      * Return the lower case extension of a file's name.
      * 
