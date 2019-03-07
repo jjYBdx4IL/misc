@@ -214,6 +214,7 @@ public class IoUtils {
                 throw new IOException(
                     "not enough data: terminated after " + nread + " bytes, but expected " + expBytes + " bytes");
             }
+            nread += n;
         } while (nread < expBytes);
         return arr;
     }

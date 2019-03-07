@@ -24,21 +24,22 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class IoUtilsTest {
-    
+
     private final static File TEMP_DIR = Maven.getTempTestDir(IoUtilsTest.class);
-    private final static File TEST_FILE= new File(TEMP_DIR, "testfile.txt");
+    private final static File TEST_FILE = new File(TEMP_DIR, "testfile.txt");
 
     @Test
     public void testSafeWriteTo() throws IOException {
         IoUtils.safeWriteTo(TEST_FILE, "abc");
         assertEquals("abc", FileUtils.readFileToString(TEST_FILE, "UTF-8"));
-        
+
         IoUtils.safeWriteTo(TEST_FILE, new ByteArrayInputStream("123".getBytes("UTF-8")));
         assertEquals("123", FileUtils.readFileToString(TEST_FILE, "UTF-8"));
     }
-    
+
     @Test
     public void testGetExt() {
         assertEquals(null, IoUtils.getExt("1."));
@@ -48,7 +49,7 @@ public class IoUtilsTest {
         assertEquals("java", IoUtils.getExt("abc.java"));
         assertEquals("java", IoUtils.getExt("abc.jAVa"));
     }
-    
+
     @Test
     public void testGetExtFile() {
         assertEquals(null, IoUtils.getExt(new File("1.")));
@@ -56,7 +57,15 @@ public class IoUtilsTest {
         assertEquals(null, IoUtils.getExt(new File("")));
         assertEquals(null, IoUtils.getExt(new File("abc")));
         assertEquals("java", IoUtils.getExt(new File("abc.java")));
-        assertEquals("java", IoUtils.getExt(new File("abc.jAVa"))); 
+        assertEquals("java", IoUtils.getExt(new File("abc.jAVa")));
+    }
+
+    @Test
+    public void testToByteArray() throws IOException {
+        byte[] arr = null;
+        try (InputStream is = getClass().getResourceAsStream("test.zip")) {
+            arr = IoUtils.toByteArray(is, 100, arr);
+        }
+        assertEquals(100, arr.length);
     }
 }
-
