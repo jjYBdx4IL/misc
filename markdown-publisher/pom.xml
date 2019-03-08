@@ -177,6 +177,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
+            <version>2.6</version>
         </dependency>
         <dependency>
             <groupId>commons-net</groupId>
@@ -191,6 +192,7 @@
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
+            <version>1.4.10</version>
         </dependency>
 
         <dependency>
@@ -228,15 +230,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <!-- make sure -am also triggers installation of depmgmt module: -->
-        <dependency>
-            <groupId>com.github.jjYBdx4IL</groupId>
-            <artifactId>depmgmt</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <type>pom</type>
-            <scope>test</scope>
+            <version>1.7.25</version>
         </dependency>
     </dependencies>
 
@@ -291,17 +285,4 @@
             </build>
         </profile>
     </profiles>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.github.jjYBdx4IL</groupId>
-                <artifactId>depmgmt</artifactId>
-                <version>1.0-SNAPSHOT</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
 </project>

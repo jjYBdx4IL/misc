@@ -256,6 +256,7 @@
         <dependency>
             <groupId>com.github.jjYBdx4IL.utils</groupId>
             <artifactId>proc-utils</artifactId>
+            <version>1.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -306,28 +307,6 @@
             <version>9.4.14.v20181114</version>
             <scope>test</scope>
         </dependency>
-
-        <!-- make sure -am also triggers installation of depmgmt module: -->
-        <dependency>
-            <groupId>com.github.jjYBdx4IL</groupId>
-            <artifactId>depmgmt</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <type>pom</type>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.github.jjYBdx4IL</groupId>
-                <artifactId>depmgmt</artifactId>
-                <version>1.0-SNAPSHOT</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
 </project>
 

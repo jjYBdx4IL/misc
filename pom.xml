@@ -69,7 +69,6 @@
         <module>cms-webapp</module>
         <module>cms-it</module>
         <module>db-utils</module>
-        <module>depmgmt</module>
         <module>diskcache</module>
         <module>env-utils</module>
         <module>ecs</module>

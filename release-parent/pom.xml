@@ -426,8 +426,8 @@
                         <rules>
                             <requireNoRepositories />
                             <requirePluginVersions />
-                            <dependencyConvergence />
-                            <requireUpperBoundDeps />
+<!--                             <dependencyConvergence /> -->
+<!--                             <requireUpperBoundDeps /> -->
                             <requireReleaseDeps>
                                 <message>No Snapshots Allowed!</message>
                                 <onlyWhenRelease>true</onlyWhenRelease>
