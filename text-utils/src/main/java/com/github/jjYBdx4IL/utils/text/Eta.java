@@ -20,7 +20,7 @@ import com.github.jjYBdx4IL.utils.time.TimeUtils;
 public class Eta<T extends Number> {
 
     public static final long DEFAULT_PERIODMS = 10000L;
-    
+
     private final T endValue;
     private final T startValue;
     private final long startMs;
@@ -61,20 +61,41 @@ public class Eta<T extends Number> {
      * @return a string with progress details incl. ETA
      */
     public String toString(T currentValue) {
-        final long elapsedMs = System.currentTimeMillis() - startMs;
+        return toString(currentValue, System.currentTimeMillis());
+    }
+
+    private String toString(T currentValue, final long now) {
+        final long elapsedMs = now - startMs;
         final float processed = (currentValue.floatValue() - (startValue != null ? startValue.floatValue() : 0f));
+        final float progressPercent = 100f * processed
+            / (endValue.floatValue() - (startValue != null ? startValue.floatValue() : 0f));
         final float speedMs = processed / (float) elapsedMs;
-        return String.format("%s in %s (%.2f/s, ETA: %s)",
+        float currentSpeedMs = Float.NaN;
+        String currentEta = "NaN";
+        if (prevValue != null) {
+            final long deltaElapsedMs = now - lastToStringPeriodical;
+            final float deltaProcessed = (currentValue.floatValue() - prevValue.floatValue());
+            currentSpeedMs = deltaProcessed / deltaElapsedMs;
+            if (deltaProcessed > 0f) {
+                currentEta = TimeUtils
+                    .millisToDuration((long) ((endValue.floatValue() - currentValue.floatValue()) / currentSpeedMs));
+            }
+        }
+        return String.format("%s (%.2f%%) in %s (total: %.2f/s, ETA: %s; current: %.2f/s, ETA: %s)",
             processed,
+            progressPercent,
             TimeUtils.millisToDuration(elapsedMs),
             speedMs * 1e3f,
             processed == 0f
                 ? "NaN"
-                : TimeUtils.millisToDuration((long) ((endValue.floatValue() - currentValue.floatValue()) / speedMs))
+                : TimeUtils.millisToDuration((long) ((endValue.floatValue() - currentValue.floatValue()) / speedMs)),
+            currentSpeedMs * 1e3f,
+            currentEta
         );
     }
 
     private long lastToStringPeriodical = 0;
+    private T prevValue = null;
 
     /**
      * Use this method to avoid spammning eta messages. Returns non-null only
@@ -90,8 +111,10 @@ public class Eta<T extends Number> {
         if (now - lastToStringPeriodical < periodMs) {
             return null;
         }
+        String result = toString(currentValue, now);
         lastToStringPeriodical = now;
-        return toString(currentValue);
+        prevValue = currentValue;
+        return result;
     }
 
 }
