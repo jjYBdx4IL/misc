@@ -14,4 +14,7 @@
    <gav regex="true">^com\.github\.jjYBdx4IL\.utils:jsoup-utils:.*$</gav>
    <cve>CVE-2015-6748</cve>
 </suppress>
+<suppress>
+   <cve>CVE-2018-12545</cve>
+</suppress>
 </suppressions>

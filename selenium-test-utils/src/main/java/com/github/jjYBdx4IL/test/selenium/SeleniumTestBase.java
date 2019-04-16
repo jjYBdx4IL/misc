@@ -15,9 +15,10 @@
  */
 package com.github.jjYBdx4IL.test.selenium;
 
+//CHECKSTYLE:OFF
 import com.github.jjYBdx4IL.test.JsoupTools;
 import com.github.jjYBdx4IL.utils.junit4.Screenshot;
-
+import com.google.common.base.Function;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
@@ -59,10 +60,8 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 
-//CHECKSTYLE:OFF
 /**
  *
  * @author jjYBdx4IL
