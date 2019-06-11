@@ -18,7 +18,7 @@ Lists of 41 third-party dependencies.
      (The Apache Software License, Version 2.0) J2ObjC Annotations (com.google.j2objc:j2objc-annotations:1.1 - https://github.com/google/j2objc/)
      (CDDL 1.1) (GPL2 w/ CPE) istack common utility code runtime (com.sun.istack:istack-commons-runtime:3.0.7 - http://java.net/istack-commons/istack-commons-runtime/)
      (Apache License, Version 2.0) fastinfoset (com.sun.xml.fastinfoset:FastInfoset:1.2.15 - http://fi.java.net)
-     (BSD style) XStream Core (com.thoughtworks.xstream:xstream:1.4.10 - http://x-stream.github.io/xstream)
+     (BSD style) XStream Core (com.thoughtworks.xstream:xstream:1.4.11.1 - http://x-stream.github.io/xstream)
      (Apache License, Version 2.0) Apache Commons CLI (commons-cli:commons-cli:1.4 - http://commons.apache.org/proper/commons-cli/)
      (Apache License, Version 2.0) Apache Commons Codec (commons-codec:commons-codec:1.10 - http://commons.apache.org/proper/commons-codec/)
      (Apache License, Version 2.0) Apache Commons IO (commons-io:commons-io:2.6 - http://commons.apache.org/proper/commons-io/)
