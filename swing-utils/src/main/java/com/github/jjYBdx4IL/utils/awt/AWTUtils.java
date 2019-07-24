@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.Container;
 import java.awt.Dialog;
+import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.MouseInfo;
@@ -422,7 +423,8 @@ public class AWTUtils {
 
     /**
      * Use {@link Container#paintAll(java.awt.Graphics)} to write the container's content
-     * to a PNG file.
+     * to a PNG file. If the container is an instance of {@link JFrame}, then its content
+     * pane will be used instead.
      * 
      * @param container the container whose contents are to be written
      * @param png the PNG output file
@@ -436,11 +438,17 @@ public class AWTUtils {
             public void run() {
                 BufferedImage img = new BufferedImage(container.getWidth(), container.getHeight(),
                     BufferedImage.TYPE_INT_ARGB);
-                container.paintAll(img.getGraphics());
+                Graphics g = null;
                 try {
+                    g = img.getGraphics();
+                    container.paintAll(g);
                     ImageIO.write(img, "png", png);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
+                } finally {
+                    if (g != null) {
+                        g.dispose();
+                    }
                 }
             }
         });

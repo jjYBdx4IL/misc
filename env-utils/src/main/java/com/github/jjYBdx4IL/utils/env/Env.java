@@ -15,16 +15,23 @@
  */
 package com.github.jjYBdx4IL.utils.env;
 
+import com.github.jjYBdx4IL.utils.io.IoUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 // CHECKSTYLE:OFF
@@ -126,6 +133,39 @@ public class Env {
         return new File(WindowsUtils.getCurrentUserDesktopPath());
     }
 
+    /**
+     * Read application config properties from a standard location.
+     * 
+     * @param classRef indicating the app (name)
+     * @return properties read from config file
+     * @throws IOException if config file is not found or cannot be read
+     */
+    public static Properties readAppConfig(Class<?> classRef) throws IOException {
+        return readAppConfig(classRef.getName());
+    }
+    
+    public static Properties readAppConfig(String appName) throws IOException {
+        File configDir = getConfigDir(appName);
+        File configFile = new File(configDir, "config");
+        Properties p = new Properties();
+        try (InputStream is = new FileInputStream(configFile)) {
+            p.load(is);
+        }
+        return p;
+    }
+    
+    public static void writeAppConfig(Class<?> classRef, Properties props) throws IOException {
+        writeAppConfig(classRef.getName(), props);
+    }
+    
+    public static void writeAppConfig(String appName, Properties props) throws IOException {
+        File configDir = getConfigDir(appName);
+        File configFile = new File(configDir, "config");
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        props.store(baos, "");
+        IoUtils.safeWriteTo(configFile, baos.toString(StandardCharsets.ISO_8859_1.name()));
+    }
+    
     public static File getConfigDir(Class<?> classRef) {
         return getConfigDir(classRef.getName());
     }

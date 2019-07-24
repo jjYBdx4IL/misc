@@ -21,6 +21,7 @@ import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+//CHECKSTYLE:OFF
 /**
  * Problems:
  * <ul>
@@ -35,7 +36,6 @@ import org.slf4j.LoggerFactory;
  * 
  * @author jjYBdx4IL
  */
-//CHECKSTYLE:OFF
 public class RetryRule implements TestRule {
 
     private static final Logger log = LoggerFactory.getLogger(RetryRule.class);

@@ -203,13 +203,35 @@ public class ImageUtils {
         return deepCopy(img.getSubimage(xLeft, yTop, xRight - xLeft + 1, yBottom - yTop + 1));
     }
 
-    public static BufferedImage deepCopy(BufferedImage bi) {
-        ColorModel cm = bi.getColorModel();
-        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-        WritableRaster raster = bi.copyData(bi.getRaster().createCompatibleWritableRaster());
-        return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+    // https://stackoverflow.com/questions/4156518/rotate-an-image-in-java/56752539
+    //@meta:keywords:rotate,bufferedimage@
+    public static BufferedImage rotate(BufferedImage image, double angle) {
+        double sin = Math.abs(Math.sin(angle)), cos = Math.abs(Math.cos(angle));
+        int w = image.getWidth(), h = image.getHeight();
+        int neww = (int)Math.floor(w*cos+h*sin), newh = (int) Math.floor(h * cos + w * sin);
+        BufferedImage result = deepCopy(image, false);
+        Graphics2D g = result.createGraphics();
+        g.translate((neww - w) / 2, (newh - h) / 2);
+        g.rotate(angle, w / 2, h / 2);
+        g.drawRenderedImage(image, null);
+        g.dispose();
+        return result;
     }
 
+    public static BufferedImage deepCopy(BufferedImage bi, boolean copyPixels) {
+        ColorModel cm = bi.getColorModel();
+        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+        WritableRaster raster = bi.getRaster().createCompatibleWritableRaster();
+        if (copyPixels) {
+            bi.copyData(raster);
+        }
+        return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+    }   
+    
+    public static BufferedImage deepCopy(BufferedImage bi) {
+        return deepCopy(bi, true);
+    }
+        
     public final static int DEFAULT_CHECKERED_BACKGROUND_SQUARE_SIZE = 8;
 
     public static void paintCheckeredBackground(BufferedImage img) {

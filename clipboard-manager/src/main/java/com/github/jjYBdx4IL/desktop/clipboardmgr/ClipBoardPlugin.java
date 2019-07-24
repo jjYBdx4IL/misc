@@ -18,6 +18,7 @@ package com.github.jjYBdx4IL.desktop.clipboardmgr;
 public interface ClipBoardPlugin {
 
     /**
+     * Plugin interface definition for the ClipBoard.
      * 
      * @param newTextContent
      *            the new text detected in the OS clipboard

@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import com.github.jjYBdx4IL.test.GraphicsResource;
+import com.github.jjYBdx4IL.utils.env.Maven;
 import com.github.jjYBdx4IL.utils.junit4.ImageTesterTest;
 import com.github.jjYBdx4IL.utils.junit4.InteractiveTestBase;
 import com.github.jjYBdx4IL.utils.klass.ClassReloader;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -48,6 +50,7 @@ import javax.imageio.ImageIO;
 public class ImageUtilsTest extends InteractiveTestBase implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(ImageUtilsTest.class);
+    private static final File TEMP_DIR = Maven.getTempTestDir(ImageUtilsTest.class);
 
     private static BufferedImage createImg1() {
         BufferedImage img = new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB);
@@ -167,7 +170,7 @@ public class ImageUtilsTest extends InteractiveTestBase implements Runnable {
     }
 
     @Test
-    public void testDeepCopy() {
+    public void testDeepCopy() throws IOException {
         BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_BYTE_GRAY);
         BufferedImage img2 = ImageUtils.deepCopy(img);
 
@@ -182,6 +185,13 @@ public class ImageUtilsTest extends InteractiveTestBase implements Runnable {
         }
         img.getRaster().setPixel(1, 1, new int[]{120});
         assertNotEquals(img.getRGB(1, 1), img2.getRGB(1, 1));
+        
+        // ImageIO.write sometimes fails silenty and creates no file if something is not right,
+        // so we use that as an additional validation
+        File jpg = new File(TEMP_DIR, "testDeepCopy.jpg");
+        ImageIO.write(img2, "jpg", jpg);
+        assertTrue(jpg.exists());
+        assertTrue(jpg.length() > 0);
     }
 
     @SuppressWarnings("unused")

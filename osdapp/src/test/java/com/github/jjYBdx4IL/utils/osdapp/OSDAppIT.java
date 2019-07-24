@@ -319,7 +319,7 @@ public class OSDAppIT extends AbstractHandler {
 
     private static void assertOutputOk(String output) {
         for (String line : output.split("\r?\n")) {
-            assertFalse(line.toLowerCase(Locale.ROOT).contains("exception"));
+            assertFalse(line.toLowerCase(Locale.ROOT), line.toLowerCase(Locale.ROOT).contains("exception"));
             if (line.contains("INFO SimpleXmlAppCfg - reading app configuration file")) {
                 continue;
             }

@@ -44,26 +44,26 @@ import java.util.StringTokenizer;
 public class YahooClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(YahooClient.class);
-	
-	public YahooClient() {
-	}
+
+    public YahooClient() {
+    }
 
     public static URL constructURL(String symbol, YahooIval ival) throws URISyntaxException, MalformedURLException {
         return new URIBuilder("http", "ichart.finance.yahoo.com", "/table.csv",
-                    "s", symbol,
-                    "a", "0", // start month - 1
-                    "b", "1", // start day
-                    "c", "1700", // start year
-                    "d", "0", // end month - 1
-                    "e", "1", // end day
-                    "f", "2038", // end year
-                    "g", ival.toString(), // ival
-                    "ignore", ".csv").toURL();
+            "s", symbol,
+            "a", "0", // start month - 1
+            "b", "1", // start day
+            "c", "1700", // start year
+            "d", "0", // end month - 1
+            "e", "1", // end day
+            "f", "2038", // end year
+            "g", ival.toString(), // ival
+            "ignore", ".csv").toURL();
     }
 
     public YahooObservations get(String symbol, YahooIval ival) throws IOException, ParseException {
         final URL url;
-        
+
         try {
             url = constructURL(symbol, ival);
         } catch (MalformedURLException | URISyntaxException ex) {
@@ -75,14 +75,14 @@ public class YahooClient {
 
     public YahooObservations get(final URL url) throws IOException, ParseException {
         YahooObservations observations = null;
-        
+
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
             HttpGet httpGet = new HttpGet(url.toExternalForm());
             try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
                 int sc = response.getStatusLine().getStatusCode();
                 if (sc != 200) {
                     throw new IOException(String.format("%s (%d)",
-                            response.getStatusLine().getReasonPhrase(), sc));
+                        response.getStatusLine().getReasonPhrase(), sc));
                 }
                 observations = new YahooObservations();
                 observations.setObservations(parseStream(response.getEntity().getContent()));
@@ -91,7 +91,7 @@ public class YahooClient {
 
         return observations;
     }
-	
+
     protected List<YahooObservation> parseStream(InputStream inputStream) throws IOException, ParseException {
         List<YahooObservation> observations = new ArrayList<>();
         // Date,Open,High,Low,Close,Volume,Adj Close
@@ -110,7 +110,7 @@ public class YahooClient {
                 }
                 StringTokenizer t = new StringTokenizer(line, ",");
                 String date = null, open = null, high = null, low = null, close = null,
-                        volume = null, adjClose = null;
+                    volume = null, adjClose = null;
                 for (YahooCsvColname colname : YahooCsvColname.values()) {
                     String value = t.nextToken();
                     switch (colname) {

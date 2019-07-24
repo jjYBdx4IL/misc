@@ -1,5 +1,6 @@
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="
         http://maven.apache.org/POM/4.0.0
             http://maven.apache.org/maven-v4_0_0.xsd
@@ -46,8 +47,10 @@
                         <phase>generate-resources</phase>
                         <configuration>
                             <target>
-                                <copy todir="${project.basedir}" includeEmptyDirs="no" verbose="true">
-                                    <fileset dir="${project.build.directory}/generated-sources/license">
+                                <copy todir="${project.basedir}"
+                                    includeEmptyDirs="no" verbose="true">
+                                    <fileset
+                                        dir="${project.build.directory}/generated-sources/license">
                                         <include name="LICENSE*" />
                                     </fileset>
                                 </copy>
@@ -97,6 +100,13 @@
                         <format>dir</format>
                     </formats>
                     <ignoreDirFormatExtensions>false</ignoreDirFormatExtensions>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
                 </configuration>
             </plugin>
 

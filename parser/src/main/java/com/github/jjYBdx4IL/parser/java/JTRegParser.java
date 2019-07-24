@@ -105,7 +105,8 @@ public class JTRegParser {
         }
 
         /**
-         * @param name the name to set
+         * @param name
+         *            the name to set
          */
         public void setName(String name) {
             this.name = name;
@@ -135,13 +136,13 @@ public class JTRegParser {
             xml.writeAttribute(ATTR_NAME, name == null ? UNKNOWN : removeNonprintableCharacters(name));
             xml.writeAttribute(TIMESTAMP, removeNonprintableCharacters(TimeUtils.toISO8601(date)));
             xml.writeAttribute(HOSTNAME, hostname == null ? UNKNOWN : removeNonprintableCharacters(hostname));
-            
+
             xml.writeAttribute(ATTR_TESTS, "" + numTests);
             xml.writeAttribute(ATTR_FAILURES, "" + numFailed);
             xml.writeAttribute(ATTR_ERRORS, "" + numErrors);
             xml.writeAttribute(ATTR_SKIPPED, "" + numSkipped);
             xml.writeAttribute(ATTR_TIME, String.format(Locale.ROOT, "%.3f", seconds));
-            
+
             xml.writeStartElement(PROPERTIES);
             if (props != null) {
                 final Enumeration<? extends Object> e = props.propertyNames();
@@ -154,7 +155,7 @@ public class JTRegParser {
                 }
             }
             xml.writeEndElement(); // PROPERTIES
-            
+
             for (TestResult result : results) {
                 result.appendTo(xml);
             }
@@ -168,7 +169,7 @@ public class JTRegParser {
                 xml.writeCharacters(removeNonprintableCharacters(stderr.toString()));
                 xml.writeEndElement(); // SYSTEM_ERR
             }
-            
+
             xml.writeEndElement(); // TESTSUITE
             xml.writeEndDocument();
         }
@@ -197,8 +198,8 @@ public class JTRegParser {
         SUCCESS, FAILED, ERROR, SKIPPED;
     }
 
-    /*
-     * <pre>
+    /**
+     * <code>
      * &lt;testcase name=&quot;testOversoldException&quot; classname=&quot;a.b.c.XYZTest&quot; time=&quot;0&quot;/&gt;
      * &lt;testcase name=&quot;testCalcRealizedGainsForTrade&quot; classname=&quot;a.b.c.XYZTest&quot; time=&quot;0.002&quot;&gt;
      *     &lt;failure message=&quot;expected:&amp;lt;1.0&amp;gt; but was:&amp;lt;0.0&amp;gt;&quot; type=&quot;java.lang.AssertionError&quot;&gt;&lt;![CDATA[java.lang.AssertionError: expected:&lt;1.0&gt; but was:&lt;0.0&gt;
@@ -209,7 +210,7 @@ public class JTRegParser {
      *         at a.b.c.XYZTest.test(XYZTest.java:43)
      * ]]&gt;&lt;/failure&gt;
      * &lt;/testcase&gt;
-     * </pre>
+     * </code>
      */
     public static class TestResult {
 
@@ -224,7 +225,7 @@ public class JTRegParser {
         private String strace;
 
         TestResult(String name, String classname, Status status, String stdout, double seconds)
-                throws ParseException, IOException {
+            throws ParseException, IOException {
             this.name = name;
             this.stdout = stdout;
             this.status = status;
@@ -337,177 +338,181 @@ public class JTRegParser {
     }
 
     private final static Pattern TEST_START_PATTERN = Pattern.compile("^TEST:\\s*(\\S+)$");
-    private final static Pattern FINAL_TEST_RESULTS_PATTERN
-            = Pattern.compile("^Test results:(?: passed: ([0-9,]+))?;?(?: failed: ([0-9,]+))?;?(?: error: ([0-9,]+))?$");
-    private final static Pattern TEST_END_PATTERN
-            = Pattern.compile("TEST RESULT: (Passed|Failed|Error)\\.\\s*(\\S.*)$");
+    private final static Pattern FINAL_TEST_RESULTS_PATTERN = Pattern
+        .compile("^Test results:(?: passed: ([0-9,]+))?;?(?: failed: ([0-9,]+))?;?(?: error: ([0-9,]+))?$");
+    private final static Pattern TEST_END_PATTERN = Pattern
+        .compile("TEST RESULT: (Passed|Failed|Error)\\.\\s*(\\S.*)$");
     private final static String JTREG_LIT_PASSED = "Passed";
     private final static String JTREG_LIT_FAILED = "Failed";
     private final static String JTREG_LIT_ERROR = "Error";
     private final static String EOL = "\n";
     private final static Pattern SUMMARY_PATTERN = Pattern.compile("^Summary:\\s*(\\S+)\\s*$");
-    private final static Pattern SUMMARY_FAILED_PATTERN
-            = Pattern.compile("^FAILED:\\s+(\\S+)$");
-    private final static Pattern FINAL_STATS_PATTERN
-            = Pattern.compile("^TEST STATS: name=(\\S+)\\s+run=(\\d+)\\s+pass=(\\d+)\\s+fail=(\\d+)$");
-    private final static Pattern TIME_PATTERN
-            = Pattern.compile("^(?:TIME|  (?:build|compile|testng|shell|main)):\\s+(\\d+\\.\\d+)\\s+seconds$");
+    private final static Pattern SUMMARY_FAILED_PATTERN = Pattern.compile("^FAILED:\\s+(\\S+)$");
+    private final static Pattern FINAL_STATS_PATTERN = Pattern
+        .compile("^TEST STATS: name=(\\S+)\\s+run=(\\d+)\\s+pass=(\\d+)\\s+fail=(\\d+)$");
+    private final static Pattern TIME_PATTERN = Pattern
+        .compile("^(?:TIME|  (?:build|compile|testng|shell|main)):\\s+(\\d+\\.\\d+)\\s+seconds$");
 
     @SuppressWarnings("unused")
-	public static TestSuite parse(InputStream is) throws ParseException, IOException {
+    public static TestSuite parse(InputStream is) throws ParseException, IOException {
         TestSuite suite = new TestSuite();
         Scanner s = new Scanner(is);
         try {
-	        Matcher m = null;
-	        int state = 0;
-	        int ln = 0;
-	        StringBuilder testStdout = null;
-	        String testFilename = null;
-	        Status testStatus = null;
-	        String testMessage = null;
-	        double testSeconds = .0;
-	        Set<String> failedTestFilenames = new HashSet<>();
-	        boolean allowGarbageAtStart = true;
-	        /**
-	         * states:.
-	         * <ul>
-	         * <li>0: separator line, -----------------... -> 1
-	         * <li>1: wait for: "Test results: passed: 2; failed: 1; error: 1" -> 3 or "TEST: " -> 2
-	         * <li>2: wait for: "TEST RESULT: " -> 0
-	         * <li>3: wait for: "Summary: jdk_core"
-	         * <li>4: wait for: "TEST STATS: name=jdk_core run=4 pass=2 fail=2" -> 5, or "FAILED:
-	         * java/net/Inet6Address/B6558853.java" -> 4
-	         * <li>5: dump rest of input
-	         * </ul>
-	         */
-	        while (s.hasNextLine()) {
-	            String l = s.nextLine();
-	            ln++;
-	            state:
-	            switch (state) {
-	                case 0:
-	                    if (JTREG_SEPARATOR.equals(l)) {
-	                        state++;
-	                        testStdout = new StringBuilder();
-	                        allowGarbageAtStart = false;
-	                        continue;
-	                    }
-	                    if (allowGarbageAtStart) {
-	                        continue;
-	                    }
-	                    break;
-	                case 1:
-	                    testStdout.append(l).append(EOL);
-	                    m = TEST_START_PATTERN.matcher(l);
-	                    if (m.find()) {
-	                        testFilename = m.group(1);
-	                        state++;
-	                        continue;
-	                    }
-	                    m = FINAL_TEST_RESULTS_PATTERN.matcher(l);
-	                    if (m.find()) {
-	                        int testsPassed = Integer.parseInt(m.group(1) == null ? "0" : m.group(1).replaceAll("[^0-9]", ""));
-	                        int testsFailed = Integer.parseInt(m.group(2) == null ? "0" : m.group(2).replaceAll("[^0-9]", ""));
-	                        int testsError = Integer.parseInt(m.group(3) == null ? "0" : m.group(3).replaceAll("[^0-9]", ""));
-	                        if (suite.getNumpassed() != testsPassed || suite.getNumErrors() != testsError || suite.getNumFailed() != testsFailed) {
-	                            throw new ParseException(ln);
-	                        }
-	                        state = 3;
-	                    }
-	                    continue;
-	                case 2:
-	                    testStdout.append(l).append(EOL);
-	                    m = TIME_PATTERN.matcher(l);
-	                    if (m.find()) {
-	                        testSeconds += Double.parseDouble(m.group(1).replaceAll("[^0-9\\.]", ""));
-	                    }
-	                    m = TEST_END_PATTERN.matcher(l);
-	                    if (m.find()) {
-	                        testMessage = m.group(2);
-	                        switch (m.group(1)) {
-	                            case JTREG_LIT_PASSED:
-	                                testStatus = Status.SUCCESS;
-	                                break;
-	                            case JTREG_LIT_FAILED:
-	                                testStatus = Status.FAILED;
-	                                break;
-	                            case JTREG_LIT_ERROR:
-	                                testStatus = Status.ERROR;
-	                                break;
-	                            default:
-	                                break state;
-	                        }
-	
-	                        String testName = testFilename.replaceFirst(".*[\\\\/]([^\\\\/]+)", "$1");
-	                        String className = testFilename;
-	                        if (className.matches(".*\\.java")) {
-	                            className = className.replaceFirst("(.*)\\.java", "$1").replaceAll("[\\\\/]", ".");
-	                        }
-	                        suite.add(new TestResult(testName, className, testStatus, testStdout.toString(), testSeconds));
-	
-	                        if (Status.ERROR.equals(testStatus) || Status.FAILED.equals(testStatus)) {
-	                            failedTestFilenames.add(testFilename);
-	                        }
-	
-	                        testStdout = null;
-	                        testFilename = null;
-	                        testStatus = null;
-	                        testMessage = null;
-	                        testSeconds = .0;
-	
-	                        state = 0;
-	                    }
-	                    continue;
-	                case 3:
-	                    m = SUMMARY_PATTERN.matcher(l);
-	                    if (m.find()) {
-	                        suite.setName(m.group(1));
-	                        state++;
-	                    }
-	                    continue;
-	                case 4:
-	                    m = SUMMARY_FAILED_PATTERN.matcher(l);
-	                    if (m.find()) {
-	                        String failedTestFilename = m.group(1);
-	                        if (!failedTestFilenames.remove(failedTestFilename)) {
-	                            throw new ParseException(ln);
-	                        }
-	                        continue;
-	                    }
-	                    m = FINAL_STATS_PATTERN.matcher(l);
-	                    if (m.find()) {
-	                        String suiteName = m.group(1);
-	                        int testsRun = Integer.parseInt(m.group(2));
-	                        int testsPassed = Integer.parseInt(m.group(3));
-	                        int testsNotPassed = Integer.parseInt(m.group(4));
-	
-	                        if (suite.getNumTests() != testsRun || suite.getNumpassed() != testsPassed
-	                                || suite.getNumErrors() + suite.getNumFailed() != testsNotPassed
-	                                || !suite.getName().equals(suiteName)) {
-	                            throw new ParseException(ln);
-	                        }
-	
-	                        state++;
-	                        continue;
-	                    }
-	                    break;
-	                case 5:
-	                    continue;
-	                default:
-	                    break;
-	            }
-	            throw new ParseException("failed to parse input at line " + ln + ": " + l);
-	        }
-	
-	        if (state != 5) {
-	            throw new ParseException("wrong state " + state, ln);
-	        }
-	
-	        if (!failedTestFilenames.isEmpty()) {
-	            throw new IllegalStateException();
-	        }
+            Matcher m = null;
+            int state = 0;
+            int ln = 0;
+            StringBuilder testStdout = null;
+            String testFilename = null;
+            Status testStatus = null;
+            String testMessage = null;
+            double testSeconds = .0;
+            Set<String> failedTestFilenames = new HashSet<>();
+            boolean allowGarbageAtStart = true;
+            /**
+             * states:.
+             * <ul>
+             * <li>0: separator line, -----------------... -> 1
+             * <li>1: wait for: "Test results: passed: 2; failed: 1; error: 1"
+             * -> 3 or "TEST: " -> 2
+             * <li>2: wait for: "TEST RESULT: " -> 0
+             * <li>3: wait for: "Summary: jdk_core"
+             * <li>4: wait for: "TEST STATS: name=jdk_core run=4 pass=2 fail=2"
+             * -> 5, or "FAILED: java/net/Inet6Address/B6558853.java" -> 4
+             * <li>5: dump rest of input
+             * </ul>
+             */
+            while (s.hasNextLine()) {
+                String l = s.nextLine();
+                ln++;
+                state: switch (state) {
+                    case 0:
+                        if (JTREG_SEPARATOR.equals(l)) {
+                            state++;
+                            testStdout = new StringBuilder();
+                            allowGarbageAtStart = false;
+                            continue;
+                        }
+                        if (allowGarbageAtStart) {
+                            continue;
+                        }
+                        break;
+                    case 1:
+                        testStdout.append(l).append(EOL);
+                        m = TEST_START_PATTERN.matcher(l);
+                        if (m.find()) {
+                            testFilename = m.group(1);
+                            state++;
+                            continue;
+                        }
+                        m = FINAL_TEST_RESULTS_PATTERN.matcher(l);
+                        if (m.find()) {
+                            int testsPassed = Integer
+                                .parseInt(m.group(1) == null ? "0" : m.group(1).replaceAll("[^0-9]", ""));
+                            int testsFailed = Integer
+                                .parseInt(m.group(2) == null ? "0" : m.group(2).replaceAll("[^0-9]", ""));
+                            int testsError = Integer
+                                .parseInt(m.group(3) == null ? "0" : m.group(3).replaceAll("[^0-9]", ""));
+                            if (suite.getNumpassed() != testsPassed || suite.getNumErrors() != testsError
+                                || suite.getNumFailed() != testsFailed) {
+                                throw new ParseException(ln);
+                            }
+                            state = 3;
+                        }
+                        continue;
+                    case 2:
+                        testStdout.append(l).append(EOL);
+                        m = TIME_PATTERN.matcher(l);
+                        if (m.find()) {
+                            testSeconds += Double.parseDouble(m.group(1).replaceAll("[^0-9\\.]", ""));
+                        }
+                        m = TEST_END_PATTERN.matcher(l);
+                        if (m.find()) {
+                            testMessage = m.group(2);
+                            switch (m.group(1)) {
+                                case JTREG_LIT_PASSED:
+                                    testStatus = Status.SUCCESS;
+                                    break;
+                                case JTREG_LIT_FAILED:
+                                    testStatus = Status.FAILED;
+                                    break;
+                                case JTREG_LIT_ERROR:
+                                    testStatus = Status.ERROR;
+                                    break;
+                                default:
+                                    break state;
+                            }
+
+                            String testName = testFilename.replaceFirst(".*[\\\\/]([^\\\\/]+)", "$1");
+                            String className = testFilename;
+                            if (className.matches(".*\\.java")) {
+                                className = className.replaceFirst("(.*)\\.java", "$1").replaceAll("[\\\\/]", ".");
+                            }
+                            suite.add(
+                                new TestResult(testName, className, testStatus, testStdout.toString(), testSeconds));
+
+                            if (Status.ERROR.equals(testStatus) || Status.FAILED.equals(testStatus)) {
+                                failedTestFilenames.add(testFilename);
+                            }
+
+                            testStdout = null;
+                            testFilename = null;
+                            testStatus = null;
+                            testMessage = null;
+                            testSeconds = .0;
+
+                            state = 0;
+                        }
+                        continue;
+                    case 3:
+                        m = SUMMARY_PATTERN.matcher(l);
+                        if (m.find()) {
+                            suite.setName(m.group(1));
+                            state++;
+                        }
+                        continue;
+                    case 4:
+                        m = SUMMARY_FAILED_PATTERN.matcher(l);
+                        if (m.find()) {
+                            String failedTestFilename = m.group(1);
+                            if (!failedTestFilenames.remove(failedTestFilename)) {
+                                throw new ParseException(ln);
+                            }
+                            continue;
+                        }
+                        m = FINAL_STATS_PATTERN.matcher(l);
+                        if (m.find()) {
+                            String suiteName = m.group(1);
+                            int testsRun = Integer.parseInt(m.group(2));
+                            int testsPassed = Integer.parseInt(m.group(3));
+                            int testsNotPassed = Integer.parseInt(m.group(4));
+
+                            if (suite.getNumTests() != testsRun || suite.getNumpassed() != testsPassed
+                                || suite.getNumErrors() + suite.getNumFailed() != testsNotPassed
+                                || !suite.getName().equals(suiteName)) {
+                                throw new ParseException(ln);
+                            }
+
+                            state++;
+                            continue;
+                        }
+                        break;
+                    case 5:
+                        continue;
+                    default:
+                        break;
+                }
+                throw new ParseException("failed to parse input at line " + ln + ": " + l);
+            }
+
+            if (state != 5) {
+                throw new ParseException("wrong state " + state, ln);
+            }
+
+            if (!failedTestFilenames.isEmpty()) {
+                throw new IllegalStateException();
+            }
         } finally {
-        	s.close();
+            s.close();
         }
         return suite;
     }

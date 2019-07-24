@@ -15,8 +15,6 @@
  */
 package com.github.jjYBdx4IL.utils.osdapp;
 
-import com.github.jjYBdx4IL.utils.text.FileSizeFormatter;
-
 /*
  * #%L
  * Java OSD
@@ -25,6 +23,8 @@ import com.github.jjYBdx4IL.utils.text.FileSizeFormatter;
  * %%
  * #L%
  */
+
+import com.github.jjYBdx4IL.utils.text.FileSizeFormatter;
 
 import org.apache.commons.io.FileSystemUtils;
 import org.slf4j.Logger;

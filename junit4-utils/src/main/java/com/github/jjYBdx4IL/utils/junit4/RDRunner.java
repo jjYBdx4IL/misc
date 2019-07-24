@@ -15,8 +15,7 @@
  */
 package com.github.jjYBdx4IL.utils.junit4;
 
-import com.github.jjYBdx4IL.utils.klass.ClassReloader;
-
+import com.github.jjYBdx4IL.utils.klazz.ClassReloader;
 import org.junit.Ignore;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.internal.runners.model.EachTestNotifier;

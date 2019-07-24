@@ -47,7 +47,7 @@ class NagiosPoller extends TimerTask {
     private final String loginPassword;
 
     NagiosPoller(URL nagiosStatusCgiUrl, String loginName, String loginPassword, JLabel label)
-            throws MalformedURLException {
+        throws MalformedURLException {
         this.url = new URL(nagiosStatusCgiUrl.toString());
         this.loginName = loginName;
         this.loginPassword = loginPassword;
@@ -68,7 +68,7 @@ class NagiosPoller extends TimerTask {
         int nWarning = 0;
         int nCritical = 0;
         @SuppressWarnings("unused")
-		int nUnknown = 0;
+        int nUnknown = 0;
         List<CheckStatus> results;
         try {
             if (loginName != null && loginPassword != null) {

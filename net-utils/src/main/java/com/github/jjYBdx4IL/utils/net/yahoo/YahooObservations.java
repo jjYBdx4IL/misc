@@ -25,16 +25,16 @@ import java.util.List;
  */
 public class YahooObservations implements Serializable {
 
-	private static final long serialVersionUID = 8483838261042212694L;
-	 
-	private List<YahooObservation> observations = null;
+    private static final long serialVersionUID = 8483838261042212694L;
 
-	public List<YahooObservation> getObservations() {
-		return observations;
-	}
+    private List<YahooObservation> observations = null;
 
-	public void setObservations(List<YahooObservation> observations) {
-		this.observations = observations;
-	}
-	
+    public List<YahooObservation> getObservations() {
+        return observations;
+    }
+
+    public void setObservations(List<YahooObservation> observations) {
+        this.observations = observations;
+    }
+
 }

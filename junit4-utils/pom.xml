@@ -37,8 +37,8 @@
         <!-- sorted by artifactId -->
         <dependency>
             <groupId>com.github.jjYBdx4IL.utils</groupId>
-            <artifactId>class-utils</artifactId>
-            <version>1.0</version>
+            <artifactId>klazz-utils</artifactId>
+            <version>1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

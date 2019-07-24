@@ -37,28 +37,31 @@ public class XMLUtils {
     /**
      * Dirty XML comparison. See {@link #strip(String)}.
      *
-     * @param xml1 first xml
-     * @param xml2 second xml to compare the first one with
+     * @param xml1
+     *            first xml
+     * @param xml2
+     *            second xml to compare the first one with
      * @return true iff the two XML snippets are identical after being stripped
      */
     public static boolean compareStrippedXml(String xml1, String xml2) {
-    	if (xml1 == null) {
-    		throw new IllegalArgumentException("first parameter must not be null");
-    	}
-    	if (xml2 == null) {
-    		throw new IllegalArgumentException("first parameter must not be null");
-    	}
+        if (xml1 == null) {
+            throw new IllegalArgumentException("first parameter must not be null");
+        }
+        if (xml2 == null) {
+            throw new IllegalArgumentException("first parameter must not be null");
+        }
         return strip(xml1).equals(strip(xml2));
     }
 
     /**
      * Trim whitespace in XML where pure whitespace shares the same parent with
-     * xml nodes and there are no text nodes with the same parent that have non-whitespace in them.
-     * Beware! Whitespace is significant in most parts of XML! Don't
-     * use this if you are not an XML pro! This is only intended for certain
-     * areas of testing. 
+     * xml nodes and there are no text nodes with the same parent that have
+     * non-whitespace in them. Beware! Whitespace is significant in most parts
+     * of XML! Don't use this if you are not an XML pro! This is only intended
+     * for certain areas of testing.
      *
-     * @param xml UTF-8 encoding is assumed
+     * @param xml
+     *            UTF-8 encoding is assumed
      * @return the trimmed xml
      */
     public static String strip(String xml) {

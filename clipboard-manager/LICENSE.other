@@ -1,7 +1,8 @@
 
-Lists of 11 third-party dependencies.
+Lists of 12 third-party dependencies.
      (The Apache Software License, Version 2.0) encryption-utils (com.github.jjYBdx4IL.utils:encryption-utils:1.2-SNAPSHOT - https://github.com/jjYBdx4IL/encryption-utils)
      (The Apache Software License, Version 2.0) Env Utils (com.github.jjYBdx4IL.utils:env-utils:1.1-SNAPSHOT - https://github.com/jjYBdx4IL/env-utils)
+     (The Apache Software License, Version 2.0) IO Utils (com.github.jjYBdx4IL.utils:io-utils:1.1-SNAPSHOT - https://github.com/jjYBdx4IL/io-utils)
      (The Apache Software License, Version 2.0) Math Utils (com.github.jjYBdx4IL.utils:math-utils:1.1-SNAPSHOT - https://github.com/jjYBdx4IL/math-utils)
      (The Apache Software License, Version 2.0) Process Utils (com.github.jjYBdx4IL.utils:proc-utils:1.2-SNAPSHOT - https://github.com/jjYBdx4IL/proc-utils)
      (The Apache Software License, Version 2.0) Swing Utils (com.github.jjYBdx4IL.utils:swing-utils:1.1-SNAPSHOT - https://github.com/jjYBdx4IL/swing-utils)

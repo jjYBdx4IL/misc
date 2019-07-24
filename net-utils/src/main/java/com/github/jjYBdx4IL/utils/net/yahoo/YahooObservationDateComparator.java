@@ -24,9 +24,9 @@ import java.util.Comparator;
  */
 public class YahooObservationDateComparator implements Comparator<YahooObservation> {
 
-	@Override
-	public int compare(YahooObservation o1, YahooObservation o2) {
-		return o1.getDate().compareTo(o2.getDate());
-	}
+    @Override
+    public int compare(YahooObservation o1, YahooObservation o2) {
+        return o1.getDate().compareTo(o2.getDate());
+    }
 
 }

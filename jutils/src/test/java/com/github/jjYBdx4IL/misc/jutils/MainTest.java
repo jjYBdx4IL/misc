@@ -20,10 +20,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
 
 import com.github.jjYBdx4IL.utils.io.FindUtils;
 import com.github.jjYBdx4IL.utils.proc.ProcRunner;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -68,11 +71,13 @@ public class MainTest {
 
     private static void run(String... args) throws IOException {
         List<String> _args = new ArrayList<>();
+        _args.add("bash");
         _args.add(new File(UNPACKED_DIST_DIR, "jutils").getAbsolutePath());
         Collections.addAll(_args, args);
         LOG.info("running external process: " + StringUtils.join(_args, " "));
         ProcRunner pr = new ProcRunner(true, _args);
         pr.setWorkDir(workDir);
+        pr.environment().remove("DEBUG");
         exitCode = pr.run();
         output = new ArrayList<>();
         pr.getOutputLines().forEach( line -> filter(line) );
@@ -159,6 +164,9 @@ public class MainTest {
     
     @Test
     public void testGrep() throws IOException {
+        // windows interpolates '*'
+        assumeFalse(SystemUtils.IS_OS_WINDOWS);
+        
         run("grep", "", "");
         assertEquals(outputBlob, 0, exitCode);
         assertEquals(outputBlob, 1, output.size());

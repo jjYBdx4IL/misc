@@ -32,11 +32,12 @@ import java.util.Map;
  * Simple URL testing methods.
  *
  * <p>
- * Think about using org.eclipse.jetty.http.HttpTester instead.</p>
+ * Think about using org.eclipse.jetty.http.HttpTester instead.
+ * </p>
  *
  * @author jjYBdx4IL
  */
-//CHECKSTYLE:OFF
+// CHECKSTYLE:OFF
 public class URLTester {
 
     public static void assertExists(String urlString) throws IOException {
@@ -59,13 +60,6 @@ public class URLTester {
     public static void assertNotExists(String urlString) throws IOException {
         URL url = new URL(urlString);
 
-//        Map<String, List<String>> fields = url.openConnection().getHeaderFields();
-//        for(String key : fields.keySet()) {
-//            for(String value : fields.get(key)) {
-//                log.info(key + " => " + value);
-//            }
-//        }
-
         try (InputStream is = url.openStream()) {
             fail();
         } catch (FileNotFoundException ex) {
@@ -78,24 +72,29 @@ public class URLTester {
     }
 
     /**
-     * Requests and returns partial http content starting at a specific position.
+     * Requests and returns partial http content starting at a specific
+     * position.
      * <p>
      * <b>Untested!</b>
      * <p>
      * Reads until the end of the stream.
      * <p>
      *
-     * @param urlString the url to decode
-     * @param firstBytePosition the offset
+     * @param urlString
+     *            the url to decode
+     * @param firstBytePosition
+     *            the offset
      * @return partial http content starting at a specific position
-     * @throws IOException on error
+     * @throws IOException
+     *             on error
      */
     public static String getContent(String urlString, long firstBytePosition) throws IOException {
         return getContent(urlString, firstBytePosition, -1L);
     }
 
     /**
-     * Requests and returns partial http content starting and ending at specific positions.
+     * Requests and returns partial http content starting and ending at specific
+     * positions.
      * <p>
      * <b>Untested!</b>
      * <p>
@@ -103,14 +102,18 @@ public class URLTester {
      * <code>lastBytePosition &lt;= firstBytePosition</code>.
      * <p>
      *
-     * @param urlString the url to decode
-     * @param firstBytePosition starting at 0
-     * @param lastBytePosition starting at 0
+     * @param urlString
+     *            the url to decode
+     * @param firstBytePosition
+     *            starting at 0
+     * @param lastBytePosition
+     *            starting at 0
      * @return partial http content starting and ending at specific positions
-     * @throws IOException on error
+     * @throws IOException
+     *             on error
      */
     public static String getContent(String urlString, long firstBytePosition, long lastBytePosition)
-            throws IOException {
+        throws IOException {
         final String rangeParamValue;
         if (lastBytePosition <= firstBytePosition) {
             rangeParamValue = String.format("bytes=%1$d-", firstBytePosition);
@@ -127,12 +130,14 @@ public class URLTester {
     /**
      * Returns all header fields values.
      * 
-     * @param urlString the url to decode
+     * @param urlString
+     *            the url to decode
      * @return the map
-     * @throws IOException on error
+     * @throws IOException
+     *             on error
      */
     @SuppressWarnings("unused")
-	public static Map<String, List<String>> getHeaderFields(String urlString) throws IOException {
+    public static Map<String, List<String>> getHeaderFields(String urlString) throws IOException {
         URL u = new URL(urlString);
         URLConnection c = u.openConnection();
         String content = IOUtils.toString(c.getInputStream());

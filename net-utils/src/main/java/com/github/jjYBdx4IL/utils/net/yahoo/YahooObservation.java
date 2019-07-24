@@ -28,21 +28,21 @@ import java.util.TimeZone;
  */
 public class YahooObservation implements Serializable {
 
-	private static final long serialVersionUID = -6533653506388858525L;
-	public static final String DATE_FORMAT = "yyyy-MM-dd";
-	private static final SimpleDateFormat SDF = new SimpleDateFormat(DATE_FORMAT);
-	
-	static {
-		SDF.setTimeZone(TimeZone.getTimeZone("UTC"));
-	}
-	
+    private static final long serialVersionUID = -6533653506388858525L;
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
+    private static final SimpleDateFormat SDF = new SimpleDateFormat(DATE_FORMAT);
+
+    static {
+        SDF.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
     private final Date date;
     private final double open, high, low, close, adjClose;
     private final long volume;
 
     // CHECKSTYLE IGNORE HiddenField FOR NEXT 2 LINES
     public YahooObservation(String date, String open, String high, String low, String close,
-            String volume, String adjClose) throws ParseException {
+        String volume, String adjClose) throws ParseException {
         this.date = SDF.parse(date);
         this.open = Double.valueOf(open);
         this.high = Double.valueOf(high);
@@ -53,9 +53,9 @@ public class YahooObservation implements Serializable {
     }
 
     public static YahooObservation createDateDummy(String date) throws ParseException {
-    	return new YahooObservation(date, "0.0", "0.0", "0.0", "0.0", "0", "0.0");
+        return new YahooObservation(date, "0.0", "0.0", "0.0", "0.0", "0", "0.0");
     }
-    
+
     /**
      * @return the date
      */

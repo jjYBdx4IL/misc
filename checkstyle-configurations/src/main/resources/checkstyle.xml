@@ -5,10 +5,6 @@
 <module name="Checker">
     <property name="charset" value="UTF-8" />
 
-    <!-- use //CHECKSTYLE:OFF|ON to disable/enable checkstyle checking within 
-        specific files/file regions -->
-    <module name="SuppressionCommentFilter" />
-
     <property name="fileExtensions" value="java, properties, xml" />
     <!-- Checks for whitespace -->
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
@@ -17,8 +13,9 @@
     </module>
 
     <module name="TreeWalker">
-        <!-- for SuppressionCommentFilter module -->
-        <module name="FileContentsHolder" />
+        <!-- use //CHECKSTYLE:OFF|ON to disable/enable checkstyle checking within 
+            specific files/file regions -->
+        <module name="SuppressionCommentFilter" />
         <module name="OuterTypeFilename" />
         <module name="IllegalTokenText">
             <property name="tokens" value="STRING_LITERAL, CHAR_LITERAL" />
@@ -47,9 +44,7 @@
                 value="LITERAL_TRY, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_SWITCH" />
         </module>
         <module name="NeedBraces" />
-        <module name="LeftCurly">
-            <property name="maxLineLength" value="120" />
-        </module>
+        <module name="LeftCurly" />
         <module name="RightCurly" />
         <module name="RightCurly">
             <property name="option" value="alone" />
@@ -98,18 +93,18 @@
                 value="Type name ''{0}'' must match pattern ''{1}''." />
         </module>
         <module name="MemberName">
-            <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9]*$" />
+            <property name="format" value="^([a-z][a-z0-9][a-zA-Z0-9]*|[a-z])$" />
             <message key="name.invalidPattern"
                 value="Member name ''{0}'' must match pattern ''{1}''." />
         </module>
         <module name="ParameterName">
-            <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9]*$" />
+            <property name="format" value="^([a-z][a-z0-9][a-zA-Z0-9]*|[a-z])$" />
             <message key="name.invalidPattern"
                 value="Parameter name ''{0}'' must match pattern ''{1}''." />
         </module>
         <module name="LocalVariableName">
             <property name="tokens" value="VARIABLE_DEF" />
-            <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9]*$" />
+            <property name="format" value="^([a-z][a-z0-9][a-zA-Z0-9]*|[a-z])$" />
             <property name="allowOneCharVarInForLoop" value="true" />
             <message key="name.invalidPattern"
                 value="Local variable name ''{0}'' must match pattern ''{1}''." />

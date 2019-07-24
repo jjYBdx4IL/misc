@@ -60,30 +60,35 @@ public abstract class AbstractConfig {
     /**
      * 
      *
-     * @param appName identifies your application and implicitly defines the location of your config directory
-     * on disk. Allowed characters: A-Z, a-z, 0-9
-     * @param manualEditMode write default config to disk and throw an exception telling the user to edit the config
-     * if no config is found when trying to read it. In this operational mode the postprocess method should also check
-     * whether the user has actually edited the config file and bail if not.
+     * @param appName
+     *            identifies your application and implicitly defines the
+     *            location of your config directory on disk. Allowed characters:
+     *            A-Z, a-z, 0-9
+     * @param manualEditMode
+     *            write default config to disk and throw an exception telling
+     *            the user to edit the config if no config is found when trying
+     *            to read it. In this operational mode the postprocess method
+     *            should also check whether the user has actually edited the
+     *            config file and bail if not.
      */
     public AbstractConfig(String appName, boolean manualEditMode) {
-    	this.manualEditMode = manualEditMode;
+        this.manualEditMode = manualEditMode;
         if (appName == null || !APP_NAME_PATTERN.matcher(appName).find()) {
             throw new IllegalArgumentException("appName param is null or invalid");
         }
         cfgDir = new File(System.getProperty("user.home"), ".config" + File.separatorChar + appName);
     }
-    
+
     public AbstractConfig(Class<?> klazz, boolean manualEditMode) {
         this(klazz.getCanonicalName(), manualEditMode);
     }
-    
+
     public AbstractConfig(String appName) {
-    	this(appName, false);
+        this(appName, false);
     }
 
     public AbstractConfig(Class<?> klazz) {
-    	this(klazz.getCanonicalName(), false);
+        this(klazz.getCanonicalName(), false);
     }
 
     public static String formatXml(String xml) {
@@ -111,17 +116,17 @@ public abstract class AbstractConfig {
     }
 
     protected void readDidntFindConfigFile() {
-    	if (manualEditMode) {
-			try {
-				write();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-			File file = getConfigFile();
-			throw new RuntimeException("writing new config file, please update " + file.getAbsolutePath());
-    	}
+        if (manualEditMode) {
+            try {
+                write();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            File file = getConfigFile();
+            throw new RuntimeException("writing new config file, please update " + file.getAbsolutePath());
+        }
     }
-    
+
     public File getConfigFile() {
         String filename = getClass().getSimpleName().toLowerCase(Locale.ROOT);
         filename = filename.replaceFirst("config$", "");
@@ -129,7 +134,7 @@ public abstract class AbstractConfig {
 
         return new File(cfgDir, filename);
     }
-    
+
     public boolean read() throws FileNotFoundException, IOException {
         File configFile = getConfigFile();
         XStream xstream = new XStream(new StaxDriver());
@@ -144,7 +149,7 @@ public abstract class AbstractConfig {
             postprocess();
             return true;
         } else {
-        	readDidntFindConfigFile();
+            readDidntFindConfigFile();
         }
 
         return false;
@@ -164,6 +169,5 @@ public abstract class AbstractConfig {
             IOUtils.write(formatXml(xml), os, "UTF-8");
         }
     }
-
 
 }

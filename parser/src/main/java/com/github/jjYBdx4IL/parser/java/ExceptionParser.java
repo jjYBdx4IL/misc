@@ -35,85 +35,85 @@ import java.util.regex.Pattern;
  */
 public class ExceptionParser {
 
-    private final static Pattern EXCEPTION_HEADER
-            = Pattern.compile("^" + JAVA_TYPENAME + ":\\s*(?<message>|\\S.*)$");
-    private final static Pattern STRACE_LINE
-            = Pattern.compile("^\\tat \\S+\\([^\\)]+\\)$");
+    private final static Pattern EXCEPTION_HEADER = Pattern.compile("^" + JAVA_TYPENAME + ":\\s*(?<message>|\\S.*)$");
+    private final static Pattern STRACE_LINE = Pattern.compile("^\\tat \\S+\\([^\\)]+\\)$");
     private final static String EOL = "\n";
 
     public static List<ParsedException> parse(InputStream is) throws ParseException {
         List<ParsedException> result = new ArrayList<>();
         Scanner s = new Scanner(is);
         try {
-	        Matcher m = null;
-	        String l = null;
-	        int ln = 0;
-	        int state = 0;
-	        String exceptionTypePkgName = null;
-	        String exceptionTypeSimpleName = null;
-	        String exceptionMessage = null;
-	        StringBuilder exceptionSTrace = null;
-	        int straceLines = 0;
-	        boolean reprocessLine = false;
-	        /**
-	         * states:
-	         * <ul>
-	         * <li>0: look for "$type: $message"
-	         * <li>1: append to stack trace while TRACE_LINE_PATTERN matches; finish exception on empty line. -> 0
-	         * </ul>
-	         */
-	        while (s.hasNextLine()) {
-	            if (!reprocessLine) {
-	                l = s.nextLine();
-	            }
-	            reprocessLine = false;
-	            ln++;
-	            switch (state) {
-	                case 0:
-	                    m = EXCEPTION_HEADER.matcher(l);
-	                    if (m.find()) {
-	                        exceptionTypePkgName = m.group(JAVA_TYPENAME_ARG_PKGNAME);
-	                        exceptionTypeSimpleName = m.group(JAVA_TYPENAME_ARG_SIMPLENAME);
-	                        exceptionMessage = m.group("message");
-	                        exceptionSTrace = new StringBuilder();
-	                        exceptionSTrace.append(l).append(EOL);
-	                        straceLines = 0;
-	                        state++;
-	                    }
-	                    continue;
-	                case 1:
-	                    if (l.length() == 0) {
-	                        if (straceLines > 0) {
-	                            result.add(new ParsedException(exceptionTypePkgName, exceptionTypeSimpleName, exceptionMessage, exceptionSTrace.toString()));
-	                        }
-	                        break;
-	                    }
-	                    m = STRACE_LINE.matcher(l);
-	                    if (m.find()) {
-	                        exceptionSTrace.append(l).append(EOL);
-	                        straceLines++;
-	                        continue;
-	                    }
-	                default:
-	                    break;
-	            }
-	            // try again
-	            exceptionTypePkgName = null;
-	            exceptionTypeSimpleName = null;
-	            exceptionMessage = null;
-	            exceptionSTrace = null;
-	            straceLines = 0;
-	            if (state == 1) {
-	                reprocessLine = true;
-	            }
-	            state = 0;
-	        }
-	
-	        if (state != 0) {
-	            throw new ParseException(ln);
-	        }
+            Matcher m = null;
+            String l = null;
+            int ln = 0;
+            int state = 0;
+            String exceptionTypePkgName = null;
+            String exceptionTypeSimpleName = null;
+            String exceptionMessage = null;
+            StringBuilder exceptionSTrace = null;
+            int straceLines = 0;
+            boolean reprocessLine = false;
+            /**
+             * states:
+             * <ul>
+             * <li>0: look for "$type: $message"
+             * <li>1: append to stack trace while TRACE_LINE_PATTERN matches;
+             * finish exception on empty line. -> 0
+             * </ul>
+             */
+            while (s.hasNextLine()) {
+                if (!reprocessLine) {
+                    l = s.nextLine();
+                }
+                reprocessLine = false;
+                ln++;
+                switch (state) {
+                    case 0:
+                        m = EXCEPTION_HEADER.matcher(l);
+                        if (m.find()) {
+                            exceptionTypePkgName = m.group(JAVA_TYPENAME_ARG_PKGNAME);
+                            exceptionTypeSimpleName = m.group(JAVA_TYPENAME_ARG_SIMPLENAME);
+                            exceptionMessage = m.group("message");
+                            exceptionSTrace = new StringBuilder();
+                            exceptionSTrace.append(l).append(EOL);
+                            straceLines = 0;
+                            state++;
+                        }
+                        continue;
+                    case 1:
+                        if (l.length() == 0) {
+                            if (straceLines > 0) {
+                                result.add(new ParsedException(exceptionTypePkgName, exceptionTypeSimpleName,
+                                    exceptionMessage, exceptionSTrace.toString()));
+                            }
+                            break;
+                        }
+                        m = STRACE_LINE.matcher(l);
+                        if (m.find()) {
+                            exceptionSTrace.append(l).append(EOL);
+                            straceLines++;
+                            continue;
+                        }
+                    default:
+                        break;
+                }
+                // try again
+                exceptionTypePkgName = null;
+                exceptionTypeSimpleName = null;
+                exceptionMessage = null;
+                exceptionSTrace = null;
+                straceLines = 0;
+                if (state == 1) {
+                    reprocessLine = true;
+                }
+                state = 0;
+            }
+
+            if (state != 0) {
+                throw new ParseException(ln);
+            }
         } finally {
-        	s.close();
+            s.close();
         }
         return result;
     }

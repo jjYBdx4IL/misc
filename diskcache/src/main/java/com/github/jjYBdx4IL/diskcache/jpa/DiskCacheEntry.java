@@ -59,72 +59,72 @@ public class DiskCacheEntry {
     @Version
     private long version;
 
-	public long getId() {
-		return id;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	public String getUrl() {
-		return url;
-	}
+    public String getUrl() {
+        return url;
+    }
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-	public byte[] getData() {
-		return data;
-	}
+    public byte[] getData() {
+        return data;
+    }
 
-	public void setData(byte[] data) {
-		this.data = data;
-	}
+    public void setData(byte[] data) {
+        this.data = data;
+    }
 
-	public long getSize() {
-		return size;
-	}
+    public long getSize() {
+        return size;
+    }
 
-	public void setSize(long size) {
-		this.size = size;
-	}
+    public void setSize(long size) {
+        this.size = size;
+    }
 
-	public long getCreatedAt() {
-		return createdAt;
-	}
+    public long getCreatedAt() {
+        return createdAt;
+    }
 
-	public void setCreatedAt(long createdAt) {
-		this.createdAt = createdAt;
-	}
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
 
-	public long getVersion() {
-		return version;
-	}
+    public long getVersion() {
+        return version;
+    }
 
-	public void setVersion(long version) {
-		this.version = version;
-	}
+    public void setVersion(long version) {
+        this.version = version;
+    }
 
-	@Override
-	public String toString() {
-		final int maxLen = 10;
-		StringBuilder builder = new StringBuilder();
-		builder.append("DiskCacheEntry [id=");
-		builder.append(id);
-		builder.append(", url=");
-		builder.append(url);
-		builder.append(", data=");
-		builder.append(data != null ? Arrays.toString(Arrays.copyOf(data, Math.min(data.length, maxLen))) : null);
-		builder.append(", size=");
-		builder.append(size);
-		builder.append(", createdAt=");
-		builder.append(createdAt);
-		builder.append(", version=");
-		builder.append(version);
-		builder.append("]");
-		return builder.toString();
-	}
+    @Override
+    public String toString() {
+        final int maxLen = 10;
+        StringBuilder builder = new StringBuilder();
+        builder.append("DiskCacheEntry [id=");
+        builder.append(id);
+        builder.append(", url=");
+        builder.append(url);
+        builder.append(", data=");
+        builder.append(data != null ? Arrays.toString(Arrays.copyOf(data, Math.min(data.length, maxLen))) : null);
+        builder.append(", size=");
+        builder.append(size);
+        builder.append(", createdAt=");
+        builder.append(createdAt);
+        builder.append(", version=");
+        builder.append(version);
+        builder.append("]");
+        return builder.toString();
+    }
 
 }
