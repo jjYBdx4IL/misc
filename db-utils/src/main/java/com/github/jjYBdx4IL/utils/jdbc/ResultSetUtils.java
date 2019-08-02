@@ -19,7 +19,10 @@ package com.github.jjYBdx4IL.utils.jdbc;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +49,20 @@ public class ResultSetUtils {
     }
 
     public static void dump(ResultSet rs) throws SQLException {
+        if (LOG.isInfoEnabled()) {
+            for (String line : toLines(rs)) {
+                LOG.info(line);
+            }
+        }
+    }
+    
+    public static String toString(ResultSet rs) throws SQLException {
+        return StringUtils.join(toLines(rs), System.lineSeparator());
+    }
+    
+    public static List<String> toLines(ResultSet rs) throws SQLException {
+        List<String> lines = new ArrayList<>();
+        
         ResultSetMetaData meta = rs.getMetaData();
         int colmax = meta.getColumnCount();
         int i;
@@ -72,7 +89,7 @@ public class ResultSetUtils {
                 sb.append("(");
             }
         }
-        LOG.info(sb.toString());
+        lines.add(sb.toString());
 
         while (rs.next()) {
             // CHECKSTYLE IGNORE MagicNumber FOR NEXT 1 LINE
@@ -87,8 +104,10 @@ public class ResultSetUtils {
                 } else {
                     sb.append(o.toString());
                 }
-                LOG.info(sb.toString());
             }
+            lines.add(sb.toString());
         }
+        
+        return lines;
     }
 }
