@@ -20,11 +20,11 @@ import javax.sound.midi.MidiMessage;
 import javax.sound.midi.ShortMessage;
 
 //CHECKSTYLE:OFF
-public class NoteOnMsg extends PMidiMessage implements HasChannel {
+public class NoteOnMsg extends PMidiMessage implements HasChannel, HasNote, HasVelocity {
 
     private int channel;
-    private final int note;
-    private final int velocity;
+    private int note;
+    private int velocity;
 
     /**
      * NoteOffEvent.
@@ -88,6 +88,16 @@ public class NoteOnMsg extends PMidiMessage implements HasChannel {
             throw new InvalidMidiDataException("invalid channel index " + channel);
         }
         this.channel = channel;
+    }
+    
+    @Override
+    public void setNote(int note) throws InvalidMidiDataException {
+        this.note = note;
+    }
+
+    @Override
+    public void setVelocity(int velocity) throws InvalidMidiDataException {
+        this.velocity = velocity;
     }
 
 }

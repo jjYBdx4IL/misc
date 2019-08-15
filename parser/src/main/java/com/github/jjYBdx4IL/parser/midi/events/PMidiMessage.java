@@ -28,8 +28,10 @@ import javax.sound.midi.MidiMessage;
  * 
  */
 public abstract class PMidiMessage {
-    public static final Pattern NOTE_PATTERN = Pattern.compile("([a-zA-Z]#?)(-?[0-9]+)"); 
-    
+    public static final Pattern NOTE_PATTERN = Pattern.compile("([a-zA-Z]#?)(-?[0-9]+)");
+    public static final int A4HZ = 440;
+    public static final int A4MIDINOTE = 69;
+
     public static Key getKey(int note) {
         return Key.values()[note % Key.values().length];
     }
@@ -50,6 +52,16 @@ public abstract class PMidiMessage {
         int octave = Integer.parseInt(m.group(2));
         Key key = Key.byName(m.group(1));
         return (octave + 1) * 12 + key.ordinal();
+    }
+
+    /**
+     * Frequency according to Stuttgart pitch or ISO 16.
+     * 
+     * @param note the midi note
+     * @return the frequency of the given note
+     */
+    public static float getFrequency(int note) {
+        return (float) (A4HZ * Math.pow(2d, (note - A4MIDINOTE) / 12d));
     }
 
     public abstract MidiMessage toMidiMessage();
