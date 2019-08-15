@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -175,7 +174,6 @@ public class CpuTimeOutputParser {
      * @throws ParseException on error
      */
     public static void main(String[] args) throws IOException, ParseException {
-        StringBuilder sb = new StringBuilder();
         System.out.println("Paste to text to parse and press CTRL-D:");
         String input = IOUtils.toString(System.in, Charset.defaultCharset());
         List<UsageData> result = parseMulti(input);
