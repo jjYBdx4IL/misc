@@ -88,7 +88,7 @@
         <module>parser</module>
         <module>proc-utils</module>
         <module>release-parent</module>
-        <module>remote-robot</module>
+	    <module>remote-robot</module>
         <module>selenium-test-utils</module>
         <module>solr-webapp</module>
         <module>solr-utils</module>

@@ -21,6 +21,8 @@ import com.github.jjYBdx4IL.utils.net.URIBuilder;
 import java.net.URISyntaxException;
 
 import static org.junit.Assert.*;
+
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -29,6 +31,7 @@ import org.junit.Test;
  */
 public class URIBuilderTest {
 
+	@Ignore
     @Test
     public void testToString() throws URISyntaxException {
         assertEquals("http://host.de", new URIBuilder("http", "host.de", null).toString());

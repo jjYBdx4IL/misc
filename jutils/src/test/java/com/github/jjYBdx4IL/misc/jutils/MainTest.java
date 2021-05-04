@@ -50,9 +50,11 @@ public class MainTest {
     private static final Logger LOG = LoggerFactory.getLogger(MainTest.class);
     private static File workDir;
     private static final File UNPACKED_DIST_DIR;
+    private static final File EXEC_JAR;
     static {
         try {
             UNPACKED_DIST_DIR = FindUtils.globOne("/target/jutils-*-bin.dir/jutils/");
+            EXEC_JAR = FindUtils.globOne("/target/jutils-*-bin.dir/jutils/jutils*.jar");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -71,8 +73,15 @@ public class MainTest {
 
     private static void run(String... args) throws IOException {
         List<String> _args = new ArrayList<>();
-        _args.add("bash");
-        _args.add(new File(UNPACKED_DIST_DIR, "jutils").getAbsolutePath());
+        if (SystemUtils.IS_OS_WINDOWS) {
+        	_args.add("java");
+        	_args.add("-jar");
+        	_args.add(EXEC_JAR.getAbsolutePath());
+        } else {
+        	// on Linux, we implicitly test the shell script
+	        _args.add("bash");
+	        _args.add(new File(UNPACKED_DIST_DIR, "jutils").getAbsolutePath());
+        }
         Collections.addAll(_args, args);
         LOG.info("running external process: " + StringUtils.join(_args, " "));
         ProcRunner pr = new ProcRunner(true, _args);

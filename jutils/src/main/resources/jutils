@@ -6,7 +6,7 @@ scriptdir=$(dirname "$(readlink -f "$0")")
 
 jarfile=$scriptdir/${project.artifactId}-${project.version}.jar
 
-# check for local development build if ${project.artifactId} is being usedfrom proper install location
+# check for local development build if ${project.artifactId} is being used from proper install location
 # (ignore this, development only)
 iloc=~/.local/${project.artifactId}/${project.artifactId}
 

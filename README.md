@@ -38,3 +38,8 @@ In the root directory (`misc-aggregator` project) do:
 mvn clean install site
 mvn clean install -Psite-archive -N
 ```
+
+
+--
+[![Build Status](https://travis-ci.org/jjYBdx4IL/misc.png?branch=master)](https://travis-ci.org/jjYBdx4IL/misc)
+devel/java/github/misc@7840

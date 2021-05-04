@@ -10,5 +10,6 @@
 <suppress>
    <cve>CVE-2018-10054</cve>
    <cve>CVE-2018-14335</cve>
+   <cve>CVE-2020-13956</cve>
 </suppress>
 </suppressions>

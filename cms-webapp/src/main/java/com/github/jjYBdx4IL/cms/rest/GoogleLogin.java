@@ -15,21 +15,7 @@
  */
 package com.github.jjYBdx4IL.cms.rest;
 
-import com.github.jjYBdx4IL.cms.jpa.AppCache;
 //CHECKSTYLE:OFF
-import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
-import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
-import com.github.jjYBdx4IL.cms.jpa.dto.User;
-import com.github.jjYBdx4IL.cms.rest.app.SessionData;
-import com.github.jjYBdx4IL.utils.text.PasswordGenerator;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
-import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -50,6 +36,21 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.jjYBdx4IL.cms.jpa.AppCache;
+import com.github.jjYBdx4IL.cms.jpa.QueryFactory;
+import com.github.jjYBdx4IL.cms.jpa.dto.ConfigKey;
+import com.github.jjYBdx4IL.cms.jpa.dto.User;
+import com.github.jjYBdx4IL.cms.rest.app.SessionData;
+import com.github.jjYBdx4IL.utils.text.PasswordGenerator;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 
 @Path("googleLogin")
 @PermitAll
@@ -175,7 +176,7 @@ public class GoogleLogin {
         String clientId = appCache.getNonEmpty(ConfigKey.GOOGLE_OAUTH2_CLIENT_ID);
         String clientSecret = appCache.getNonEmpty(ConfigKey.GOOGLE_OAUTH2_CLIENT_SECRET);
         return new GoogleAuthorizationCodeFlow(
-            new NetHttpTransport(), new JacksonFactory(), clientId, clientSecret,
+            new NetHttpTransport(), GsonFactory.getDefaultInstance(), clientId, clientSecret,
             Arrays.asList(new String[] { "openid", "email" }));
     }
 }

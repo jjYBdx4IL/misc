@@ -1,14 +1,13 @@
 
-Lists of 12 third-party dependencies.
+Lists of 11 third-party dependencies.
      (The Apache Software License, Version 2.0) encryption-utils (com.github.jjYBdx4IL.utils:encryption-utils:1.2-SNAPSHOT - https://github.com/jjYBdx4IL/encryption-utils)
      (The Apache Software License, Version 2.0) Env Utils (com.github.jjYBdx4IL.utils:env-utils:1.1-SNAPSHOT - https://github.com/jjYBdx4IL/env-utils)
      (The Apache Software License, Version 2.0) IO Utils (com.github.jjYBdx4IL.utils:io-utils:1.1-SNAPSHOT - https://github.com/jjYBdx4IL/io-utils)
      (The Apache Software License, Version 2.0) Math Utils (com.github.jjYBdx4IL.utils:math-utils:1.1-SNAPSHOT - https://github.com/jjYBdx4IL/math-utils)
      (The Apache Software License, Version 2.0) Process Utils (com.github.jjYBdx4IL.utils:proc-utils:1.2-SNAPSHOT - https://github.com/jjYBdx4IL/proc-utils)
      (The Apache Software License, Version 2.0) Swing Utils (com.github.jjYBdx4IL.utils:swing-utils:1.1-SNAPSHOT - https://github.com/jjYBdx4IL/swing-utils)
-     (Apache License, Version 2.0) Apache Commons Codec (commons-codec:commons-codec:1.10 - http://commons.apache.org/proper/commons-codec/)
-     (Apache License, Version 2.0) Apache Commons IO (commons-io:commons-io:2.6 - http://commons.apache.org/proper/commons-io/)
-     (The Apache Software License, Version 2.0) Apache Log4j (log4j:log4j:1.2.17 - http://logging.apache.org/log4j/1.2/)
+     (Apache License, Version 2.0) Apache Commons Codec (commons-codec:commons-codec:1.13 - https://commons.apache.org/proper/commons-codec/)
+     (Apache License, Version 2.0) Apache Commons IO (commons-io:commons-io:2.8.0 - https://commons.apache.org/proper/commons-io/)
      (Apache License, Version 2.0) Apache Commons Lang (org.apache.commons:commons-lang3:3.5 - http://commons.apache.org/proper/commons-lang/)
-     (MIT License) SLF4J API Module (org.slf4j:slf4j-api:1.7.25 - http://www.slf4j.org)
-     (MIT License) SLF4J LOG4J-12 Binding (org.slf4j:slf4j-log4j12:1.7.25 - http://www.slf4j.org)
+     (MIT License) SLF4J API Module (org.slf4j:slf4j-api:1.7.30 - http://www.slf4j.org)
+     (MIT License) SLF4J Simple Binding (org.slf4j:slf4j-simple:1.7.30 - http://www.slf4j.org)

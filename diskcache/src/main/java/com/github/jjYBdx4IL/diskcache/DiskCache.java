@@ -147,7 +147,7 @@ public class DiskCache implements Closeable {
         props.put("hibernate.hbm2ddl.auto", "update");
         props.put("hibernate.show_sql", Boolean.toString(LOG.isTraceEnabled()));
         props.put("javax.persistence.jdbc.driver", "org.h2.Driver");
-        props.put("javax.persistence.jdbc.url", "jdbc:h2:" + dbLocation + ";MVCC=TRUE");
+        props.put("javax.persistence.jdbc.url", "jdbc:h2:" + dbLocation);
 
         emf = Persistence.createEntityManagerFactory("DiskCachePU", props);
 

@@ -16,15 +16,23 @@
 package com.github.jjYBdx4IL.parser.linux;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import com.github.jjYBdx4IL.parser.ParseException;
 import com.github.jjYBdx4IL.parser.linux.CpuTimeOutputParser.UsageData;
+import org.apache.commons.lang3.SystemUtils;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
 public class CpuTimeOutputParserTest {
 
+    @Before
+    public void assumeLinux() {
+        assumeTrue(SystemUtils.IS_OS_LINUX);
+    }
+    
     @Test
     public void testParse() throws ParseException {
         assertEquals("UsageData [real=38197ms, user=98938ms, sys=2804ms]", CpuTimeOutputParser.parse(

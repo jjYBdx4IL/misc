@@ -22,7 +22,7 @@
         <maven.compiler.plugin.encoding>${default.encoding}</maven.compiler.plugin.encoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <jetty.version>9.4.18.v20190429</jetty.version>
+        <jetty.version>9.4.40.v20210413</jetty.version>
         <wildfly.version>17.0.0.Final</wildfly.version>
     </properties>
 
@@ -89,7 +89,7 @@
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
                 <configuration>
-                    <failBuildOnAnyVulnerability>true</failBuildOnAnyVulnerability>
+                    <failOnError>false</failOnError>
                     <skipTestScope>true</skipTestScope>
                 </configuration>
             </plugin>
@@ -220,10 +220,6 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <configuration>
-                    <failBuildOnAnyVulnerability>true</failBuildOnAnyVulnerability>
-                    <skipTestScope>true</skipTestScope>
-                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -270,7 +266,7 @@
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <failOnWarnings>true</failOnWarnings>
+                    <failOnWarnings>false</failOnWarnings>
                 </configuration>
                 <executions>
                     <execution>
@@ -312,7 +308,11 @@
                 <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
-                    <version>5.0.0-M3</version>
+                    <version>6.1.6</version>
+	                <configuration>
+	                    <failOnError>false</failOnError>
+	                    <skipTestScope>true</skipTestScope>
+	                </configuration>
                 </plugin>
                 <plugin>
                     <groupId>com.googlecode.maven-download-plugin</groupId>
@@ -484,8 +484,9 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.0</version>
                     <configuration>
+                    	<failOnWarnings>false</failOnWarnings>
                         <detectOfflineLinks>false</detectOfflineLinks>
                     </configuration>
                 </plugin>
