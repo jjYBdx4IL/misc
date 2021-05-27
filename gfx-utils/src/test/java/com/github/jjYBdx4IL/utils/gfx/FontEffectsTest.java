@@ -21,8 +21,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import com.github.jjYBdx4IL.utils.gfx.FontEffects;
-
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,7 +55,7 @@ public class FontEffectsTest {
     @Test
     public void testPaintGlassEffect() throws IOException {
         FontEffects effects = new FontEffects();
-        effects.setText("it systems GmbH");
+        effects.setText("Hello, World!");
         effects.setGlassBG(true);
         effects.setShadowOffset(15);
         effects.paint();
@@ -67,7 +65,7 @@ public class FontEffectsTest {
     @Test
     public void testBlurShadow() throws IOException {
         FontEffects effects = new FontEffects();
-        effects.setText("it systems GmbH");
+        effects.setText("Hello, World!");
         effects.setShadowType(FontEffects.ShadowType.BLUR);
         effects.setGlassBG(false);
         effects.setShadowOffset(15);

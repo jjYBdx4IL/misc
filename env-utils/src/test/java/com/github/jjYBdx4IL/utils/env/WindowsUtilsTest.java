@@ -16,11 +16,12 @@
 package com.github.jjYBdx4IL.utils.env;
 
 //CHECKSTYLE:OFF
-import com.github.jjYBdx4IL.utils.env.CI;
-import com.github.jjYBdx4IL.utils.env.WindowsUtils;
-
+import java.io.File;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.junit.Assert.*;
 import org.junit.Assume;
 
@@ -29,6 +30,8 @@ import org.junit.Assume;
  * @author jjYBdx4IL
  */
 public class WindowsUtilsTest {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(WindowsUtilsTest.class);
     
     /**
      * Test of getCurrentUserDesktopPath method, of class WindowsUtils.
@@ -39,5 +42,16 @@ public class WindowsUtilsTest {
         
         String result = WindowsUtils.getCurrentUserDesktopPath();
         assertNotNull(result);
+    }
+    
+    @Test
+    public void testGetCygwinInstallationPath() {
+        Assume.assumeTrue(SystemUtils.IS_OS_WINDOWS && !CI.isCI());
+        
+        String result = WindowsUtils.getCygwinInstallationPath();
+        if (new File("C:\\cygwin64").exists()) {
+            assertNotNull(result);
+        }
+        LOG.info(result);
     }
 }

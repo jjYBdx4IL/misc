@@ -8,6 +8,6 @@ Lists of 11 third-party dependencies.
      (The Apache Software License, Version 2.0) Swing Utils (com.github.jjYBdx4IL.utils:swing-utils:1.1-SNAPSHOT - https://github.com/jjYBdx4IL/swing-utils)
      (Apache License, Version 2.0) Apache Commons Codec (commons-codec:commons-codec:1.13 - https://commons.apache.org/proper/commons-codec/)
      (Apache License, Version 2.0) Apache Commons IO (commons-io:commons-io:2.8.0 - https://commons.apache.org/proper/commons-io/)
-     (Apache License, Version 2.0) Apache Commons Lang (org.apache.commons:commons-lang3:3.5 - http://commons.apache.org/proper/commons-lang/)
+     (Apache License, Version 2.0) Apache Commons Lang (org.apache.commons:commons-lang3:3.12.0 - https://commons.apache.org/proper/commons-lang/)
      (MIT License) SLF4J API Module (org.slf4j:slf4j-api:1.7.30 - http://www.slf4j.org)
      (MIT License) SLF4J Simple Binding (org.slf4j:slf4j-simple:1.7.30 - http://www.slf4j.org)

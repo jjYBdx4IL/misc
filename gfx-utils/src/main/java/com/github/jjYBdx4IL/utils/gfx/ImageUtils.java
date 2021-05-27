@@ -15,21 +15,26 @@
  */
 package com.github.jjYBdx4IL.utils.gfx;
 
+import org.apache.commons.math3.ml.clustering.CentroidCluster;
+import org.apache.commons.math3.ml.clustering.Clusterable;
+import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
+
 //CHECKSTYLE:OFF
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.math3.ml.clustering.CentroidCluster;
-import org.apache.commons.math3.ml.clustering.Clusterable;
-import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -153,6 +158,16 @@ public class ImageUtils {
     }
 
     public static BufferedImage autoCrop(BufferedImage img) {
+        Rectangle r = getBoundingBox(img);
+        return deepCopy(img.getSubimage(r.x, r.y, r.width, r.height));
+    }
+    
+    public static Rectangle getBoundingBox(Path imgFile) throws IOException {
+        BufferedImage img = ImageIO.read(imgFile.toFile());
+        return getBoundingBox(img);
+    }
+    
+    public static Rectangle getBoundingBox(BufferedImage img) {
         final int bkgd = img.getRGB(0, 0);
         int x, y;
 
@@ -199,8 +214,8 @@ public class ImageUtils {
             }
         }
         int yBottom = y;
-
-        return deepCopy(img.getSubimage(xLeft, yTop, xRight - xLeft + 1, yBottom - yTop + 1));
+        
+        return new Rectangle(xLeft, yTop, xRight - xLeft + 1, yBottom - yTop + 1);
     }
 
     // https://stackoverflow.com/questions/4156518/rotate-an-image-in-java/56752539
@@ -295,5 +310,40 @@ public class ImageUtils {
         return dbi;
     }
 
+    /**
+     * Quality, bicubic scaling. Width/height ratio not preserved.
+     * 
+     * @param input the image to be scaled
+     * @param dWidth desired target width
+     * @param dHeight desired target height
+     * @return the scaled image
+     */
+    public static BufferedImage scale(Path input, int dWidth, int dHeight) throws IOException {
+        BufferedImage img = ImageIO.read(input.toFile());
+        return scale(img, dWidth, dHeight);
+    }
+
+    /**
+     * Quality, bicubic scaling. Width/height ratio not preserved.
+     * 
+     * @param input the image to be scaled
+     * @param output the scaled image. target file will be overwritten if it exists.
+     * @param dWidth desired target width
+     * @param dHeight desired target height
+     */
+    public static void scale(Path input, Path output, int dWidth, int dHeight) throws IOException {
+        BufferedImage img = ImageIO.read(input.toFile());
+        BufferedImage out = scale(img, dWidth, dHeight);
+        String outname = output.toFile().getName();
+        int i = outname.lastIndexOf(".");
+        if (i == -1) {
+            throw new IOException("failed to determine image format form file extension");
+        }
+        String ext = outname.substring(i+1);
+        if (!ImageIO.write(out, ext, output.toFile())) {
+            throw new IOException("failed to determine image format form file extension: " + ext);
+        }
+    }
+    
     private ImageUtils() {}
 }

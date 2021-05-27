@@ -204,7 +204,7 @@ public class BackupGithubRepos implements JUtilsCommandInterface {
         int exitCode = 0;
         try {
             exitCode = pr.run();
-        } catch (IOException e) {
+        } catch (IOException|InterruptedException e) {
             e.printStackTrace();
             return false;
         }

@@ -63,6 +63,7 @@ public class FindUtilsTest {
         assertEquals(1, FindUtils.find(TEMP_DIR, "^/1/$").size());
         assertEquals(1, FindUtils.find(TEMP_DIR, "/333/$").size());
         assertEquals(1, FindUtils.find(TEMP_DIR, "^/1/22/333/$").size());
+        assertEquals(1, FindUtils.find(TEMP_DIR, "^/1/22/*/$").size());
         assertEquals(1, FindUtils.find(TEMP_DIR, "/4444$").size());
     }
 
@@ -101,10 +102,17 @@ public class FindUtilsTest {
     
     @Test
     public void testGlobOne() throws IOException {
+        assertNull(FindUtils.globOne(TEMP_DIR, "1"));
+        assertNull(FindUtils.globOne(TEMP_DIR, "1/"));
+        assertNotNull(FindUtils.globOne(TEMP_DIR, "/1/"));
+        assertNotNull(FindUtils.globOne(TEMP_DIR, "/1/*/"));
+        assertNotNull(FindUtils.globOne(TEMP_DIR, "**/1/"));
         assertNotNull(FindUtils.globOne(TEMP_DIR, "**/333/"));
+        assertNull(FindUtils.globOne(TEMP_DIR, "**/333"));
         assertNull(FindUtils.globOne(TEMP_DIR, "**/3"));
         assertNull(FindUtils.globOne(TEMP_DIR, "*/3"));
         assertNotNull(FindUtils.globOne(TEMP_DIR, "**/4444"));
+        assertNotNull(FindUtils.globOne(TEMP_DIR, "**4444"));
         assertNotNull(FindUtils.globOne(TEMP_DIR, "/*/*/*/4444"));
         assertNotNull(FindUtils.globOne(TEMP_DIR, "/*/*/*/*4*"));
         assertNull(FindUtils.globOne(TEMP_DIR, "/*/*/*/*4*/"));

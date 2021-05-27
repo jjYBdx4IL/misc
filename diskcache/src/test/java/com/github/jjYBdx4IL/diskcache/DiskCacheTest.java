@@ -21,8 +21,6 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.AfterClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -34,7 +32,6 @@ import java.io.IOException;
  */
 public class DiskCacheTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DiskCacheTest.class);
     private static final DiskCache cache = new DiskCache(null, null, true);
 
     @AfterClass
@@ -43,10 +40,11 @@ public class DiskCacheTest {
     }
     
     @Test
-    public void testSetExpirySecs() throws IOException {
+    public void testSetExpirySecs() throws IOException, InterruptedException {
         try {
             cache.put("1", "1".getBytes());
             cache.setExpirySecs(0);
+            Thread.sleep(3);
             assertNull(cache.get("1"));
         } finally {
             cache.setExpirySecs(DiskCache.DEFAULT_EXPIRY_SECS);

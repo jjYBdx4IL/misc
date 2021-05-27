@@ -27,11 +27,20 @@ import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 //CHECKSTYLE:OFF
 public class WebsiteVerifier {
@@ -45,6 +54,7 @@ public class WebsiteVerifier {
     private String rootUrl = null;
     protected final Set<String> externalUrls = new HashSet<>();
     private boolean checkExternalUrls = false;
+    private final Pattern zipPattern = Pattern.compile("\\.(zip|jar|war)$", Pattern.CASE_INSENSITIVE);
 
     /**
      * verify method. runs the crawling process.
@@ -67,15 +77,25 @@ public class WebsiteVerifier {
             @Override
             public Result process(Request request, Page page) {
                 String pageUrl = request.getUrl();
-                LOG.info("process: " + pageUrl + " page: " + page);
+                LOG.info("process: " + pageUrl);
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("page: " + page);
+                }
 
                 Result result = new Result();
+
+                if (zipPattern.matcher(pageUrl).find()) {
+                    if (!verifyZip(page)) {
+                        throw new RuntimeException();
+                    }
+                    return result;
+                }
 
                 // parse html
                 if (!(page.getResult() instanceof String)) {
                     return result;
                 }
-
+                
                 // find new urls
                 for (Element element : page.document().select("a")) {
                     String url = element.absUrl("href");
@@ -83,7 +103,11 @@ public class WebsiteVerifier {
                         continue;
                     }
                     LOG.info("url found: " + url);
-                    page.addTargetRequest(url);
+                    if (zipPattern.matcher(url).find()) {
+                        page.addTargetRequest(url, ResponseType.STREAM);
+                    } else {
+                        page.addTargetRequest(url);
+                    }
                     registerLink(url, pageUrl);
                 }
                 for (Element element : page.document().select("img")) {
@@ -221,5 +245,31 @@ public class WebsiteVerifier {
 
     public void setCheckExternalUrls(boolean checkExternalUrls) {
         this.checkExternalUrls = checkExternalUrls;
+    }
+    
+    /**
+     * Verify zip stream integrity. Requires at least one non-directory entry to be present in the zip stream.
+     */
+    private boolean verifyZip(Page page) {
+        try (InputStream is = page.getStreamResult();
+                ZipInputStream zis = new ZipInputStream(is)) {
+            ZipEntry ze = zis.getNextEntry();
+            if(ze == null) {
+                return false;
+            }
+            long nFiles = 0;
+            while(ze != null) {
+                ze.getCrc();
+                ze.getCompressedSize();
+                ze.getName();
+                nFiles += ze.isDirectory() ? 0 : 1;
+                ze = zis.getNextEntry();
+            }
+            return nFiles > 0;
+        } catch (ZipException e) {
+            return false;
+        } catch (IOException e) {
+            return false;
+        }
     }
 }

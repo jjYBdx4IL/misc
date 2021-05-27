@@ -15,19 +15,22 @@
  */
 package com.github.jjYBdx4IL.utils.proc;
 
-//CHECKSTYLE:OFF
-import java.io.File;
-import java.util.Random;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
 
 import org.apache.commons.lang3.SystemUtils;
-import static org.junit.Assert.*;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.jjYBdx4IL.utils.proc.ProcRunner;
+//CHECKSTYLE:OFF
+import java.io.File;
+import java.util.Random;
 
 /**
  *
@@ -35,39 +38,55 @@ import com.github.jjYBdx4IL.utils.proc.ProcRunner;
  */
 public class ProcRunnerTest {
 
-    private static final Logger log = LoggerFactory.getLogger(ProcRunnerTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProcRunnerTest.class);
+    
     Random r = new Random(0);
+    String filename = "akhkha";
+    File notExistingFile = new File(filename);
 
     @Before
     public void before() {
-    	Assume.assumeTrue(SystemUtils.IS_OS_LINUX);
-    }
-    
-    @Test
-    public void testErrorRedirect() throws Exception {
-        String filename = "akhkha";
         int i = 0;
-        File notExistingFile = new File(filename);
         while (notExistingFile.exists()) {
             notExistingFile = new File(filename + i);
             i++;
         }
-
-        log.trace(notExistingFile.getAbsolutePath());
+    }
+    
+    @Test
+    public void testErrorRedirect() throws Exception {
+        LOG.trace(notExistingFile.getAbsolutePath());
         ProcRunner pr = new ProcRunner("ls", notExistingFile.getAbsolutePath());
+
+        if (SystemUtils.IS_OS_WINDOWS) {
+            pr = new ProcRunner("xcopy.exe", notExistingFile.getAbsolutePath());
+        }
+        
         assertNotEquals(0, pr.run());
-        log.debug(pr.getOutputBlob());
-        assertTrue(pr.getOutputBlob().contains(filename));
+        LOG.debug(pr.getOutputBlob());
+        assertTrue(pr.getOutputBlob(), pr.getOutputBlob().contains(filename));
     }
 
     @Test
     public void testStdout() throws Exception {
+        assumeFalse(SystemUtils.IS_OS_WINDOWS);
+        
         String testString = "akhkhasad88d";
 
         ProcRunner pr = new ProcRunner("echo", testString);
         assertEquals(0, pr.run());
-        log.debug(pr.getOutputBlob());
+        LOG.debug(pr.getOutputBlob());
         assertTrue(pr.getOutputBlob().contains(testString));
+    }
+
+    @Test
+    public void testStdoutWindows() throws Exception {
+        assumeTrue(SystemUtils.IS_OS_WINDOWS);
+        
+        ProcRunner pr = new ProcRunner("xcopy.exe", notExistingFile.getAbsolutePath());
+        assertNotEquals(0, pr.run());
+        LOG.debug(pr.getOutputBlob());
+        assertTrue(pr.getOutputBlob().contains("0 File(s) copied"));
     }
 
 }

@@ -355,11 +355,12 @@ public class ProcDiskStatsParser {
 
     protected static Data get(String device, InputStream procNetDevInputStream) throws IOException {
         Scanner s = new Scanner(procNetDevInputStream);
-        while (s.hasNext()) {
+        while (s.hasNextLine()) {
             Data data = new Data(s);
             if (device.equals(data.getDeviceName())) {
                 return data;
             }
+            s.nextLine();
         }
         return null;
     }

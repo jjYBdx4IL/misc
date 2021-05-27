@@ -147,7 +147,7 @@
         <module name="OverloadMethodsDeclarationOrder" />
         <module name="VariableDeclarationUsageDistance" />
         <module name="CustomImportOrder">
-            <property name="specialImportsRegExp" value="com.google" />
+            <property name="specialImportsRegExp" value="DISABLEDcom.google" />
             <property name="sortImportsInGroupAlphabetically"
                 value="true" />
             <property name="customImportOrderRules"

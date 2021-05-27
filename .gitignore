@@ -11,6 +11,8 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 /.project
+/.classpath
+/.settings
 /*/.project
 /*/.classpath
 /*/.settings/

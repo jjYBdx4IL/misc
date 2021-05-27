@@ -17,13 +17,20 @@ package com.github.jjYBdx4IL.utils.text;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 
 import javax.activation.MimetypesFileTypeMap;
 
 //CHECKSTYLE:OFF
 public class MimeType {
 
-    public static MimetypesFileTypeMap MAP = createMap();
+    /**
+     * You can use the internal map directly. It is initialized with an extended mime types
+     * list, which is considered "programmatic" by {@link MimetypesFileTypeMap} and therefore
+     * takes precedence over any unbundled resources. That, in turn, leads to more predictable
+     * behavior.
+     */
+    public static final MimetypesFileTypeMap MAP = createMap();
     
     /**
      * 
@@ -37,17 +44,28 @@ public class MimeType {
         }
     }
 
+    /**
+     * Determine mime type based on file name extension.
+     * 
+     * @param fileName a file name including an extension
+     * @return mime type for case-insensitive file name extension
+     */
     public static String get(String fileName) {
         return get(fileName, null);
     }
     
+    /**
+     * Determine mime type based on file name extension.
+     * 
+     * @param fileName a file name including an extension
+     * @param charset appended if mime type starts with "text/" or contains "javascript"
+     * @return mime type for case-insensitive file name extension
+     */
     public static String get(String fileName, String charset) {
-        String mimeType = MAP.getContentType(fileName.toLowerCase());
+        String mimeType = MAP.getContentType(fileName.toLowerCase(Locale.ROOT));
         if (charset != null && (mimeType.startsWith("text/") || mimeType.contains("javascript"))) {
             mimeType += ";charset=" + charset.toLowerCase();
         }
         return mimeType;
     }
-    
-    
 }

@@ -21,10 +21,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
@@ -41,20 +45,43 @@ public class ProcRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcRunner.class);
     private static final long DEFAULT_TIMEOUT = 0L; // no timeout by default
+    private static final long THREAD_SHUTDOWN_TIMEOUT_MS = 10000;
+    public static final String LINE_SEP = System.getProperty("line.separator");
+
+    public static final int TIMEOUT_RC = 1000;
+    public static final int KILLED_RC = 1001;
 
     private ProcessBuilder mProcessBuilder;
     private Charset consoleEncoding = Charset.defaultCharset();
 
-    private final List<String> mOutput = new ArrayList<>();
+    private final ConcurrentLinkedQueue<String> mOutput = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<String> mError = new ConcurrentLinkedQueue<>();
+    private final boolean includeErrorStream;
+    private int rc = -1;
+    private Thread tout = null;
+    private Thread terr = null;
+    private Process p = null;
 
     public ProcRunner(boolean includeErrorStream, List<String> command) {
         mProcessBuilder = new ProcessBuilder(escapeArgs(command)).redirectErrorStream(includeErrorStream);
+        this.includeErrorStream = includeErrorStream;
     }
 
     public ProcRunner(boolean includeErrorStream, String... command) {
         mProcessBuilder = new ProcessBuilder(escapeArgs(command)).redirectErrorStream(includeErrorStream);
+        this.includeErrorStream = includeErrorStream;
     }
 
+    public ProcRunner(boolean includeErrorStream, Path exe, String... command) {
+        List<String> cmd = new ArrayList<>(command.length + 1);
+        cmd.add(exe.toString());
+        for (String s : command) {
+            cmd.add(s);
+        }
+        mProcessBuilder = new ProcessBuilder(escapeArgs(cmd)).redirectErrorStream(includeErrorStream);
+        this.includeErrorStream = includeErrorStream;
+    }
+    
     public ProcRunner(List<String> command) {
         this(true, command);
     }
@@ -63,16 +90,25 @@ public class ProcRunner {
         this(true, command);
     }
 
+    public ProcRunner(Path exe, String... command) {
+        List<String> cmd = new ArrayList<>(command.length + 1);
+        cmd.add(exe.toString());
+        for (String s : command) {
+            cmd.add(s);
+        }
+        includeErrorStream = true;
+        mProcessBuilder = new ProcessBuilder(escapeArgs(cmd)).redirectErrorStream(includeErrorStream);
+    }
+
     public Charset getConsoleEncoding() {
         return consoleEncoding;
     }
 
     /**
-     * Interpret program output in the given encoding. Default is the JVM's
-     * default charset as defined by environment and startup parameters.
+     * Interpret program output in the given encoding. Default is the JVM's default
+     * charset as defined by environment and startup parameters.
      * 
-     * @param consoleEncoding
-     *            the expected console encoding, not null
+     * @param consoleEncoding the expected console encoding, not null
      */
     public void setConsoleEncoding(Charset consoleEncoding) {
         if (consoleEncoding == null) {
@@ -113,68 +149,164 @@ public class ProcRunner {
      * No timeout.
      * 
      * @return exit value of the process
-     * @throws IOException
-     *             if there was an I/O problem
+     * @throws IOException          if there was an I/O problem
+     * @throws InterruptedException
      */
-    public int run() throws IOException {
+    public int run() throws IOException, InterruptedException {
         return run(DEFAULT_TIMEOUT);
     }
 
     /**
      * 
-     * @param timeout
-     *            in milliseconds
+     * @param timeout in milliseconds
      * @return exit value of the process
-     * @throws IOException
-     *             if there was an I/O problem
+     * @throws IOException          if there was an I/O problem
+     * @throws InterruptedException
      */
-    public int run(long timeout) throws IOException {
-        final Process p = mProcessBuilder.start();
-        Thread t = new Thread() {
+    public int run(long timeout) throws IOException, InterruptedException {
+        return start().waitFor(timeout, TimeUnit.MILLISECONDS);
+    }
+
+    public ProcRunner start() throws IOException {
+        p = mProcessBuilder.start();
+        tout = new Thread() {
             @Override
             public void run() {
                 String line;
                 mOutput.clear();
-                try {
-                    try (BufferedReader br = new BufferedReader(new InputStreamReader(
-                        p.getInputStream(), consoleEncoding))) {
+                try (BufferedReader br = new BufferedReader(
+                        new InputStreamReader(p.getInputStream(), consoleEncoding))) {
+                    line = br.readLine();
+                    while (line != null) {
+                        mOutput.add(line);
                         line = br.readLine();
-                        while (line != null) {
-                            mOutput.add(line);
-                            line = br.readLine();
-                        }
                     }
                 } catch (IOException e) {
                     LOG.error("", e);
                 }
             }
         };
-        t.start();
-        try {
-            t.join(timeout);
-        } catch (InterruptedException e) {
-            LOG.error("", e);
+        tout.start();
+
+        if (!this.includeErrorStream) {
+            terr = new Thread() {
+                @Override
+                public void run() {
+                    String line;
+                    mError.clear();
+                    try (BufferedReader br = new BufferedReader(
+                            new InputStreamReader(p.getErrorStream(), consoleEncoding))) {
+                        line = br.readLine();
+                        while (line != null) {
+                            mError.add(line);
+                            line = br.readLine();
+                        }
+                    } catch (IOException e) {
+                        LOG.error("", e);
+                    }
+                }
+            };
+            terr.start();
         }
-        if (t.isAlive()) {
-            throw new IOException("external process not terminating.");
+        return this;
+    }
+
+    public int kill() throws InterruptedException, IOException {
+        return waitFor(-1, null);
+    }
+
+    public int waitFor(long timeout, TimeUnit unit) throws InterruptedException, IOException {
+        if (tout == null || p == null || rc >= 0) {
+            throw new IllegalStateException();
+        }
+        if (timeout > 0 && unit == null) {
+            unit = TimeUnit.MILLISECONDS;
         }
         try {
-            return p.waitFor();
-        } catch (InterruptedException e) {
-            LOG.error("", e);
-            throw new IOException(e);
+            if (timeout == 0) {
+                rc = p.waitFor();
+                return rc;
+            }
+            if (timeout < 0) {
+                p.destroyForcibly();
+                rc = KILLED_RC;
+                return rc;
+            }
+            if (p.waitFor(timeout, unit)) {
+                rc = p.exitValue();
+                return rc;
+            } else {
+                p.destroyForcibly();
+                rc = TIMEOUT_RC;
+                return rc;
+            }
+        } finally {
+            // don't close the streams forcefully here. Instead, if something hangs,
+            // use the new Java capabilities to traverse the child process tree and kill stuff
+            // one by one. Otherwise we might be cutting of required output.
+            if (!this.includeErrorStream) {
+                try {
+                    terr.join(THREAD_SHUTDOWN_TIMEOUT_MS);
+                    if (terr.isAlive()) {
+                        terr.interrupt();
+                        terr.join(THREAD_SHUTDOWN_TIMEOUT_MS);
+                    } else {
+                    }
+                } catch (InterruptedException e) {
+                    LOG.error("", e);
+                }
+                if (terr.isAlive()) {
+                    throw new IOException("external process not terminated");
+                }
+            }
+            try {
+                tout.join(THREAD_SHUTDOWN_TIMEOUT_MS);
+                if (tout.isAlive()) {
+                    tout.interrupt();
+                    tout.join(THREAD_SHUTDOWN_TIMEOUT_MS);
+                }
+            } catch (InterruptedException e) {
+                LOG.error("", e);
+            }
+            if (tout.isAlive()) {
+                throw new IOException("external process not terminated");
+            }
         }
     }
 
-    public List<String> getOutputLines() {
-        return Collections.unmodifiableList(mOutput);
+    public ConcurrentLinkedQueue<String> getOutputLines() {
+        return mOutput;
+    }
+    
+    public String getLastLine() {
+        String line = null;
+        Iterator<String> it = mOutput.iterator();
+        while(it.hasNext()) {
+            line = it.next();
+        }
+        return line;
     }
 
     public String getOutputBlob() {
         StringBuilder sb = new StringBuilder();
-        for (String line : mOutput) {
-            sb.append(line);
-            sb.append(System.getProperty("line.separator"));
+        Iterator<String> it = mOutput.iterator();
+        while (it.hasNext()) {
+            sb.append(it.next());
+            sb.append(LINE_SEP);
+        }
+        return sb.toString();
+    }
+
+    public ConcurrentLinkedQueue<String> getErrorLines() {
+        return mError;
+    }
+
+    public String getErrorBlob() {
+        StringBuilder sb = new StringBuilder();
+        Iterator<String> it = mError.iterator();
+        while (it.hasNext()) {
+            sb.append(it.next());
+            sb.append(LINE_SEP);
         }
         return sb.toString();
     }
@@ -188,4 +320,11 @@ public class ProcRunner {
         return mProcessBuilder.environment();
     }
 
+    public int getRc() {
+        return rc;
+    }
+    
+    public Process getProcess() {
+        return p;
+    }
 }

@@ -51,6 +51,14 @@ public class TimeUtils {
         df.setTimeZone(tz);
         return df.format(date);
     }
+    
+    public static String toISO8601(long epochMillis) {
+        return toISO8601(new Date(epochMillis));
+    }
+    
+    public static String nowISO8601() {
+        return toISO8601(new Date());
+    }
 
     /**
      * Converts a given date to its ISO8601 ({@link #ISO8601_DATE_FMT}) format.
@@ -81,6 +89,14 @@ public class TimeUtils {
         final DateFormat df = new SimpleDateFormat(ISO8601_SECS_FMT);
         df.setTimeZone(tz);
         return df.format(date);
+    }
+
+    public static String toISO8601WithSeconds(long epochMillis) {
+        return toISO8601WithSeconds(new Date(epochMillis));
+    }
+    
+    public static String nowISO8601WithSeconds() {
+        return toISO8601WithSeconds(new Date());
     }
 
     /**

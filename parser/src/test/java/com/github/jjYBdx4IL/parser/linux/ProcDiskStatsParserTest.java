@@ -50,6 +50,27 @@ public class ProcDiskStatsParserTest {
         assertEquals(740, data.getWeightedTimeSpentDoingIOsMillis());
     }
 
+    // newer, extended /proc/diskstats:
+    @Test
+    public void testGet2() throws Exception {
+        Data data = ProcDiskStatsParser.get("sda1", ProcDiskStatsParserTest.class.getResourceAsStream("proc_diskstats_2.txt"));
+        assertNotNull(data);
+        assertEquals(8, data.getMajorNumber());
+        assertEquals(1, data.getMinorNumber());
+        assertEquals("sda1", data.getDeviceName());
+        assertEquals(235, data.getReadsCompletedSuccessfully());
+        assertEquals(21, data.getReadsMerged());
+        assertEquals(18926, data.getSectorsRead());
+        assertEquals(154, data.getTimeSpentReadingMillis());
+        assertEquals(2, data.getWritesCompleted());
+        assertEquals(0, data.getWritesMerged());
+        assertEquals(2, data.getSectorsWritten());
+        assertEquals(0, data.getTimeSpentWritingMillis());
+        assertEquals(0, data.getIosCurrentlyInProgress());
+        assertEquals(244, data.getTimeSpentDoingIOsMillis());
+        assertEquals(154, data.getWeightedTimeSpentDoingIOsMillis());
+    }
+
     @Test
     public void testGetWrongDevice() throws Exception {
         assertNull(ProcDiskStatsParser.get("sda111", ProcDiskStatsParserTest.class.getResourceAsStream("proc_diskstats_1.txt")));

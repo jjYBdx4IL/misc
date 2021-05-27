@@ -18,6 +18,7 @@ package com.github.jjYBdx4IL.utils.io;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -29,6 +30,9 @@ public class FindUtils {
     public static final String PATH_SEPARATOR = "/";
     public static final int MAX_DEPTH = 100;
 
+    public static List<File> glob(Path startDir, String glob) throws IOException {
+        return find(startDir.toFile(), globToRegex(glob));
+    }
     public static List<File> glob(File startDir, String glob) throws IOException {
         return find(startDir, globToRegex(glob));
     }
@@ -36,6 +40,10 @@ public class FindUtils {
         return find(globToRegex(glob));
     }
 
+    public static List<File> find(Path startDir, String regex) throws IOException {
+        return find(startDir.toFile(), Pattern.compile(regex, Pattern.CASE_INSENSITIVE), "",
+            MAX_DEPTH, new ArrayList<File>(), false);
+    }
     public static List<File> find(File startDir, String regex) throws IOException {
         return find(startDir, Pattern.compile(regex, Pattern.CASE_INSENSITIVE), "",
             MAX_DEPTH, new ArrayList<File>(), false);
@@ -45,6 +53,9 @@ public class FindUtils {
             MAX_DEPTH, new ArrayList<File>(), false);
     }
 
+    public static File globFirst(Path startDir, String glob) throws IOException {
+        return findFirst(startDir.toFile(), globToRegex(glob));
+    }
     public static File globFirst(File startDir, String glob) throws IOException {
         return findFirst(startDir, globToRegex(glob));
     }
@@ -52,6 +63,12 @@ public class FindUtils {
         return findFirst(globToRegex(glob));
     }
 
+    public static File findFirst(Path startDir, String regex) throws IOException {
+        List<File> result = new ArrayList<>();
+        find(startDir.toFile(), Pattern.compile(regex, Pattern.CASE_INSENSITIVE), "",
+            MAX_DEPTH, result, false);
+        return result.isEmpty() ? null : result.get(0);
+    }
     public static File findFirst(File startDir, String regex) throws IOException {
         List<File> result = new ArrayList<>();
         find(startDir, Pattern.compile(regex, Pattern.CASE_INSENSITIVE), "",
@@ -65,6 +82,9 @@ public class FindUtils {
         return result.isEmpty() ? null : result.get(0);
     }
 
+    public static File globFirstOrThrow(Path startDir, String glob) throws IOException {
+        return findFirstOrThrow(startDir.toFile(), globToRegex(glob));
+    }
     public static File globFirstOrThrow(File startDir, String glob) throws IOException {
         return findFirstOrThrow(startDir, globToRegex(glob));
     }
@@ -72,6 +92,13 @@ public class FindUtils {
         return findFirstOrThrow(globToRegex(glob));
     }
 
+    public static File findFirstOrThrow(Path startDir, String regex) throws IOException {
+        File result = findFirst(startDir.toFile(), regex);
+        if (result == null) {
+            throw new FileNotFoundException();
+        }
+        return result;
+    }
     public static File findFirstOrThrow(File startDir, String regex) throws IOException {
         File result = findFirst(startDir, regex);
         if (result == null) {
@@ -87,6 +114,9 @@ public class FindUtils {
         return result;
     }
 
+    public static File globOne(Path startDir, String glob) throws IOException {
+        return findOne(startDir.toFile(), globToRegex(glob));
+    }
     public static File globOne(File startDir, String glob) throws IOException {
         return findOne(startDir, globToRegex(glob));
     }
@@ -94,6 +124,12 @@ public class FindUtils {
         return findOne(globToRegex(glob));
     }
 
+    public static File findOne(Path startDir, String regex) throws IOException {
+        List<File> result = new ArrayList<>();
+        find(startDir.toFile(), Pattern.compile(regex, Pattern.CASE_INSENSITIVE), "",
+            MAX_DEPTH, result, false);
+        return result.size() != 1 ? null : result.get(0);
+    }
     public static File findOne(File startDir, String regex) throws IOException {
         List<File> result = new ArrayList<>();
         find(startDir, Pattern.compile(regex, Pattern.CASE_INSENSITIVE), "",
@@ -107,6 +143,9 @@ public class FindUtils {
         return result.size() != 1 ? null : result.get(0);
     }
 
+    public static File globOneOrThrow(Path startDir, String glob) throws IOException {
+        return findOneOrThrow(startDir.toFile(), globToRegex(glob));
+    }
     public static File globOneOrThrow(File startDir, String glob) throws IOException {
         return findOneOrThrow(startDir, globToRegex(glob));
     }
@@ -114,6 +153,13 @@ public class FindUtils {
         return findOneOrThrow(globToRegex(glob));
     }
 
+    public static File findOneOrThrow(Path startDir, String regex) throws IOException {
+        File result = findOne(startDir.toFile(), regex);
+        if (result == null) {
+            throw new IOException();
+        }
+        return result;
+    }
     public static File findOneOrThrow(File startDir, String regex) throws IOException {
         File result = findOne(startDir, regex);
         if (result == null) {
@@ -129,6 +175,9 @@ public class FindUtils {
         return result;
     }
 
+    public static List<File> globFiles(Path startDir, String glob) throws IOException {
+        return findFiles(startDir.toFile(), globToRegex(glob));
+    }
     public static List<File> globFiles(File startDir, String glob) throws IOException {
         return findFiles(startDir, globToRegex(glob));
     }
@@ -136,6 +185,10 @@ public class FindUtils {
         return findFiles(globToRegex(glob));
     }
 
+    public static List<File> findFiles(Path startDir, String regex) throws IOException {
+        return find(startDir.toFile(), Pattern.compile(regex, Pattern.CASE_INSENSITIVE), "",
+            MAX_DEPTH, new ArrayList<File>(), true);
+    }
     public static List<File> findFiles(File startDir, String regex) throws IOException {
         return find(startDir, Pattern.compile(regex, Pattern.CASE_INSENSITIVE), "",
             MAX_DEPTH, new ArrayList<File>(), true);
@@ -145,6 +198,9 @@ public class FindUtils {
             MAX_DEPTH, new ArrayList<File>(), true);
     }
 
+    public static File globFirstFile(Path startDir, String glob) throws IOException {
+        return findFirstFile(startDir.toFile(), globToRegex(glob));
+    }
     public static File globFirstFile(File startDir, String glob) throws IOException {
         return findFirstFile(startDir, globToRegex(glob));
     }
@@ -152,6 +208,12 @@ public class FindUtils {
         return findFirstFile(globToRegex(glob));
     }
 
+    public static File findFirstFile(Path startDir, String regex) throws IOException {
+        List<File> result = new ArrayList<>();
+        find(startDir.toFile(), Pattern.compile(regex, Pattern.CASE_INSENSITIVE), "",
+            MAX_DEPTH, result, true);
+        return result.isEmpty() ? null : result.get(0);
+    }
     public static File findFirstFile(File startDir, String regex) throws IOException {
         List<File> result = new ArrayList<>();
         find(startDir, Pattern.compile(regex, Pattern.CASE_INSENSITIVE), "",
@@ -165,6 +227,9 @@ public class FindUtils {
         return result.isEmpty() ? null : result.get(0);
     }
 
+    public static File globFirstFileOrThrow(Path startDir, String glob) throws IOException {
+        return findFirstFileOrThrow(startDir.toFile(), globToRegex(glob));
+    }
     public static File globFirstFileOrThrow(File startDir, String glob) throws IOException {
         return findFirstFileOrThrow(startDir, globToRegex(glob));
     }
@@ -172,6 +237,13 @@ public class FindUtils {
         return findFirstFileOrThrow(globToRegex(glob));
     }
 
+    public static File findFirstFileOrThrow(Path startDir, String regex) throws IOException {
+        File result = findFirstFile(startDir.toFile(), regex);
+        if (result == null) {
+            throw new FileNotFoundException();
+        }
+        return result;
+    }
     public static File findFirstFileOrThrow(File startDir, String regex) throws IOException {
         File result = findFirstFile(startDir, regex);
         if (result == null) {
@@ -187,6 +259,9 @@ public class FindUtils {
         return result;
     }
 
+    public static File globOneFile(Path startDir, String glob) throws IOException {
+        return findOneFile(startDir.toFile(), globToRegex(glob));
+    }
     public static File globOneFile(File startDir, String glob) throws IOException {
         return findOneFile(startDir, globToRegex(glob));
     }
@@ -194,6 +269,12 @@ public class FindUtils {
         return findOneFile(globToRegex(glob));
     }
     
+    public static File findOneFile(Path startDir, String regex) throws IOException {
+        List<File> result = new ArrayList<>();
+        find(startDir.toFile(), Pattern.compile(regex, Pattern.CASE_INSENSITIVE), "",
+            MAX_DEPTH, result, true);
+        return result.size() != 1 ? null : result.get(0);
+    }
     public static File findOneFile(File startDir, String regex) throws IOException {
         List<File> result = new ArrayList<>();
         find(startDir, Pattern.compile(regex, Pattern.CASE_INSENSITIVE), "",
@@ -207,6 +288,9 @@ public class FindUtils {
         return result.size() != 1 ? null : result.get(0);
     }
 
+    public static File globOneFileOrThrow(Path startDir, String glob) throws IOException {
+        return findOneFileOrThrow(startDir.toFile(), globToRegex(glob));
+    }
     public static File globOneFileOrThrow(File startDir, String glob) throws IOException {
         return findOneFileOrThrow(startDir, globToRegex(glob));
     }
@@ -214,6 +298,13 @@ public class FindUtils {
         return findOneFileOrThrow(globToRegex(glob));
     }
     
+    public static File findOneFileOrThrow(Path startDir, String regex) throws IOException {
+        File result = findOneFile(startDir.toFile(), regex);
+        if (result == null) {
+            throw new IOException();
+        }
+        return result;
+    }
     public static File findOneFileOrThrow(File startDir, String regex) throws IOException {
         File result = findOneFile(startDir, regex);
         if (result == null) {
@@ -230,7 +321,7 @@ public class FindUtils {
     }
 
     protected static List<File> find(Pattern pattern, String prefix, int maxDepth,
-        List<File> result, boolean filesOnly) throws IOException {
+            List<File> result, boolean filesOnly) throws IOException {
         return find(new File(System.getProperty("user.dir")), pattern, prefix, maxDepth, result, filesOnly);
     }
     protected static List<File> find(File startDir, Pattern pattern, String prefix, int maxDepth,

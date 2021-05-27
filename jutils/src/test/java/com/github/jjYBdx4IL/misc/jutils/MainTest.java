@@ -71,7 +71,7 @@ public class MainTest {
         LOG.info("workDir = " + workDir.getAbsolutePath());
     }
 
-    private static void run(String... args) throws IOException {
+    private static void run(String... args) throws IOException, InterruptedException {
         List<String> _args = new ArrayList<>();
         if (SystemUtils.IS_OS_WINDOWS) {
         	_args.add("java");
@@ -120,7 +120,7 @@ public class MainTest {
     }
 
     @Test
-    public void testFullHelp() throws IOException {
+    public void testFullHelp() throws IOException, InterruptedException {
         run();
         assertEquals(1, exitCode);
         assertTrue(isFullHelp());
@@ -135,7 +135,7 @@ public class MainTest {
     }
 
     @Test
-    public void testSingleCmdHelp() throws IOException {
+    public void testSingleCmdHelp() throws IOException, InterruptedException {
         run("grep", "-h");
         assertEquals(1, exitCode);
         assertTrue(isSingleCmdHelp());
@@ -146,14 +146,14 @@ public class MainTest {
     }
 
     @Test
-    public void testInvalidCommand() throws IOException {
+    public void testInvalidCommand() throws IOException, InterruptedException {
         run("ljkasdlasd");
         assertEquals(1, exitCode);
         assertTrue(isFullHelp());
     }
 
     @Test
-    public void testInvalidCommandOptCount() throws IOException {
+    public void testInvalidCommandOptCount() throws IOException, InterruptedException {
         run("grep");
         assertEquals(1, exitCode);
         assertTrue(outputBlob, isSingleCmdHelp());
@@ -166,13 +166,13 @@ public class MainTest {
     }
 
     @Test
-    public void testBgr() throws IOException {
+    public void testBgr() throws IOException, InterruptedException {
         run("bgr", "--devtests");
         assertEquals(outputBlob, 0, exitCode);
     }
     
     @Test
-    public void testGrep() throws IOException {
+    public void testGrep() throws IOException, InterruptedException {
         // windows interpolates '*'
         assumeFalse(SystemUtils.IS_OS_WINDOWS);
         
@@ -232,7 +232,7 @@ public class MainTest {
     }
 
     @Test
-    public void test2Img() throws IOException {
+    public void test2Img() throws IOException, InterruptedException {
         run("2img", "-html", "-i", globOne("/src/**/a.html").getAbsolutePath(), "-o",
             new File(globOne("/target/"), "a.png").getAbsolutePath());
         assertEquals(outputBlob, 0, exitCode);

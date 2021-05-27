@@ -17,21 +17,19 @@ package com.github.jjYBdx4IL.utils.encryption.gnupg;
 
 import static org.junit.Assert.assertEquals;
 
-import com.github.jjYBdx4IL.utils.env.Maven;
-
-import org.apache.commons.io.IOUtils;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import org.apache.commons.io.IOUtils;
+import org.junit.Test;
+
+import com.github.jjYBdx4IL.utils.env.Maven;
+
 public class GnuPgClWrapperTest {
 
     @Test
-    public void testDecryptTextAa() throws IOException, URISyntaxException {
+    public void testDecryptTextAa() throws IOException, URISyntaxException, InterruptedException {
         GnuPgClWrapper wrapper = new GnuPgClWrapper();
         wrapper.setLogErrorOutput(true);
         String gnuPgHomeDir = new File(new File(Maven.getBasedir(GnuPgClWrapperTest.class)),

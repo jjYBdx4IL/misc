@@ -70,8 +70,8 @@ public class MdiInternalImageFrameTest {
         return intFrame;
     }
 
-    BufferedImage getImage() {
-        try (InputStream is = getClass()
+    public static BufferedImage getImage() {
+        try (InputStream is = MdiInternalImageFrameTest.class
             .getResourceAsStream("/org/openimaj/image/contour/aestheticode/aestheticode.jpg")) {
             return ImageIO.read(is);
         } catch (IOException ex) {
@@ -79,7 +79,7 @@ public class MdiInternalImageFrameTest {
         }
     }
 
-    BufferedImage getImage2() {
+    public static BufferedImage getImage2() {
         BufferedImage image = new BufferedImage(800, 600, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = (Graphics2D) image.getGraphics();
         g.setColor(Color.WHITE);

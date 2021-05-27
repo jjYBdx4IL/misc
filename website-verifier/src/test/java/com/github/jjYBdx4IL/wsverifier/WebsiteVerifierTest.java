@@ -17,6 +17,8 @@ package com.github.jjYBdx4IL.wsverifier;
 
 import static org.junit.Assert.*;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -27,6 +29,11 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.brucezee.jspider.Page;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -34,6 +41,10 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Locale;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -72,10 +83,12 @@ public class WebsiteVerifierTest extends AbstractHandler {
         LOG.info(verifier.resultToString());
 
         Set<String> badUrls = verifier.getBadUrls();
-        assertEquals(2, badUrls.size());
+        assertEquals(3, badUrls.size());
         LOG.info("" + badUrls);
         assertTrue(badUrls.contains(serverUrl + "a.png"));
         assertTrue(badUrls.contains(serverUrl + "invalid"));
+        assertTrue(badUrls.contains(serverUrl + "bad.zip"));
+        assertFalse(badUrls.contains(serverUrl + "good.zip"));
         Set<String> referralUrls = verifier.getPagesContainingUrl(serverUrl + "a.png");
         assertEquals(1, referralUrls.size());
         assertTrue(referralUrls.contains(serverUrl));
@@ -90,7 +103,7 @@ public class WebsiteVerifierTest extends AbstractHandler {
         LOG.info(verifier.resultToString());
 
         Set<String> badUrls = verifier.getBadUrls();
-        assertEquals(1, badUrls.size());
+        assertEquals(2, badUrls.size());
         LOG.info("" + badUrls);
         assertTrue(badUrls.contains(serverUrl + "a.png"));
         assertFalse(badUrls.contains(serverUrl + "invalid"));
@@ -127,6 +140,8 @@ public class WebsiteVerifierTest extends AbstractHandler {
                 + "<a href=\"http://ahsdlkfhasdf/asdfasjdh/asdlsd\"></a>"
                 + "<a href=\"/valid\"></a>"
                 + "<a href=\"/invalid\"></a>"
+                + "<a href=\"/bad.zip\"></a>"
+                + "<a href=\"/good.zip\"></a>"
                 + "<img src=\"a.png\">"
                 + "</body></html>");
         } else if ("/valid".equals(target)) {
@@ -141,6 +156,14 @@ public class WebsiteVerifierTest extends AbstractHandler {
         } else if ("/b.png".equals(target)) {
             response.setStatus(HttpServletResponse.SC_OK);
             response.setContentType("image/png");
+        } else if ("/good.zip".equals(target)) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType("application/zip");
+            response.getOutputStream().write(createZip());
+        } else if ("/bad.zip".equals(target)) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType("application/zip");
+            response.getWriter().print("garbage");
         } else {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             response.setContentType("text/html");
@@ -148,4 +171,19 @@ public class WebsiteVerifierTest extends AbstractHandler {
 
         baseRequest.setHandled(true);
     }
+    
+    private byte[] createZip() {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ZipOutputStream zos = new ZipOutputStream(baos)) {
+            ZipEntry ze = new ZipEntry("name");
+            zos.putNextEntry(ze);
+            zos.write("teststring".getBytes());
+            zos.closeEntry();
+            zos.close();
+            return baos.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
 }

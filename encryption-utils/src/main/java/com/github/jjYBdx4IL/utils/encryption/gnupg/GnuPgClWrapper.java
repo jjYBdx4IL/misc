@@ -52,8 +52,9 @@ public class GnuPgClWrapper {
      * 
      * @return the decrypted text
      * @throws GnuPgClDecryptionException if there was a problem
+     * @throws InterruptedException on process interruption 
      */
-    public String decryptTextAa(String input) throws GnuPgClDecryptionException {
+    public String decryptTextAa(String input) throws GnuPgClDecryptionException, InterruptedException {
         File inputFile = null;
         try {
             inputFile = File.createTempFile("tmp", ".tmp");
@@ -80,7 +81,7 @@ public class GnuPgClWrapper {
         }
     }
 
-    private int runGpg(File inputFile, boolean includeErrorOutput) throws IOException {
+    private int runGpg(File inputFile, boolean includeErrorOutput) throws IOException, InterruptedException {
         proc = new ProcRunner(includeErrorOutput, "gpg", "-d", inputFile.getName());
         proc.setWorkDir(inputFile.getParentFile());
         if (gnuPgHomeDir != null) {

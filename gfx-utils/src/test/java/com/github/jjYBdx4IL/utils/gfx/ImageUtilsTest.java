@@ -15,10 +15,7 @@
  */
 package com.github.jjYBdx4IL.utils.gfx;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import com.github.jjYBdx4IL.test.GraphicsResource;
 import com.github.jjYBdx4IL.utils.env.Maven;
@@ -33,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -72,6 +70,17 @@ public class ImageUtilsTest extends InteractiveTestBase implements Runnable {
         g.fillRect(0, 0, 150, 150);
         g.setColor(Color.RED);
         g.fillRect(50, 50, 50, 50);
+        return img;
+    }
+
+    private static BufferedImage createImg3() {
+        BufferedImage img = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = (Graphics2D) img.getGraphics();
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, 100, 100);
+        g.setColor(Color.RED);
+        g.fillRect(20, 20, 1, 1);
+        g.fillRect(30, 40, 1, 1);
         return img;
     }
 
@@ -293,4 +302,20 @@ public class ImageUtilsTest extends InteractiveTestBase implements Runnable {
         }
     }
     
+    @Test
+    public void testScale3() throws IOException {
+        BufferedImage img = createImg3();
+        File f = new File(TEMP_DIR, "testScale3_1.png");
+        assertTrue(ImageIO.write(img, "png", f));
+        
+        File f2 = new File(TEMP_DIR, "testScale3_2.png");
+        ImageUtils.scale(f.toPath(), f2.toPath(), 30, 30);
+    }
+
+    @Test
+    public void testGetBoundingBox() throws Exception {
+        BufferedImage img = createImg3();
+        Rectangle r = ImageUtils.getBoundingBox(img);
+        assertEquals(new Rectangle(20, 20, 11, 21), r);
+    }
 }

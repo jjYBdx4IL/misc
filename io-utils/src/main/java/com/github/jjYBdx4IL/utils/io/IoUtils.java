@@ -20,13 +20,17 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 
 //CHECKSTYLE:OFF
@@ -264,4 +268,42 @@ public class IoUtils {
         }
         return getExt(file.getName());
     }
+    
+    public static String getDigest(String input, String type) throws IOException {
+        return getDigest(new File(input).toPath(), type);
+    }
+    
+    public static String getDigest(File input, String type) throws IOException {
+        return getDigest(input.toPath(), type);
+    }
+    
+    public static String getDigest(Path input, String type) throws IOException {
+        try {
+            MessageDigest digest = MessageDigest.getInstance(type);
+            feed(digest, input);
+            byte[] hash = digest.digest();
+            StringBuilder hexString = new StringBuilder();
+            for (int i = 0; i < hash.length; i++) {
+                String hex = Integer.toHexString(0xff & hash[i]);
+                if (hex.length() == 1) { 
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString().toLowerCase(Locale.ROOT);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IOException(e);
+        }
+    }
+    
+    private static void feed(MessageDigest digest, Path input) throws IOException {
+        try (FileInputStream fis = new FileInputStream(input.toFile())) {
+            byte[] buf = new byte[4096];
+            int read;
+            while ((read = fis.read(buf)) > 0) {
+                digest.update(buf, 0, read);
+            }
+        }
+    }
+
 }

@@ -15,6 +15,8 @@
  */
 package com.github.jjYBdx4IL.parser.linux;
 
+import static com.github.jjYBdx4IL.utils.text.StringUtil.f;
+
 import com.github.jjYBdx4IL.parser.ParseException;
 import org.apache.commons.io.IOUtils;
 
@@ -160,9 +162,9 @@ public class CpuTimeOutputParser {
         double sysSdev = Math.sqrt(sysSqDeltaSum) / (data.size() - 1);
         
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("real: (%,.0f +/- %,.0f)ms %s", realMean, realSdev, System.lineSeparator()));
-        sb.append(String.format("user: (%,.0f +/- %,.0f)ms %s", userMean, userSdev, System.lineSeparator()));
-        sb.append(String.format("sys: (%,.0f +/- %,.0f)ms", sysMean, sysSdev, System.lineSeparator()));
+        sb.append(f("real: (%,.0f +/- %,.0f)ms %n", realMean, realSdev));
+        sb.append(f("user: (%,.0f +/- %,.0f)ms %n", userMean, userSdev));
+        sb.append(f("sys: (%,.0f +/- %,.0f)ms", sysMean, sysSdev));
         return sb.toString();
     }
     

@@ -16,9 +16,8 @@
 package com.github.jjYBdx4IL.utils.security;
 
 //CHECKSTYLE:OFF
-import static org.junit.Assert.*;
-
-import com.github.jjYBdx4IL.utils.security.Password;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -29,9 +28,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author Github jjYBdx4IL Projects
  */
-public class PasswordTest {
+public class PasswordUtilsTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PasswordTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PasswordUtilsTest.class);
 
     /**
      * Test of getSaltedHash method, of class Password.
@@ -51,26 +50,28 @@ public class PasswordTest {
 
         long storeStartTime = System.currentTimeMillis();
 
+        PasswordUtils pu = new PasswordUtils();
+        
         String password = "password";
         String password2 = "password2";
-        String result1a = Password.getSaltedHash(password);
+        String result1a = pu.getSaltedHash(password);
         LOG.info(result1a);
-        String result1b = Password.getSaltedHash(password);
+        String result1b = pu.getSaltedHash(password);
         LOG.info(result1b);
-        String result2 = Password.getSaltedHash(password2);
+        String result2 = pu.getSaltedHash(password2);
         LOG.info(result2);
 
         long storeEndTime = System.currentTimeMillis();
 
         long checkStartTime = System.currentTimeMillis();
 
-        assertTrue(Password.check(password, result1a));
-        assertTrue(Password.check(password, result1b));
-        assertTrue(Password.check(password2, result2));
+        assertTrue(pu.check(password, result1a));
+        assertTrue(pu.check(password, result1b));
+        assertTrue(pu.check(password2, result2));
 
-        assertFalse(Password.check(password2, result1a));
-        assertFalse(Password.check(password2, result1b));
-        assertFalse(Password.check(password, result2));
+        assertFalse(pu.check(password2, result1a));
+        assertFalse(pu.check(password2, result1b));
+        assertFalse(pu.check(password, result2));
 
         long checkEndTime = System.currentTimeMillis();
 

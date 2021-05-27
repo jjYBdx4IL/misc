@@ -57,7 +57,7 @@ public class GpgDecryptionPlugin implements ClipBoardPlugin {
                 frame.pack();
                 AWTUtils.centerOnMouseScreen(frame);
                 frame.setVisible(true);
-            } catch (GnuPgClDecryptionException e) {
+            } catch (GnuPgClDecryptionException | InterruptedException e) {
                 LOG.error("", e);
             }
         }

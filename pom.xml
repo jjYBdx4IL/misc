@@ -73,6 +73,7 @@
         <module>ecs</module>
         <module>encryption-utils</module>
         <module>gfx-utils</module>
+        <module>h2-frontend</module>
         <module>io-utils</module>
         <module>jersey-client-utils</module>
         <module>jna-utils</module>
@@ -97,7 +98,7 @@
         <module>vmmgmt-utils</module>
         <module>vmmgmt-test-utils</module>
         <module>website-verifier</module>
-        <module>h2-frontend</module>
+        <module>wildfly-client</module>
         <module>xml-dom4j-utils</module>
     </modules>
 
@@ -106,11 +107,11 @@
             <plugins>
                 <plugin>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.2</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.7.1</version>
+                    <version>3.9.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -129,7 +130,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.8</version>
+                        <version>3.0.0</version>
                         <executions>
                             <execution>
                                 <goals>
@@ -138,12 +139,22 @@
                                 <phase>compile</phase>
                                 <configuration>
                                     <target>
+                                        <!-- non-windows: -->
                                         <copy todir="${project.build.directory}/site.agg" includeEmptyDirs="no"
                                             verbose="false">
                                             <fileset dir="${project.basedir}">
                                                 <include name="*/target/site/com.github.*/**" />
                                             </fileset>
                                             <mapper type="regexp" from="^.*/target/site/(com\.github\..*)$$"
+                                                to="\1" />
+                                        </copy>
+                                        <!-- windows: -->
+                                        <copy todir="${project.build.directory}/site.agg" includeEmptyDirs="no"
+                                            verbose="false">
+                                            <fileset dir="${project.basedir}">
+                                                <include name="*\\target\\site\\com.github.*\\**" />
+                                            </fileset>
+                                            <mapper type="regexp" from="^.*\\target\\site\\(com\.github\..*)$$"
                                                 to="\1" />
                                         </copy>
                                     </target>

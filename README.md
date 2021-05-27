@@ -2,8 +2,6 @@
 
 Misc Java stuff
 
-[![Build Status](https://travis-ci.org/jjYBdx4IL/misc.png?branch=master)](https://travis-ci.org/jjYBdx4IL/misc)
-
 ## LICENSE
 
 All modules are licensed under the Apache License v2.0 by default. However, there are some
@@ -41,5 +39,4 @@ mvn clean install -Psite-archive -N
 
 
 --
-[![Build Status](https://travis-ci.org/jjYBdx4IL/misc.png?branch=master)](https://travis-ci.org/jjYBdx4IL/misc)
-devel/java/github/misc@7840
+devel/java/github/misc@7853

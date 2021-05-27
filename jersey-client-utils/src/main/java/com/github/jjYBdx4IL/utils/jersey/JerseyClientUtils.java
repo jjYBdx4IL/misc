@@ -37,7 +37,6 @@ public class JerseyClientUtils {
      * 
      * <p>"Usable" means:
      * <ul>
-     * <li>Intercepts logging and redirects it to the slf4j framework.
      * <li>Makes the client use the {@link ApacheConnectorProvider} which adds Cookie handling support.
      * </ul>
      * 
@@ -46,12 +45,19 @@ public class JerseyClientUtils {
      * @return the client
      */
     public static Client createClient() {
-        java.util.logging.Logger logj = java.util.logging.Logger.getLogger(JerseyClientUtils.class.getName());
         // add cookie handling support:
         ClientConfig clientConfig = new ClientConfig().connectorProvider(new ApacheConnectorProvider());
         clientConfig = clientConfig.property(ClientProperties.CONNECT_TIMEOUT, 10000);
         clientConfig = clientConfig.property(ClientProperties.READ_TIMEOUT, 10000);
-        logj.setLevel(java.util.logging.Level.FINEST);
+        Client client = JerseyClientBuilder.createClient(clientConfig);
+        return client;
+    }
+
+    /**
+     * Enable logging. Use {@link java.util.logging.Level#FINEST} for full wire logging.
+     */
+    public static void enableLogging(Client client, java.util.logging.Level level) {
+        java.util.logging.Logger logj = java.util.logging.Logger.getLogger(JerseyClientUtils.class.getName());
         logj.addHandler(new Handler() {
 
             @Override
@@ -67,10 +73,7 @@ public class JerseyClientUtils {
             public void close() throws SecurityException {
             }
         });
-        logj.log(java.util.logging.Level.FINEST, "test");
-        Client client = JerseyClientBuilder.createClient(clientConfig);
+        logj.setLevel(level);
         client.register(new LoggingFeature(logj, LoggingFeature.Verbosity.PAYLOAD_ANY));
-        return client;
     }
-
 }

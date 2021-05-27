@@ -38,6 +38,11 @@ public class AWTUtilsTest {
     }
 
     @Test
+    public void testShowAndWaitForCloseByUser() {
+        AWTUtils.showAndWaitForCloseByUser(MdiInternalImageFrameTest.getImage());
+    }
+    
+    @Test
     public void testAskForConfirmationOnMouseScreen() {
         LOG.info(Boolean.toString(AWTUtils.askForConfirmationOnMouseScreen("title", "are you sure?")));
     }
@@ -54,5 +59,4 @@ public class AWTUtilsTest {
         AWTUtils.showPopupNotification(-1, "some test message", AWTUtils.POS_RIGHT|AWTUtils.POS_BOTTOM, 5000, false);
         Thread.sleep(7000L);
     }
-
 }

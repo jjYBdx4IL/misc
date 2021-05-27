@@ -18,6 +18,7 @@ package com.github.jjYBdx4IL.utils.text;
 import static com.github.jjYBdx4IL.utils.text.StringUtil.haveEqualSets;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
@@ -40,6 +41,39 @@ public class StringUtilTest {
         assertTrue(haveEqualSets(Arrays.asList("a", "b"), Arrays.asList("b", "a")));
         assertTrue(haveEqualSets(Arrays.asList("a", "b"), Arrays.asList("b", "a", "a")));
         assertTrue(haveEqualSets(Arrays.asList("a"), Arrays.asList("a")));
+    }
+    
+    @Test
+    public void testsq() {
+        assertEquals("one=1, two=2, three='3', %q", StringUtil.sq("one=%d, two=%s, three=%q, %%q", 1, "2", "3"));
+        
+        assertEquals("%", StringUtil.sq("%%"));
+        assertEquals("%", StringUtil.sq("%"));
+        assertEquals("", StringUtil.sq(""));
+        
+        assertEquals("1", StringUtil.sq("%d", 1));
+        assertEquals("-1", StringUtil.sq("%d", -1));
+        assertEquals("-1", StringUtil.sq("%d", -1L));
+        
+        assertEquals("1", StringUtil.sq("%s", "1"));
+        
+        assertEquals("'1'", StringUtil.sq("%q", "1"));
+        assertEquals("'1'\\''2'", StringUtil.sq("%q", "1'2"));
+        
+        try {
+            StringUtil.sq("%d", 1.f);
+            fail();
+        } catch (IllegalArgumentException ex) {
+            assertTrue(ex.getMessage().contains("#0 has wrong type"));
+        }
+        
+        try {
+            StringUtil.sq("%d %s", 1, 2);
+            fail();
+        } catch (IllegalArgumentException ex) {
+            assertTrue(ex.getMessage().contains("#1 has wrong type"));
+        }
+        
     }
 
 }

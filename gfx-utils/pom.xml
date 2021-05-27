@@ -16,7 +16,7 @@
     <name>GFX Utils</name>
     <description>graphics helpers</description>
     <inceptionYear>2017</inceptionYear>
-
+    
     <build>
         <plugins>
             <plugin>
@@ -49,7 +49,13 @@
         <dependency>
             <groupId>net.sf.cssbox</groupId>
             <artifactId>cssbox</artifactId>
-            <version>4.12</version>
+            <version>4.17</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -57,13 +63,6 @@
             <version>1.7.30</version>
         </dependency>
         
-        <!-- bump dep version for cssbox dependency xercesImpl: -->
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>2.12.0</version>
-        </dependency>
-
         <dependency>
             <groupId>com.github.jjYBdx4IL.utils</groupId>
             <artifactId>class-utils</artifactId>
@@ -92,7 +91,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13</version>
+            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>

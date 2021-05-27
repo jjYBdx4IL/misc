@@ -212,5 +212,8 @@ public class Env {
         }
         return logDir;
     }
-
+    
+    public static File home() {
+        return new File(System.getProperty("user.home"));
+    }
 }

@@ -202,10 +202,10 @@ public class OSDAppIT extends AbstractHandler {
         }
 
         File diskStandbyScriptFile = new File(targetDir, "disk-standby.sh");
-        String disStandbyScriptContents = "#!/bin/bash\n"
+        String diskStandbyScriptContents = "#!/bin/bash\n"
             + "exit 0\n";
         try (OutputStream os = new FileOutputStream(diskStandbyScriptFile)) {
-            IOUtils.write(disStandbyScriptContents, os, "UTF-8");
+            IOUtils.write(diskStandbyScriptContents, os, "UTF-8");
         }
         diskStandbyScriptFile.setExecutable(true);
 
@@ -319,7 +319,7 @@ public class OSDAppIT extends AbstractHandler {
 
     private static void assertOutputOk(String output) {
         for (String line : output.split("\r?\n")) {
-            assertFalse(line.toLowerCase(Locale.ROOT), line.toLowerCase(Locale.ROOT).contains("exception"));
+            assertFalse(output, line.toLowerCase(Locale.ROOT).contains("exception"));
             if (line.contains("INFO SimpleXmlAppCfg - reading app configuration file")) {
                 continue;
             }

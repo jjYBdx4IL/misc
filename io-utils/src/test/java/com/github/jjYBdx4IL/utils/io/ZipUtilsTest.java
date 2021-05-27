@@ -15,39 +15,75 @@
  */
 package com.github.jjYBdx4IL.utils.io;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-
 public class ZipUtilsTest {
 
+    private static final File TEST_ZIP;
+    
+    static {
+        try {
+            TEST_ZIP = new File(ZipUtilsTest.class.getResource("test.zip").toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    @Test
+    public void testExtractRecreate() throws IOException {
+        File destDir = new File(tempFolder.getRoot(), "unpacked");
+        
+        ZipUtils.extractRecreate(TEST_ZIP, null, destDir, 0);
+        assertEquals(2, FindUtils.globFiles(destDir, "**").size()); // 2 files
+        
+        ZipUtils.extractRecreate(TEST_ZIP, "^(?!123)", destDir, 0);
+        assertEquals("test", FindUtils.globFiles(destDir, "**").get(0).getName());
+        
+        ZipUtils.extractRecreate(TEST_ZIP, "^(?!123)", destDir, 1);
+        assertEquals(1, FindUtils.globFiles(destDir, "/test").size());
+        
+        try {
+            ZipUtils.extractRecreate(TEST_ZIP, null, destDir, 1);
+            fail();
+        } catch (IOException ex) {
+        }
+        
+        try {
+            ZipUtils.extractRecreate(TEST_ZIP, "not-existing", destDir, 0);
+            fail();
+        } catch (IOException ex) {
+        }
+    }
     
     @Test
     public void testTest() throws Exception {
-        File testZip = new File(getClass().getResource("test.zip").toURI());
-        assertTrue(testZip.exists() && testZip.isFile() && testZip.length() > 50);
-        byte[] testZipContents = FileUtils.readFileToByteArray(testZip);
+        assertTrue(TEST_ZIP.exists() && TEST_ZIP.isFile() && TEST_ZIP.length() > 50);
+        byte[] testZipContents = FileUtils.readFileToByteArray(TEST_ZIP);
 
         // positive test
-        assertTrue(ZipUtils.test(testZip));
+        assertTrue(ZipUtils.test(TEST_ZIP));
         
         // some selected negative tests
         testModifiedZip(testZipContents, 0);
         testModifiedZip(testZipContents, 1);
         testModifiedZip(testZipContents, 2);
         testModifiedZip(testZipContents, 3);
-        testModifiedZip(testZipContents, 150);
-        testModifiedZip(testZipContents, 155);
         
         // negative tests (not all working)
 //        for (int i=0; i<testZip.length(); i++) {

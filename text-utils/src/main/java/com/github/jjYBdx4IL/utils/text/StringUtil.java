@@ -28,6 +28,70 @@ public class StringUtil {
         return String.format(Locale.ROOT, pattern, args);
     }
     
+    /**
+     * String formatter for BASH '-quotes interpolation.
+     */
+    public static String sq(String input, Object... args) {
+        StringBuilder sb = new StringBuilder(input.length() + args.length * 3);
+        int i = 0;
+        int cnt = 0;
+        while (i < input.length()) {
+            int j = input.indexOf("%", i);
+            if (j == -1 || j == input.length() - 1) {
+                sb.append(input.substring(i));
+                i = input.length();
+                continue;
+            }
+            char mod = input.charAt(j+1);
+            if (mod == '%') {
+                sb.append(input.substring(i, j+1));
+                i = j+2;
+                continue;
+            }
+            final Object o;
+            String append = null;
+            if (mod == 's' || mod == 'd' || mod == 'q') {
+                if (cnt == args.length) {
+                    throw new IllegalArgumentException("too many placeholders, not enough arguments");
+                }
+                o = args[cnt++];
+            }
+            else {
+                throw new IllegalArgumentException("unsupported modifier: " + mod);
+            }
+            sb.append(input.substring(i, j));
+            i = j+2;
+            if (mod == 's') {
+                if (o instanceof String) {
+                    append = (String) o;
+                }
+            }
+            else if (mod == 'd') {
+                if (o instanceof Integer) {
+                    append = Integer.toString((Integer)o);
+                }
+                else if (o instanceof Long) {
+                    append = Long.toString((Long)o);
+                }
+            }
+            else if (mod == 'q') {
+                if (o instanceof String) {
+                    sb.append("'");
+                    sb.append(((String)o).replaceAll("'", "'\\\\''"));
+                    append = "'";
+                }
+            }
+            if (append == null) {
+                throw new IllegalArgumentException("argument #" + (cnt-1) + " has wrong type: " + o.getClass());
+            }
+            sb.append(append);
+        }
+        if (cnt != args.length) {
+            throw new IllegalArgumentException("more arguments than placeholders");
+        }
+        return sb.toString();
+    }
+    
     public static boolean haveEqualSets(Collection<String> a, Collection<String> b) {
         if (a == null || a.isEmpty()) {
             return b == null || b.isEmpty();

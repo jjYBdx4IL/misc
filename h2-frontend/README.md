@@ -1,6 +1,6 @@
 # H2 Database Web Frontend
 
-This WAR makes the database managment frontend bundled with H2 drivers
+This WAR makes the database management frontend bundled with H2 drivers
 accessible. The H2 database comes with WildFly 11. This module has no
 dependency on H2 and needs H2 being provided by the JavaEE instance or
 whatever servlet container provider is running it. You could remove
@@ -10,3 +10,13 @@ another database.
 
 The H2 frontend can be used to access all JDBC-type databases if their
 driver is on the classpath.
+
+## Deployment
+
+Deploy to localhost/h2 (management port 9991) via:
+
+```
+mvn wildfly:deploy -Dwildfly.port=9991
+```
+
+
