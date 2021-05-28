@@ -48,8 +48,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Locale;
@@ -58,13 +60,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * To enable wire-logging, set log level of this class to TRACE. 
+ * To enable wire-logging, set log level of this class to TRACE.
  */
 public class WildFlyClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(WildFlyClient.class);
     public static final long TIMEOUT_SECS = 300;
-    
+
     static {
         if (LOG.isTraceEnabled()) {
             System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http", "DEBUG");
@@ -99,7 +101,7 @@ public class WildFlyClient {
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(mgmtUser, mgmtPass);
         credsProvider.setCredentials(new AuthScope(target), credentials);
         httpclient = HttpClients.custom().setDefaultCookieStore(cookieStore)
-                .setDefaultCredentialsProvider(credsProvider).build();
+            .setDefaultCredentialsProvider(credsProvider).build();
     }
 
     protected Gson createGson() {
@@ -195,7 +197,9 @@ public class WildFlyClient {
     /**
      * Execute wildfly management command.
      * 
-     * @param cmd a string in CLI style, ie. <code>/deployment=ROOT.war:remove</code>
+     * @param cmd
+     *            a string in CLI style, ie.
+     *            <code>/deployment=ROOT.war:remove</code>
      */
     public boolean exec(String cmd) throws Exception {
         Matcher m = CMD_PAT.matcher(cmd);
@@ -219,7 +223,8 @@ public class WildFlyClient {
         post.setEntity(new StringEntity(jsonCmd, ContentType.APPLICATION_JSON));
 
         try (CloseableHttpResponse response = httpclient.execute(target, post)) {
-            // {"outcome" : "success", "response-headers" : {"operation-requires-reload" :
+            // {"outcome" : "success", "response-headers" :
+            // {"operation-requires-reload" :
             // true, "process-state" : "reload-required"}}
             reply = EntityUtils.toString(response.getEntity(), UTF_8);
             try {
@@ -244,7 +249,8 @@ public class WildFlyClient {
     /**
      * Convenience wrapper method for {@link #exec(String)}.
      * 
-     *  @throws RuntimeException if result is not positive
+     * @throws RuntimeException
+     *             if result is not positive
      */
     public void assertPostCmd(String cmd) throws Exception {
         if (!exec(cmd)) {
@@ -255,8 +261,10 @@ public class WildFlyClient {
     /**
      * Upload file.
      * 
-     * @param file the file to upload
-     * @return the base64 encoded SHA-1 of the uploaded contents as reported by the server
+     * @param file
+     *            the file to upload
+     * @return the base64 encoded SHA-1 of the uploaded contents as reported by
+     *         the server
      */
     public String upload(File file) throws Exception {
         LOG.info("uploading: " + file);
@@ -292,11 +300,12 @@ public class WildFlyClient {
     public void uploadDeploy(String deploymentName, String fileLoc) throws Exception {
         String uploadId = upload(fileLoc);
         assertPostCmd(f("/deployment=%s:add(enabled=true,content=[{\"hash\":{\"BYTES_VALUE\":\"%s\"}}])",
-                deploymentName, uploadId));
+            deploymentName, uploadId));
     }
 
     /**
-     * Upload and deploy (add+enable). Skips upload and deployment if remote checksum matches.
+     * Upload and deploy (add+enable). Skips upload and deployment if remote
+     * checksum matches.
      */
     public void uploadDeployIfChanged(String deploymentName, String fileLoc) throws Exception {
         final String localSha1 = IoUtils.getDigest(fileLoc, "SHA-1").toLowerCase(Locale.ROOT);
@@ -328,43 +337,102 @@ public class WildFlyClient {
             assertPostCmd(f("/deployment=%s:remove", deploymentName));
         }
         assertPostCmd(f("/deployment=%s:add(enabled=true,content=[{\"hash\":{\"BYTES_VALUE\":\"%s\"}}])",
-                deploymentName, uploadHash));
+            deploymentName, uploadHash));
     }
 
     /**
-     * Undeploy and remove. 
+     * Check whether the given resource exists.
+     */
+    public boolean resourceExists(String resLoc) throws Exception {
+        return exec(f("%s:read-resource", resLoc));
+    }
+    
+    /**
+     * Add the resource if it does not exist yet.
+     */
+    public boolean addResourceIfNotExists(String resLoc, String spec) throws Exception {
+        if (resourceExists(resLoc)) {
+            return false;
+        }
+        if (spec != null) {
+            assertPostCmd(f("%s:add(%s)", resLoc, spec));
+        } else {
+            assertPostCmd(f("%s:add", resLoc));
+        }
+        return true;
+    }
+
+    /**
+     * Add VHost if it doesn't exist.
+     */
+    public boolean addVhostIfNotExists(String name) throws Exception {
+        String hostres = f("/subsystem=undertow/server=default-server/host=%s", name);
+        return addResourceIfNotExists(hostres, null);
+    }
+    
+    /**
+     * Set vhost alias(es).
+     */
+    public void setVhostAliases(String vhost, String[] aliases) throws Exception {
+        if (vhost == null) {
+            vhost = "default-host";
+        }
+        String hostres = f("/subsystem=undertow/server=default-server/host=%s", vhost);
+        writeAttr(hostres, "alias", aliases);
+    }
+
+    /**
+     * Write attribute.
+     */
+    public void writeAttr(String resLoc, String attrName, String[] attrValue) throws Exception {
+        assertPostCmd(f("%s:write-attribute(name=%s,value=%s)", resLoc, attrName, gson.toJson(attrValue)));
+    }
+
+    /**
+     * Write attribute.
+     */
+    public void writeAttr(String resLoc, String attrName, String attrValue) throws Exception {
+        assertPostCmd(f("%s:write-attribute(name=%s,value=%s)", resLoc, attrName, gson.toJson(attrValue)));
+    }
+    
+    /**
+     * Undeploy and remove.
      * 
      * @return false if removal failed or deployment does not exist.
      */
     public boolean undeployAndRemove(String deployment) throws Exception {
-        exec("/deployment=" + deployment + ":undeploy()");
-        return exec("/deployment=" + deployment + ":remove()");
+        exec("/deployment=" + deployment + ":undeploy");
+        return exec("/deployment=" + deployment + ":remove");
     }
 
     /**
-     * Add and deploy path.
+     * Add and deploy path. If path is a directory, assume an exploded deployment (archive=false).
      *
-     * @param path the path (directory) to deploy
-     * @throws Exception if anything fails, ie. deployment already exists etc.
+     * @param path
+     *            the path (directory) to deploy
+     * @throws Exception
+     *             if anything fails, ie. deployment already exists etc.
      */
     public void deploy(String deployment, Path path) throws Exception {
-        assertPostCmd("/deployment=" + deployment + ":add(archive=false,path=" + path.toString() + ")");
-        assertPostCmd("/deployment=" + deployment + ":deploy()");
+        if (!Files.exists(path)) {
+            throw new FileNotFoundException(path.toString());
+        }
+        assertPostCmd(f("/deployment=%s:add(enabled=true,content={\"archive\":%s,\"path\":%s})",
+            deployment, Files.isDirectory(path) ? "false" : "true", gson.toJson(path.toString())));
     }
 
     /**
      * Add and deploy.
      */
     public void addAndDeploy(String deployment) throws Exception {
-        assertPostCmd("/deployment=" + deployment + ":add()");
-        assertPostCmd("/deployment=" + deployment + ":deploy()");
+        assertPostCmd("/deployment=" + deployment + ":add");
     }
 
     /**
      * Redeploy.
      */
     public void redeploy(String deployment) throws Exception {
-        exec("/deployment=" + deployment + ":redeploy()");
+        exec("/deployment=" + deployment + ":redeploy");
     }
 
     /**
@@ -417,7 +485,8 @@ public class WildFlyClient {
     }
 
     /**
-     * Trigger server reload if any of the previous responses indicated the necessity to do so.
+     * Trigger server reload if any of the previous responses indicated the
+     * necessity to do so.
      */
     public void reloadIfRequired() throws Exception {
         if (reloadRequired) {
@@ -463,7 +532,7 @@ public class WildFlyClient {
         assertPostCmd("/subsystem=logging/console-handler=CONSOLE:write-attribute(name=level,value=ALL)");
         exec("/subsystem=logging/logger=" + category + ":remove()");
         assertPostCmd(
-                "/subsystem=logging/logger=" + category + ":add(level=" + logLevel + ",use-parent-handlers=true)");
+            "/subsystem=logging/logger=" + category + ":add(level=" + logLevel + ",use-parent-handlers=true)");
     }
 
     /**
@@ -483,8 +552,11 @@ public class WildFlyClient {
     /**
      * Add a data source.
      * 
-     * @param dsName the name of the data source
-     * @param config the CLI style part after the command part, without the parentheses.
+     * @param dsName
+     *            the name of the data source
+     * @param config
+     *            the CLI style part after the command part, without the
+     *            parentheses.
      */
     public void addDataSource(String dsName, String config) throws Exception {
         String res = f("/subsystem=datasources/data-source=%s", dsName);
@@ -508,7 +580,8 @@ public class WildFlyClient {
     /**
      * Wait for server to respond.
      * 
-     * @throws Exception on timeout, {@link #TIMEOUT_SECS}
+     * @throws Exception
+     *             on timeout, {@link #TIMEOUT_SECS}
      */
     public void waitFor() throws Exception {
         long timeout = System.currentTimeMillis() + 1000 * TIMEOUT_SECS;

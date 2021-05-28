@@ -299,7 +299,6 @@ public class AWTUtils {
     public static void showAndWaitForCloseByUser(final BufferedImage image) {
         final JFrame frame = new JFrame("Press a key to continue...") {
             private static final long serialVersionUID = -8204999021827089908L;
-            private AffineTransform descale = null;
             
             @Override
             public void paint(Graphics g) {
@@ -500,7 +499,8 @@ public class AWTUtils {
         SwingUtilities.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                BufferedImage img = new BufferedImage(container.getWidth(), container.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                BufferedImage img = new BufferedImage(container.getWidth(), container.getHeight(),
+                    BufferedImage.TYPE_INT_ARGB);
                 Graphics g = null;
                 try {
                     g = img.getGraphics();
