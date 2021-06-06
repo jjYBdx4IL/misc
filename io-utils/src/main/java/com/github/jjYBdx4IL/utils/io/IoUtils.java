@@ -68,7 +68,7 @@ public class IoUtils {
             }
         }
     }
-
+    
     /**
      * Same as {@link #safeWriteTo(File, String, Charset)}, but always uses
      * UTF-8 for writing.
@@ -83,6 +83,13 @@ public class IoUtils {
      */
     public static void safeWriteTo(File dest, String data) throws IOException {
         safeWriteTo(dest, data, Charset.forName("UTF-8"));
+    }
+
+    /**
+     * See {@link #safeWriteTo(File, String)}. 
+     */
+    public static void safeWriteTo(Path dest, String data) throws IOException {
+        safeWriteTo(dest.toFile(), data);
     }
 
     /**

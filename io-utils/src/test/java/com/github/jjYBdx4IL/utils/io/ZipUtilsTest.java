@@ -15,20 +15,18 @@
  */
 package com.github.jjYBdx4IL.utils.io;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Arrays;
+import static org.junit.Assert.*;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.util.Arrays;
 
 public class ZipUtilsTest {
 
@@ -45,6 +43,27 @@ public class ZipUtilsTest {
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
 
+    @Test
+    public void testZipEntryToString() throws Exception {
+        assertEquals("123", ZipUtils.zipEntryToString(TEST_ZIP, "123").trim());
+        assertEquals("test", ZipUtils.zipEntryToString(TEST_ZIP, "parentdir/test").trim());
+    }
+    
+    @Test
+    public void testZip() throws IOException {
+        File destDir = new File(tempFolder.getRoot(), "unpacked");
+        Path outFile = tempFolder.getRoot().toPath().resolve("out.zip");
+        
+        ZipUtils.extractRecreate(TEST_ZIP, null, destDir, 0);
+        assertEquals(2, FindUtils.globFiles(destDir, "**").size()); // 2 files
+
+        ZipUtils.zip(outFile, destDir.toPath());
+        
+        File destDir2 = new File(tempFolder.getRoot(), "unpacked2");
+        ZipUtils.extractRecreate(outFile.toFile(), null, destDir2, 0);
+        assertEquals(2, FindUtils.globFiles(destDir2, "**").size()); // 2 files
+    }
+    
     @Test
     public void testExtractRecreate() throws IOException {
         File destDir = new File(tempFolder.getRoot(), "unpacked");

@@ -15,11 +15,7 @@
  */
 package com.github.jjYBdx4IL.parser.linux;
 
-//CHECKSTYLE:OFF
 import static org.junit.Assert.assertEquals;
-
-import com.github.jjYBdx4IL.parser.linux.ProcNetDevData;
-import com.github.jjYBdx4IL.parser.linux.ProcNetDevParser;
 
 import org.junit.Test;
 

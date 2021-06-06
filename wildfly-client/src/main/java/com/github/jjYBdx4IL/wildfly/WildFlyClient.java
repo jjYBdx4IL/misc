@@ -307,8 +307,8 @@ public class WildFlyClient {
      * Upload and deploy (add+enable). Skips upload and deployment if remote
      * checksum matches.
      */
-    public void uploadDeployIfChanged(String deploymentName, String fileLoc) throws Exception {
-        final String localSha1 = IoUtils.getDigest(fileLoc, "SHA-1").toLowerCase(Locale.ROOT);
+    public boolean uploadDeployIfChanged(String deploymentName, File war) throws Exception {
+        final String localSha1 = IoUtils.getDigest(war, "SHA-1").toLowerCase(Locale.ROOT);
         boolean needsRemoval = false;
         if (exec(f("/deployment=%s:read-resource", deploymentName))) {
             needsRemoval = true;
@@ -322,12 +322,12 @@ public class WildFlyClient {
                 String deployedSha1 = Hex.encodeHexString(Base64.getDecoder().decode(deployedHash), true);
                 if (localSha1.equals(deployedSha1)) {
                     LOG.info("deployment content hash unchanged, skipping");
-                    return;
+                    return false;
                 }
             }
         }
 
-        String uploadHash = upload(fileLoc);
+        String uploadHash = upload(war);
         String uploadSha1 = Hex.encodeHexString(Base64.getDecoder().decode(uploadHash), true);
         if (!localSha1.equals(uploadSha1)) {
             throw new IOException("checksum mismatch for upload: upload=" + uploadSha1 + ", local=" + localSha1);
@@ -338,6 +338,7 @@ public class WildFlyClient {
         }
         assertPostCmd(f("/deployment=%s:add(enabled=true,content=[{\"hash\":{\"BYTES_VALUE\":\"%s\"}}])",
             deploymentName, uploadHash));
+        return true;
     }
 
     /**

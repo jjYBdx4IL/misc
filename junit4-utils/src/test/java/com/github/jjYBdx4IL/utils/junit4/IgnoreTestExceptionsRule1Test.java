@@ -19,8 +19,6 @@ import java.net.SocketTimeoutException;
 
 import static org.junit.Assert.*;
 
-import com.github.jjYBdx4IL.utils.junit4.IgnoreTestExceptionsRule;
-
 import org.junit.Rule;
 import org.junit.Test;
 

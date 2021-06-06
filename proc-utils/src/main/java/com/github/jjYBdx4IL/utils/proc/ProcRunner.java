@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author jjYBdx4IL
  */
-public class ProcRunner {
+public class ProcRunner implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcRunner.class);
     private static final long DEFAULT_TIMEOUT = 0L; // no timeout by default
@@ -102,6 +102,23 @@ public class ProcRunner {
 
     public Charset getConsoleEncoding() {
         return consoleEncoding;
+    }
+    
+    public ProcRunner rootLocaleUtc() {
+        environment().put("LC_ALL", "C");
+        environment().put("LANG", "C");
+        environment().put("TZ", "UTC");
+        return this;
+    }
+    
+    public ProcRunner prependPath(Path element) {
+        String s = environment().get("PATH");
+        if (s == null || s.trim().isEmpty()) {
+            environment().put("PATH", element.toAbsolutePath().toString());
+        } else {
+            environment().put("PATH", element.toAbsolutePath().toString() + File.pathSeparator + s);
+        }
+        return this;
     }
 
     /**
@@ -211,6 +228,11 @@ public class ProcRunner {
         return this;
     }
 
+    @Override
+    public void close() throws InterruptedException, IOException {
+        kill();
+    }
+    
     public int kill() throws InterruptedException, IOException {
         return waitFor(-1, null);
     }

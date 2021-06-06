@@ -63,6 +63,7 @@ public class JavaUtilLoggingUtilsTest extends AbstractHandler {
         }
 
         countDownLatch.await();
+        Thread.sleep(10L);
         
         assertTrue(systemErrRule.getLog().contains(token));
     }

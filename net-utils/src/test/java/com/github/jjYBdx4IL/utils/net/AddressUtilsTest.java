@@ -15,20 +15,18 @@
  */
 package com.github.jjYBdx4IL.utils.net;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 //CHECKSTYLE:OFF
 import com.github.jjYBdx4IL.utils.env.CI;
 
+import org.junit.Assume;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
-import static org.junit.Assert.*;
-
-import org.apache.commons.lang.StringUtils;
-import org.junit.Assume;
 
 /**
  *
@@ -36,11 +34,10 @@ import org.junit.Assume;
  */
 public class AddressUtilsTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AddressUtilsTest.class);
-    
     public AddressUtilsTest() {
     }
 
+    @Ignore
     @Test
     public void testGetNonLocalHostIPAddress() throws Exception {
         // don't run this test where we can't control host configurations

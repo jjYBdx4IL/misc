@@ -32,6 +32,6 @@ public class TimeUsageTest {
         a.startSub("two");
         a.startSub("two");
         a.close();
-        LOG.info(a.toString());
+        LOG.debug(a.toString());
     }
 }

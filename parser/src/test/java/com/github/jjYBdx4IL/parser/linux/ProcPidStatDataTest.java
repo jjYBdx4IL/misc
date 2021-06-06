@@ -15,16 +15,13 @@
  */
 package com.github.jjYBdx4IL.parser.linux;
 
-//CHECKSTYLE:OFF
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-
-import static org.junit.Assert.assertEquals;
-
-import com.github.jjYBdx4IL.parser.linux.ProcPidStatData;
-
-import org.junit.Test;
 
 /**
  *

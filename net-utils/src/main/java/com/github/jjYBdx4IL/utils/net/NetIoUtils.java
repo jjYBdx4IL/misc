@@ -161,7 +161,6 @@ public class NetIoUtils {
 
     private static Charset getCharset(String contentType) throws IOException {
         String[] values = contentType.split(";"); // values.length should be 2
-        String charset = "";
 
         for (String value : values) {
             value = value.trim();

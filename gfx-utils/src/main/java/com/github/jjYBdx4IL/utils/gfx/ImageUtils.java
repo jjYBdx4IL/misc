@@ -42,6 +42,17 @@ import javax.imageio.ImageIO;
  */
 public class ImageUtils {
 
+    /**
+     * Crop image by drawing parts of its contents into a new image.
+     */
+    public static BufferedImage cropNew(BufferedImage img, int x, int y, int w, int h) {
+        BufferedImage imgPart = new BufferedImage(w, h, img.getType());
+        Graphics2D gr = imgPart.createGraphics();
+        gr.drawImage(img, 0, 0, w, h, x, y, x + w, y + h, null);
+        gr.dispose();
+        return imgPart;
+    }
+    
     public static double colorDist(int pixel1, int pixel2) {
         int p1r = (pixel1 >> 16) & 0xFF;
         int p1g = (pixel1 >> 8) & 0xFF;

@@ -89,7 +89,7 @@
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
                 <configuration>
-                    <failOnError>false</failOnError>
+                    <failOnError>true</failOnError>
                     <skipTestScope>true</skipTestScope>
                 </configuration>
             </plugin>
@@ -308,11 +308,11 @@
                 <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
-                    <version>6.1.6</version>
-	                <configuration>
-	                    <failOnError>false</failOnError>
-	                    <skipTestScope>true</skipTestScope>
-	                </configuration>
+                    <version>6.2.0</version>
+                    <configuration>
+                        <failOnError>true</failOnError>
+                        <skipTestScope>true</skipTestScope>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>com.googlecode.maven-download-plugin</groupId>
@@ -406,7 +406,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.0</version>
+                    <version>3.8.1</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>

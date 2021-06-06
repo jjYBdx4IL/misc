@@ -15,9 +15,11 @@
  */
 package com.github.jjYBdx4IL.utils.osdapp;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.github.jjYBdx4IL.parser.ParseException;
-import com.github.jjYBdx4IL.parser.linux.ZFSStatusParser;
-import com.github.jjYBdx4IL.parser.linux.ZFSStatusParser.Result;
+import com.github.jjYBdx4IL.parser.linux.ZfsStatusParser;
+import com.github.jjYBdx4IL.parser.linux.ZfsStatusParser.Result;
 import com.github.jjYBdx4IL.utils.net.WakeOnLAN;
 
 import org.apache.commons.io.IOUtils;
@@ -60,7 +62,7 @@ class ZFSPoller extends TimerTask {
             pb.redirectErrorStream(true);
             pb.redirectOutput(ProcessBuilder.Redirect.PIPE);
             Process p = pb.start();
-            String zpoolStatusCommandOutput = IOUtils.toString(p.getInputStream());
+            String zpoolStatusCommandOutput = IOUtils.toString(p.getInputStream(), UTF_8);
             p.waitFor();
             if (p.exitValue() != 0) {
                 throw new IOException("zpool status command returned bad exit code " + p.exitValue()
@@ -71,7 +73,7 @@ class ZFSPoller extends TimerTask {
                 LOG.trace(zpoolStatusCommandOutput);
             }
 
-            result = ZFSStatusParser.parse(zpoolStatusCommandOutput);
+            result = ZfsStatusParser.parse(zpoolStatusCommandOutput);
             if (LOG.isDebugEnabled()) {
                 LOG.debug(result.toString());
             }

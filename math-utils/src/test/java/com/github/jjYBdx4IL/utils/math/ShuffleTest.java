@@ -15,21 +15,18 @@
  */
 package com.github.jjYBdx4IL.utils.math;
 
-//CHECKSTYLE:OFF
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import java.util.Arrays;
 import java.util.Collections;
-
-import static org.junit.Assert.*;
-import org.junit.Test;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Github jjYBdx4IL Projects
  */
 public class ShuffleTest extends ShuffleTestBase {
-
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ShuffleTest.class);
 
     @Test
     public void testShuffle2() {
@@ -48,7 +45,6 @@ public class ShuffleTest extends ShuffleTestBase {
      */
     @Test
     public void testShuffleQuality() {
-        LOG.info("testShuffleQuality");
         // perfect quality (transition matrix shows even distribution)
         float delta = computeDelta(new ShuffleRunner<Integer>() {
 
@@ -62,7 +58,6 @@ public class ShuffleTest extends ShuffleTestBase {
 
     @Test
     public void testShuffle2Quality() {
-        LOG.info("testShuffle2Quality");
         // not so good quality (transition matrix shows a larger weight on diagonal elements, which means
         // that shuffle2 tends to leave array elements at their position.
         float delta = computeDelta(new ShuffleRunner<Integer>() {
@@ -77,7 +72,6 @@ public class ShuffleTest extends ShuffleTestBase {
 
     @Test
     public void testArraysShuffleQuality() {
-        LOG.info("testArraysShuffleQuality");
         // perfect quality (transition matrix shows even distribution)
         float delta = computeDelta(new ShuffleRunner<Integer>() {
 

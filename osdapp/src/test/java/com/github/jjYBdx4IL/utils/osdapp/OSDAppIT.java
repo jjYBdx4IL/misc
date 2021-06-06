@@ -22,7 +22,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeFalse;
 
-import com.github.jjYBdx4IL.parser.linux.ZFSStatusParserTest;
+import com.github.jjYBdx4IL.parser.linux.ZfsStatusParserTest;
 import com.github.jjYBdx4IL.utils.env.Maven;
 import com.github.jjYBdx4IL.utils.gfx.ImageUtils;
 import com.github.jjYBdx4IL.utils.io.FindUtils;
@@ -198,7 +198,7 @@ public class OSDAppIT extends AbstractHandler {
         }
         sudoFile.setExecutable(true);
         try (OutputStream os = new FileOutputStream(zpoolStatusOutput)) {
-            IOUtils.copy(ZFSStatusParserTest.class.getResourceAsStream(zfsRes), os);
+            IOUtils.copy(ZfsStatusParserTest.class.getResourceAsStream(zfsRes), os);
         }
 
         File diskStandbyScriptFile = new File(targetDir, "disk-standby.sh");

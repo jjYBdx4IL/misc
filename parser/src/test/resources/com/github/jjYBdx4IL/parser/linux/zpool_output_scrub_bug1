@@ -1,0 +1,30 @@
+  pool: bpool
+ state: ONLINE
+status: Some supported features are not enabled on the pool. The pool can
+	still be used, but some features are unavailable.
+action: Enable all features using 'zpool upgrade'. Once this is done,
+	the pool may no longer be accessible by software that does not support
+	the features. See zpool-features(5) for details.
+  scan: scrub repaired 0B in 0 days 00:00:03 with 0 errors on Tue Jan  5 06:24:05 2021
+config:
+
+	NAME                                                STATE     READ WRITE CKSUM
+	bpool                                               ONLINE       0     0     0
+	  mirror-0                                          ONLINE       0     0     0
+	    ata-WDC_WD40EFRX-68N32N0_WD-WCC7K2ATSZXJ-part3  ONLINE       0     0     0
+	    ata-WDC_WD40EFRX-68N32N0_WD-WCC7K0YKSETV-part3  ONLINE       0     0     0
+
+errors: No known data errors
+
+  pool: rpool
+ state: ONLINE
+  scan: scrub repaired 0B in 0 days 03:26:28 with 0 errors on Tue Jan  5 09:50:30 2021
+config:
+
+	NAME                                                STATE     READ WRITE CKSUM
+	rpool                                               ONLINE       0     0     0
+	  mirror-0                                          ONLINE       0     0     0
+	    ata-WDC_WD40EFRX-68N32N0_WD-WCC7K2ATSZXJ-part4  ONLINE       0     0     0
+	    ata-WDC_WD40EFRX-68N32N0_WD-WCC7K0YKSETV-part4  ONLINE       0     0     0
+
+errors: No known data errors

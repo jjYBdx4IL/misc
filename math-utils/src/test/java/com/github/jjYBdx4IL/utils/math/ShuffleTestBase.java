@@ -72,11 +72,11 @@ public class ShuffleTestBase {
             loopCount++;
         } while (loopCount < 2 || deltaVariation > maxDeltaVariation);
         long duration = System.currentTimeMillis() - start;
-        LOG.info("=================");
-        LOG.info(String.format("delta: %f, shuffle(T[]) calls per second: %d", delta,
+        LOG.debug("=================");
+        LOG.debug(String.format("delta: %f, shuffle(T[]) calls per second: %d", delta,
                 loopCount * iterationsPerLoop * 1000L / duration));
         for (long[] ia : counts) {
-            LOG.info(Arrays.toString(ia));
+            LOG.debug(Arrays.toString(ia));
         }
 
         return delta;

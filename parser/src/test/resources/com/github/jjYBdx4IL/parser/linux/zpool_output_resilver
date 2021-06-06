@@ -1,0 +1,39 @@
+  pool: bpool
+ state: ONLINE
+status: Some supported features are not enabled on the pool. The pool can
+	still be used, but some features are unavailable.
+action: Enable all features using 'zpool upgrade'. Once this is done,
+	the pool may no longer be accessible by software that does not support
+	the features. See zpool-features(5) for details.
+  scan: scrub repaired 0B in 0 days 00:00:04 with 0 errors on Sun Dec 13 00:24:31 2020
+config:
+
+	NAME                                                STATE     READ WRITE CKSUM
+	bpool                                               ONLINE       0     0     0
+	  mirror-0                                          ONLINE       0     0     0
+	    ata-WDC_WD40EFAX-68JH4N0_WD-WX12D809L5JH-part3  ONLINE       0     0     0
+	    ata-WDC_WD40EFAX-68JH4N0_WD-WX12D80N5E9E-part3  ONLINE       0     0     0
+	    ata-WDC_WD40EFRX-68N32N0_WD-WCC7K2ATSZXJ-part3  ONLINE       0     0     0
+	    ata-WDC_WD40EFRX-68N32N0_WD-WCC7K0YKSETV-part3  ONLINE       0     0     0
+
+errors: No known data errors
+
+  pool: rpool
+ state: ONLINE
+status: One or more devices is currently being resilvered.  The pool will
+	continue to function, possibly in a degraded state.
+action: Wait for the resilver to complete.
+  scan: resilver in progress since Sun Dec 13 00:24:31 2020
+	1.39T scanned at 409M/s, 451G issued at 130M/s, 1.39T total
+	905G resilvered, 31.74% done, 0 days 02:07:40 to go
+config:
+
+	NAME                                                STATE     READ WRITE CKSUM
+	rpool                                               ONLINE       0     0     0
+	  mirror-0                                          ONLINE       0     0     0
+	    ata-WDC_WD40EFAX-68JH4N0_WD-WX12D809L5JH-part4  ONLINE       0     0     0
+	    ata-WDC_WD40EFAX-68JH4N0_WD-WX12D80N5E9E-part4  ONLINE       0     0     0
+	    ata-WDC_WD40EFRX-68N32N0_WD-WCC7K2ATSZXJ-part4  ONLINE       0     0     0  (resilvering)
+	    ata-WDC_WD40EFRX-68N32N0_WD-WCC7K0YKSETV-part4  ONLINE       0     0     0  (resilvering)
+
+errors: No known data errors

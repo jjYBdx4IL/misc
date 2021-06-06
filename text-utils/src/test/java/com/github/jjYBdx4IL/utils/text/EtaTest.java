@@ -26,12 +26,12 @@ public class EtaTest {
     @Test
     public void test() throws InterruptedException {
         Eta<Integer> eta = new Eta<>(0, 10, 300);
-        LOG.info(eta.toString(0));
+        LOG.debug(eta.toString(0));
         for(int i=0; i<9; i++) {
             Thread.sleep(200l);
             String etaStr = eta.toStringPeriodical(i+1);
             if (etaStr != null) {
-                LOG.info(etaStr);
+                LOG.debug(etaStr);
             }
         }
     }
