@@ -22,9 +22,6 @@
             <target dev='sda' bus='scsi'/>
         </disk>
         <graphics type='vnc' port='-1' <#if keymap?has_content>keymap='${keymap}'</#if>/>
-        <interface type='user'>
-            <model type='virtio'/>
-        </interface>
 <#list sharedFolders as x>
         <filesystem type='mount' accessmode='squash'>
             <source dir='${x.source}'/>
@@ -33,7 +30,9 @@
 </#list>
     </devices>
     <qemu:commandline>
-        <qemu:arg value='-redir'/>
-        <qemu:arg value='tcp:${sshFwdPort}::22'/>
+        <qemu:arg value='-netdev'/>
+        <qemu:arg value='user,id=unet,hostfwd=tcp::${sshFwdPort}-:22'/>
+        <qemu:arg value='-device'/>
+        <qemu:arg value='virtio-net-pci,netdev=unet'/>
     </qemu:commandline>
 </domain>

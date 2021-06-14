@@ -230,6 +230,10 @@ public class ProcRunner implements AutoCloseable {
 
     @Override
     public void close() throws InterruptedException, IOException {
+        if (tout == null || p == null || rc >= 0) {
+            LOG.debug("already closed");
+            return;
+        }
         kill();
     }
     

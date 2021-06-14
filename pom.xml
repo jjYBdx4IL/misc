@@ -67,6 +67,7 @@
         <module>config-utils</module>
         <module>cms-webapp</module>
         <module>cms-it</module>
+        <module>cygwin-utils</module>
         <module>db-utils</module>
         <module>diskcache</module>
         <module>env-utils</module>

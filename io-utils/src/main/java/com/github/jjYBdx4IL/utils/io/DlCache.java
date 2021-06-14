@@ -20,7 +20,10 @@ import org.apache.commons.lang3.SystemUtils;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -52,6 +55,9 @@ public class DlCache {
      * $HOME/.cache/dlcache). If a checksum is given, the file will be verified once
      * after download and before moving it into its final cache location. See also:
      * https://github.com/jjYBdx4IL/dlcache
+     *
+     * <p>You may set the environment variable <code>http_proxy</code> to force usage
+     * of a proxy. 
      * 
      * @param url    the url to download
      * @param sha256 SHA-256 digest
@@ -71,7 +77,16 @@ public class DlCache {
             }
         }
         try {
-            try (InputStream in = url.openStream()) {
+            URLConnection connection;
+            if (System.getenv("http_proxy") != null) {
+                URL u = new URL(System.getenv("http_proxy"));
+                Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(u.getHost(), u.getPort()));
+                connection = url.openConnection(proxy);
+            } else {
+                connection = url.openConnection();
+            }
+            
+            try (InputStream in = connection.getInputStream()) {
                 Files.copy(in, cacheFileTmp, StandardCopyOption.REPLACE_EXISTING);
             }
 
@@ -132,6 +147,9 @@ public class DlCache {
      * Convenience wrapper around {@link #get(URL, String, String)}.
      */
     public static void copyIfNotExists(URL url, Path dest, String sha256, String sha512) throws IOException {
+        if (dest.toFile().exists()) {
+            return;
+        }
         Path tmp = createRenameableTmpFn(dest);
         try (InputStream is = get(url, sha256, sha512)) {
             Files.copy(is, tmp, StandardCopyOption.REPLACE_EXISTING);

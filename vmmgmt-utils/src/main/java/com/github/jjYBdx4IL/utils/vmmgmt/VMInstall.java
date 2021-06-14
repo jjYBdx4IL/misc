@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+//CHECKSTYLE:OFF
 package com.github.jjYBdx4IL.utils.vmmgmt;
 
-//CHECKSTYLE:OFF
-import com.github.jjYBdx4IL.utils.cache.SimpleDiskCacheEntry;
+import com.github.jjYBdx4IL.utils.io.DlCache;
 
 import org.apache.commons.compress.archivers.cpio.CpioArchiveEntry;
 import org.apache.commons.compress.archivers.cpio.CpioArchiveOutputStream;
@@ -24,6 +24,8 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.libvirt.Connect;
 import org.libvirt.LibvirtException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,11 +38,13 @@ import java.net.URISyntaxException;
 import freemarker.template.TemplateException;
 
 /**
+ * libvirt vm install.
  *
  * @author jjYBdx4IL
  */
 public class VMInstall {
     
+    private static final Logger LOG = LoggerFactory.getLogger(VMInstall.class);
     public static final int VM_INSTALLATION_TIMEOUT_SECS = 3600;
 
     private final VMData vm;
@@ -58,9 +62,24 @@ public class VMInstall {
             ctrl.destroyVMByName();
         }
 
-        fetch(vm.getInstallKernelURI(), vm.getKernel());
-        fetch(vm.getInstallInitrdURI(), vm.getInitRD());
-        fetch(vm.getInstallIsoURI(), vm.getInstallationISO());
+        try {
+            fetch(vm.getInstallKernelURI(), vm.getInstallKernelSha256(), vm.getKernel());
+        } catch (IOException ex) {
+            LOG.error("failed to download: {}", vm.getInstallKernelURI());
+            throw ex;
+        }
+        try {
+            fetch(vm.getInstallInitrdURI(), vm.getInstallInitrdSha256(), vm.getInitRD());
+        } catch (IOException ex) {
+            LOG.error("failed to download: {}", vm.getInitRD());
+            throw ex;
+        }
+        try {
+            fetch(vm.getInstallIsoURI(), vm.getInstallIsoSha256(), vm.getInstallationISO());
+        } catch (IOException ex) {
+            LOG.error("failed to download: {}", vm.getInstallationISO());
+            throw ex;
+        }
         vm.getDiskImage().create();
 
         // append kickstart config to initrd
@@ -73,8 +92,6 @@ public class VMInstall {
         ctrl.startVM(BootMode.REGULAR);
         ctrl.waitVMOnlineBySSH();
         ctrl.shutdownAndWait();
-
-
     }
 
     protected void appendKickstartConfig() throws IOException, TemplateException {
@@ -92,14 +109,13 @@ public class VMInstall {
         }
     }
 
-    protected void fetch(URI uri, File destFile) throws IOException {
+    protected void fetch(URI uri, String sha256, File destFile) throws IOException {
         File parentDir = destFile.getParentFile();
         if (!parentDir.exists()) {
             parentDir.mkdirs();
         }
 
-        SimpleDiskCacheEntry sdce = new SimpleDiskCacheEntry(uri.toURL(), SimpleDiskCacheEntry.UpdateMode.NEVER);
-        try (InputStream is = sdce.getInputStream()) {
+        try (InputStream is = DlCache.get(uri.toURL(), sha256, null)) {
             try (OutputStream os = new FileOutputStream(destFile)) {
                 IOUtils.copyLarge(is, os);
             }

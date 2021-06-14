@@ -15,6 +15,7 @@
  */
 package com.github.jjYBdx4IL.utils.svncw;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.github.jjYBdx4IL.utils.env.WindowsUtils;
@@ -45,6 +46,7 @@ public class SvnClientWrapper {
     private static final Logger LOG = LoggerFactory.getLogger(SvnClientWrapper.class);
 
     protected final String svnExe;
+    protected final List<Path> additionalPathElements = new ArrayList<>();
 
     /**
      * Can be used to determine if the given path is part of a subversion
@@ -73,7 +75,7 @@ public class SvnClientWrapper {
      *         not found.
      */
     public static Path getSvnCoRoot(Path startDir) throws IOException {
-        Path current = startDir.toAbsolutePath();
+        Path current = startDir.toAbsolutePath().normalize();
         do {
             Path p = current.resolve(".svn/format");
             if (Files.isRegularFile(p)) {
@@ -106,6 +108,7 @@ public class SvnClientWrapper {
             String cygPath = WindowsUtils.getCygwinInstallationPath();
             if (cygPath != null) {
                 svnExe = cygPath + "\\bin\\svn.exe";
+                additionalPathElements.add(Paths.get(cygPath, "bin").toAbsolutePath().normalize());
             } else {
                 svnExe = "svn.exe";
             }
@@ -119,19 +122,31 @@ public class SvnClientWrapper {
      * Creates a runnable ProcRunner for the svn executable.
      */
     public ProcRunner createRunner(Path workingDirectory, List<String> svnArgs) throws IOException {
-        File wd = workingDirectory.toFile();
-        if (!wd.exists() || !wd.isDirectory()) {
-            throw new IOException("working directory does not exist or isn't a directory: " + wd);
-        }
         List<String> cmd = new ArrayList<>();
         cmd.add(svnExe);
         cmd.addAll(svnArgs);
         if (LOG.isDebugEnabled()) {
-            LOG.debug("cmd: {} ({})", StringUtils.join(cmd, " "), wd.getCanonicalPath());
+            LOG.debug("cmd: {} ({})", StringUtils.join(cmd, " "), workingDirectory);
         }
         ProcRunner pr = new ProcRunner(cmd);
         pr.rootLocaleUtc();
-        pr.setWorkDir(wd);
+        if (workingDirectory != null) {
+            File wd = workingDirectory.toFile();
+            if (!wd.exists() || !wd.isDirectory()) {
+                throw new IOException("working directory does not exist or isn't a directory: " + wd);
+            }
+            pr.setWorkDir(wd);
+        }
+        if (!additionalPathElements.isEmpty()) {
+            String path = System.getenv("PATH");
+            StringBuilder sb = new StringBuilder(path.length());
+            additionalPathElements.forEach(el -> {
+                sb.append(el);
+                sb.append(File.pathSeparator);
+            });
+            sb.append(path);
+            pr.environment().put("PATH", sb.toString());
+        }
         return pr;
     }
 
@@ -140,6 +155,18 @@ public class SvnClientWrapper {
      */
     public Map<String, String> getSvnInfo(Path pathSpec) throws IOException, InterruptedException {
         ProcRunner pr = createRunner(pathSpec, Arrays.asList("info", "."));
+        return getSvnInfo(pr);
+    }
+    
+    /**
+     * Get svn info output as a map.
+     */
+    public Map<String, String> getSvnInfo(SvnUrl url) throws IOException, InterruptedException {
+        ProcRunner pr = createRunner(null, Arrays.asList("info", url.toExternalForm()));
+        return getSvnInfo(pr);
+    }
+    
+    protected Map<String, String> getSvnInfo(ProcRunner pr) throws IOException, InterruptedException {
         int rc = pr.run();
         if (LOG.isTraceEnabled()) {
             LOG.trace("rc = {}, output: {}", rc, pr.getOutputBlob());
@@ -156,6 +183,20 @@ public class SvnClientWrapper {
             }
         }
         return map;
+    }
+    
+    /**
+     * Get svn info output as {@link SvnInfoResult}.
+     */
+    public SvnInfoResult getSvnInfoR(Path pathSpec) throws IOException, InterruptedException {
+        return new SvnInfoResult(getSvnInfo(pathSpec));
+    }
+
+    /**
+     * Get svn info output as {@link SvnInfoResult}.
+     */
+    public SvnInfoResult getSvnInfoR(SvnUrl url) throws IOException, InterruptedException {
+        return new SvnInfoResult(getSvnInfo(url));
     }
 
     /**
@@ -253,5 +294,15 @@ public class SvnClientWrapper {
             throw new IOException("last changed rev not found");
         }
         return isDirty ? rev + " (dirty)" : rev;
+    }
+
+    /**
+     * RUn the svn executable in the given work directory and with the specified arguments.
+     * 
+     * @throws IOException on failure
+     */
+    public void exec(Path workdir, String... args) throws IOException, InterruptedException {
+        ProcRunner pr = createRunner(workdir, Arrays.asList(args));
+        checkArgument(pr.run() == 0, pr.getOutputBlob());
     }
 }

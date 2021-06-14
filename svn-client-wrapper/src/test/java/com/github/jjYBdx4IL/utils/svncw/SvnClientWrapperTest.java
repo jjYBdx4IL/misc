@@ -41,6 +41,12 @@ public class SvnClientWrapperTest {
     }
     
     @Test
+    public void testGetSvnInfoR() throws Exception {
+        SvnInfoResult r = scw.getSvnInfoR(Paths.get("."));
+        assertTrue(r.url != null);
+    }
+    
+    @Test
     public void testGetSvnRoot() throws Exception {
         assertEquals(SvnClientWrapper.getSvnCoRoot(Paths.get(".")), scw.getSvnRoot(Paths.get(".")));
     }

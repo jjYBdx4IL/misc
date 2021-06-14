@@ -59,6 +59,9 @@ public class VMData {
     private URI installKernelURI = null;
     private URI installInitrdURI = null;
     private URI installIsoURI = null;
+    private String installKernelSha256 = null;
+    private String installInitrdSha256 = null;
+    private String installIsoSha256 = null;
     private VMControl.SSHResources sshResources = null;
     private Random r = new Random();
 
@@ -275,6 +278,27 @@ public class VMData {
             return new URI(os.getDefaultInstallIsoURL());
         }
         return installIsoURI;
+    }
+
+    public String getInstallKernelSha256() throws URISyntaxException {
+        if (installKernelURI == null) {
+            return os.getDefaultInstallKernelSha256();
+        }
+        return installKernelSha256;
+    }
+
+    public String getInstallInitrdSha256() throws URISyntaxException {
+        if (installInitrdURI == null) {
+            return os.getDefaultInstallInitrdSha256();
+        }
+        return installInitrdSha256;
+    }
+
+    public String getInstallIsoSha256() throws URISyntaxException {
+        if (installIsoURI == null) {
+            return os.getDefaultInstallIsoSha256();
+        }
+        return installIsoSha256;
     }
 
     public SSHClient getSSHClient() {

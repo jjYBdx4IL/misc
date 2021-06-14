@@ -113,7 +113,7 @@
             </activation>
         </profile>
         <profile>
-            <id>sign-artifacts</id>
+            <id>release-stuff</id>
             <activation>
                 <property>
                     <name>performRelease</name>
@@ -122,6 +122,13 @@
             </activation>
             <build>
                 <plugins>
+                    <plugin>
+                        <artifactId>maven-release-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                    </plugin>
                     <plugin>
                         <artifactId>maven-gpg-plugin</artifactId>
                         <executions>
@@ -278,9 +285,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <artifactId>maven-source-plugin</artifactId>
                 <executions>
                     <execution>
@@ -291,10 +295,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
             </plugin>
         </plugins>
 
@@ -308,7 +308,7 @@
                 <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
-                    <version>6.2.0</version>
+                    <version>6.2.1</version>
                     <configuration>
                         <failOnError>true</failOnError>
                         <skipTestScope>true</skipTestScope>
@@ -486,7 +486,7 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>3.2.0</version>
                     <configuration>
-                    	<failOnWarnings>false</failOnWarnings>
+                        <failOnWarnings>false</failOnWarnings>
                         <detectOfflineLinks>false</detectOfflineLinks>
                     </configuration>
                 </plugin>

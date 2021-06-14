@@ -44,6 +44,36 @@ public class StringUtilTest {
     }
     
     @Test
+    public void testNthIndexOfFwd() {
+        assertEquals(0, StringUtil.nthIndexOf("aaa", "aa", 1));
+        assertEquals(-1, StringUtil.nthIndexOf("aaa", "aa", 2));
+        assertEquals(2, StringUtil.nthIndexOf("aaaa", "aa", 2));
+        assertEquals(-1, StringUtil.nthIndexOf("aaaa", "aa", 3));
+        assertEquals(-1, StringUtil.nthIndexOf("aaaaa", "aa", 3));
+        assertEquals(4, StringUtil.nthIndexOf("aaaaaa", "aa", 3));
+        
+        assertEquals(6, StringUtil.nthIndexOf("abcadea", "a", 3));
+        assertEquals(-1, StringUtil.nthIndexOf("abcadea", "ea", 3));
+        assertEquals(5, StringUtil.nthIndexOf("abcadea", "ea", 1));
+        
+        assertEquals(-1, StringUtil.nthIndexOf("e", "ea", 1));
+        assertEquals(-1, StringUtil.nthIndexOf("a", "ea", 1));
+    }
+    
+    @Test
+    public void testNthIndexOfBwd() {
+        assertEquals(1, StringUtil.nthIndexOf("aaa", "aa", -1));
+        assertEquals(-1, StringUtil.nthIndexOf("aaa", "aa", -2));
+        assertEquals(0, StringUtil.nthIndexOf("aaaa", "aa", -2));
+        assertEquals(-1, StringUtil.nthIndexOf("aaaa", "aa", -3));
+        assertEquals(-1, StringUtil.nthIndexOf("aaaaa", "aa", -3));
+        assertEquals(0, StringUtil.nthIndexOf("aaaaaa", "aa", -3));
+        
+        assertEquals(-1, StringUtil.nthIndexOf("e", "ea", -1));
+        assertEquals(-1, StringUtil.nthIndexOf("a", "ea", -1));
+    }
+    
+    @Test
     public void testsq() {
         assertEquals("one=1, two=2, three='3', %q", StringUtil.sq("one=%d, two=%s, three=%q, %%q", 1, "2", "3"));
         

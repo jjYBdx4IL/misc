@@ -15,6 +15,8 @@
  */
 package com.github.jjYBdx4IL.utils.text;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,7 +29,7 @@ public class StringUtil {
     public static String f(String pattern, Object... args) {
         return String.format(Locale.ROOT, pattern, args);
     }
-    
+
     /**
      * String formatter for BASH '-quotes interpolation.
      */
@@ -42,10 +44,10 @@ public class StringUtil {
                 i = input.length();
                 continue;
             }
-            char mod = input.charAt(j+1);
+            char mod = input.charAt(j + 1);
             if (mod == '%') {
-                sb.append(input.substring(i, j+1));
-                i = j+2;
+                sb.append(input.substring(i, j + 1));
+                i = j + 2;
                 continue;
             }
             final Object o;
@@ -55,34 +57,30 @@ public class StringUtil {
                     throw new IllegalArgumentException("too many placeholders, not enough arguments");
                 }
                 o = args[cnt++];
-            }
-            else {
+            } else {
                 throw new IllegalArgumentException("unsupported modifier: " + mod);
             }
             sb.append(input.substring(i, j));
-            i = j+2;
+            i = j + 2;
             if (mod == 's') {
                 if (o instanceof String) {
                     append = (String) o;
                 }
-            }
-            else if (mod == 'd') {
+            } else if (mod == 'd') {
                 if (o instanceof Integer) {
-                    append = Integer.toString((Integer)o);
+                    append = Integer.toString((Integer) o);
+                } else if (o instanceof Long) {
+                    append = Long.toString((Long) o);
                 }
-                else if (o instanceof Long) {
-                    append = Long.toString((Long)o);
-                }
-            }
-            else if (mod == 'q') {
+            } else if (mod == 'q') {
                 if (o instanceof String) {
                     sb.append("'");
-                    sb.append(((String)o).replaceAll("'", "'\\\\''"));
+                    sb.append(((String) o).replaceAll("'", "'\\\\''"));
                     append = "'";
                 }
             }
             if (append == null) {
-                throw new IllegalArgumentException("argument #" + (cnt-1) + " has wrong type: " + o.getClass());
+                throw new IllegalArgumentException("argument #" + (cnt - 1) + " has wrong type: " + o.getClass());
             }
             sb.append(append);
         }
@@ -91,7 +89,49 @@ public class StringUtil {
         }
         return sb.toString();
     }
-    
+
+    /**
+     * Find the n-th occurrence of needle in haystack and return the offset in
+     * haystack. Matched subsequences will be skipped over, ie.
+     * <code>nthInfdexOf("aaa", "aa", 2) == -1</code>.
+     *
+     * @param n
+     *            for positive values, find the n-th occurrence from the start,
+     *            otherwise from the end. 0 is invalid.
+     * @return -1 if not found
+     */
+    public static int nthIndexOf(String haystack, String needle, int n) {
+        checkArgument(n != 0 && haystack != null && needle != null && needle.length() > 0);
+        if (n > 0) {
+            int idx = 0;
+            while (n > 0) {
+                if (idx >= haystack.length()) {
+                    return -1;
+                }
+                idx = haystack.indexOf(needle, idx);
+                n--;
+                if (n == 0 || idx == -1) {
+                    return idx;
+                }
+                idx += needle.length();
+            }
+        } else {
+            int idx = haystack.length();
+            while (n < 0) {
+                if (idx < 0) {
+                    return -1;
+                }
+                idx = haystack.lastIndexOf(needle, idx);
+                n++;
+                if (n == 0 || idx == -1) {
+                    return idx;
+                }
+                idx -= needle.length();
+            }
+        }
+        return -1;
+    }
+
     public static boolean haveEqualSets(Collection<String> a, Collection<String> b) {
         if (a == null || a.isEmpty()) {
             return b == null || b.isEmpty();
@@ -99,14 +139,14 @@ public class StringUtil {
         if (b == null || b.isEmpty()) {
             return a == null || a.isEmpty();
         }
-        
+
         Set<String> c = new HashSet<>(b.size());
         Iterator<String> it = b.iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             c.add(it.next());
         }
         it = a.iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             if (!c.remove(it.next())) {
                 return false;
             }
