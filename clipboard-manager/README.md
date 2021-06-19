@@ -5,6 +5,10 @@ Version: ${my.release.version}
 Watches your system clipboard, and executes a plugin if the clipboard is found to contain some expected content.
 
 
+## REQUIREMENTS
+
+* `gcc-multilib` package on Debian/Ubuntu (launch4j's wndres executable requires 32 bit libs).
+
 
 ## Homepage / Download
 

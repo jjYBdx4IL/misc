@@ -2,6 +2,12 @@
 
 Misc Java stuff
 
+## REQUIREMENTS
+
+Some sub-projects require launch4j, which in turn needs 32bit libraries on Linux. On Debian-like
+systems (like Ubuntu), that boils down to the`gcc-multilib` package. Also, if there is an error
+involving not finding `jni.h`, it's likely that JAVA_HOME is not set properly.
+
 ## LICENSE
 
 All modules are licensed under the Apache License v2.0 by default. However, there are some
@@ -39,4 +45,4 @@ mvn clean install -Psite-archive -N
 
 
 --
-devel/java/github/misc@7881
+devel/java/github/misc@7887
